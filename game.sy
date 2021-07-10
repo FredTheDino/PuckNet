@@ -44,7 +44,6 @@ player_new :: fn pos: (float, float) -> Player {
 
             if self.tackle_timer == 0.0 && l_input_pressed("tackle") {
                 self.tackle_timer = 0.5
-                print "tackle!"
                 self.vel += 1.0
             }
 
