@@ -35,16 +35,18 @@ player_new :: fn pos: (float, float) -> Player {
             self.vel += self.acc * delta
 
             // Air resistance
-            air_friction :: 0.50
-            self.vel *= pow' air_friction, delta
+            air_fric :: 0.50
+            self.vel *= pow' air_fric, delta
 
             // Friction
             speed :: abs(self.vel)
-            moving_fric :: 0.8 * delta
-            if speed <= moving_fric {
+            break_fric :: 10.0
+            ice_fric :: 0.8
+            ground_fric :: (ice_fric + break_fric * l_input_value("break")) * delta
+            if speed <= ground_fric {
                 self.vel = 0.0
             } else {
-                self.vel -= (self.vel / speed) * moving_fric
+                self.vel -= (self.vel / speed) * ground_fric
             }
 
             self.pos += (cos(self.rot), sin(self.rot)) * self.vel * delta
@@ -62,6 +64,7 @@ init :: fn {
     l_bind_key("a", "left")
     l_bind_key("s", "down")
     l_bind_key("d", "right")
+    l_bind_key("SPACE", "break")
 
     l_bind_quit("quit")
     l_bind_key("ESCAPE", "quit")
