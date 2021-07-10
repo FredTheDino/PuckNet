@@ -19,12 +19,14 @@ player_new :: fn pos: (float, float) -> Player {
         acc: (0.0, 0.0),
         draw: fn -> void {
             rgb :: (sin(l_time()), cos(l_time()), 0.0)
-            l_gfx_rect' self.pos[0], self.pos[1], 1.0, 1.0, rgb
+            l_gfx_rect' self.pos[0], self.pos[1], 0.1, 0.1, rgb
         },
         update: fn delta: float -> void {
-            dx := (l_input_value("right") - l_input_value("left"))
-            dy := (l_input_value("up") - l_input_value("down"))
-            self.pos += (dx, dy) * (delta, delta)
+            input := (
+                (l_input_value("right") - l_input_value("left")),
+                (l_input_value("up") - l_input_value("down")),
+            )
+            self.pos += input * (delta, delta)
         }
     }
     ret self
