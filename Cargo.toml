@@ -6,3 +6,8 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+sylt = { path = "sylt/sylt" }
+
+[patch.'https://github.com/sornas/lingon.git']
+lingon = { path = "lingon" }
