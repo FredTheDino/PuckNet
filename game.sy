@@ -43,7 +43,7 @@ init :: fn {
     l_bind_quit("quit")
     l_bind_key("ESCAPE", "quit")
 
-    append' entities, player_new' (0.0, 0.0)
+    push' entities, player_new' (0.0, 0.0)
 }
 
 update :: fn delta: float -> void {
