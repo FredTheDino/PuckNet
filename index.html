@@ -1,0 +1,443 @@
+
+<html>
+<head>
+<title>Lingon Sylt documentation</title>
+<style>
+body {
+    background-color: white;
+}
+
+.sigs {
+    font-family: monospace;
+    font-size: 120%;
+    background-color: rgba(0.0, 0.0, 0.0, 0.2);
+    list-style-type: none;
+    padding-left: 1em;
+    padding-top: calc(1em - 0.5em);
+    padding-bottom: 1em;
+    border-radius: 5px;
+    
+}
+
+.sigs li {
+    margin-top: 0.5em;
+}
+
+.sigs .fn {
+    color: gray;
+}
+
+.sigs .arrow {
+    color: gray;
+}
+
+.sigs .ty {
+    color: red;
+}
+
+.sigs .ret {
+    color: red;
+}
+
+</style>
+</head>
+<body>
+<h1>THE Lingon Sylt documentation</h1>
+<ul class='tok'><li><a href='#l_update'>l_update</a></li><li><a href='#l_render'>l_render</a></li><li><a href='#l_window_size'>l_window_size</a></li><li><a href='#l_set_window_size'>l_set_window_size</a></li><li><a href='#l_set_window_icon'>l_set_window_icon</a></li><li><a href='#l_gfx_rect'>l_gfx_rect</a></li><li><a href='#l_gfx_sprite'>l_gfx_sprite</a></li><li><a href='#l_gfx_camera_at'>l_gfx_camera_at</a></li><li><a href='#l_gfx_camera_place'>l_gfx_camera_place</a></li><li><a href='#l_gfx_camera_angle'>l_gfx_camera_angle</a></li><li><a href='#l_gfx_camera_rotate'>l_gfx_camera_rotate</a></li><li><a href='#l_gfx_camera_set_zoom'>l_gfx_camera_set_zoom</a></li><li><a href='#l_gfx_camera_zoom_by'>l_gfx_camera_zoom_by</a></li><li><a href='#l_gfx_particle_new'>l_gfx_particle_new</a></li><li><a href='#l_gfx_particle_spawn'>l_gfx_particle_spawn</a></li><li><a href='#l_gfx_particle_update'>l_gfx_particle_update</a></li><li><a href='#l_gfx_particle_render'>l_gfx_particle_render</a></li><li><a href='#l_gfx_particle_add_sprite'>l_gfx_particle_add_sprite</a></li><li><a href='#l_gfx_particle_x'>l_gfx_particle_x</a></li><li><a href='#l_gfx_particle_y'>l_gfx_particle_y</a></li><li><a href='#l_gfx_particle_lifetime'>l_gfx_particle_lifetime</a></li><li><a href='#l_gfx_particle_vel_angle'>l_gfx_particle_vel_angle</a></li><li><a href='#l_gfx_particle_vel_magnitude'>l_gfx_particle_vel_magnitude</a></li><li><a href='#l_gfx_particle_acc_angle'>l_gfx_particle_acc_angle</a></li><li><a href='#l_gfx_particle_acc_magnitude'>l_gfx_particle_acc_magnitude</a></li><li><a href='#l_gfx_particle_drag'>l_gfx_particle_drag</a></li><li><a href='#l_gfx_particle_angle'>l_gfx_particle_angle</a></li><li><a href='#l_gfx_particle_angle_velocity'>l_gfx_particle_angle_velocity</a></li><li><a href='#l_gfx_particle_angle_drag'>l_gfx_particle_angle_drag</a></li><li><a href='#l_gfx_particle_start_sx'>l_gfx_particle_start_sx</a></li><li><a href='#l_gfx_particle_start_sy'>l_gfx_particle_start_sy</a></li><li><a href='#l_gfx_particle_end_sx'>l_gfx_particle_end_sx</a></li><li><a href='#l_gfx_particle_end_sy'>l_gfx_particle_end_sy</a></li><li><a href='#l_gfx_particle_start_red'>l_gfx_particle_start_red</a></li><li><a href='#l_gfx_particle_start_green'>l_gfx_particle_start_green</a></li><li><a href='#l_gfx_particle_start_blue'>l_gfx_particle_start_blue</a></li><li><a href='#l_gfx_particle_start_alpha'>l_gfx_particle_start_alpha</a></li><li><a href='#l_gfx_particle_end_red'>l_gfx_particle_end_red</a></li><li><a href='#l_gfx_particle_end_green'>l_gfx_particle_end_green</a></li><li><a href='#l_gfx_particle_end_blue'>l_gfx_particle_end_blue</a></li><li><a href='#l_gfx_particle_end_alpha'>l_gfx_particle_end_alpha</a></li><li><a href='#l_gfx_particle_start_color'>l_gfx_particle_start_color</a></li><li><a href='#l_gfx_particle_end_color'>l_gfx_particle_end_color</a></li><li><a href='#l_delta'>l_delta</a></li><li><a href='#l_time'>l_time</a></li><li><a href='#l_random'>l_random</a></li><li><a href='#l_random_range'>l_random_range</a></li><li><a href='#l_bind_key'>l_bind_key</a></li><li><a href='#l_bind_quit'>l_bind_quit</a></li><li><a href='#l_bind_button'>l_bind_button</a></li><li><a href='#l_bind_axis'>l_bind_axis</a></li><li><a href='#l_bind_mouse'>l_bind_mouse</a></li><li><a href='#l_input_down'>l_input_down</a></li><li><a href='#l_input_up'>l_input_up</a></li><li><a href='#l_input_pressed'>l_input_pressed</a></li><li><a href='#l_input_released'>l_input_released</a></li><li><a href='#l_input_value'>l_input_value</a></li><li><a href='#l_audio_play'>l_audio_play</a></li><li><a href='#l_audio_master_gain'>l_audio_master_gain</a></li><li><a href='#l_mouse'>l_mouse</a></li><li><a href='#l_mouse_rel'>l_mouse_rel</a></li><li><a href='#l_load_image'>l_load_image</a></li><li><a href='#l_load_audio'>l_load_audio</a></li><li><a href='#dbg'>dbg</a></li><li><a href='#push'>push</a></li><li><a href='#clear'>clear</a></li><li><a href='#prepend'>prepend</a></li><li><a href='#len'>len</a></li><li><a href='#atan2'>atan2</a></li><li><a href='#sin'>sin</a></li><li><a href='#cos'>cos</a></li><li><a href='#as_float'>as_float</a></li><li><a href='#as_int'>as_int</a></li><li><a href='#sqrt'>sqrt</a></li><li><a href='#abs'>abs</a></li><li><a href='#clamp'>clamp</a></li><li><a href='#min'>min</a></li><li><a href='#max'>max</a></li><li><a href='#rem'>rem</a></li><li><a href='#pow'>pow</a></li><li><a href='#magnitude_squared'>magnitude_squared</a></li><li><a href='#magnitude'>magnitude</a></li><li><a href='#pop'>pop</a></li></ul><div class='fun'>
+                 <h2 id='l_update'>l_update</h2>
+                 <div class='comment'>Updates the engine. Needs to be called once per frame</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>()</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_render'>l_render</h2>
+                 <div class='comment'>Draws all render calls to the screen. Needs to be called once per frame</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>()</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_window_size'>l_window_size</h2>
+                 <div class='comment'>Returns the size of the game window</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>()</span></span> <span class='arrow'>-></span> <span class='ret'> tuple(vec ! [int, int])</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_set_window_size'>l_set_window_size</h2>
+                 <div class='comment'>Sets the dimension of the game window</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>x</span>:<span class='ty'>int</span>, <span class='name'>y</span>:<span class='ty'>int</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_set_window_icon'>l_set_window_icon</h2>
+                 <div class='comment'>Sets the window icon of the game window</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>path</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_rect'>l_gfx_rect</h2>
+                 <div class='comment'>Draws a rectangle on the screen, in many different ways</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>x</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>y</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>w</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>h</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>x</span>:<span class='ty'>float</span>, <span class='name'>y</span>:<span class='ty'>float</span>)</span>, <span class='arg'>(<span class='name'>w</span>:<span class='ty'>float</span>, <span class='name'>h</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>x</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>y</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>w</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>h</span>:<span class='ty'>float</span></span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>x</span>:<span class='ty'>float</span>, <span class='name'>y</span>:<span class='ty'>float</span>)</span>, <span class='arg'>(<span class='name'>w</span>:<span class='ty'>float</span>, <span class='name'>h</span>:<span class='ty'>float</span>)</span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>x</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>y</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>w</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>h</span>:<span class='ty'>float</span></span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>, <span class='name'>a</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>x</span>:<span class='ty'>float</span>, <span class='name'>y</span>:<span class='ty'>float</span>)</span>, <span class='arg'>(<span class='name'>w</span>:<span class='ty'>float</span>, <span class='name'>h</span>:<span class='ty'>float</span>)</span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>, <span class='name'>a</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>x</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>y</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>w</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>h</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>rot</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>x</span>:<span class='ty'>float</span>, <span class='name'>y</span>:<span class='ty'>float</span>)</span>, <span class='arg'>(<span class='name'>w</span>:<span class='ty'>float</span>, <span class='name'>h</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>rot</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> type ::void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>x</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>y</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>w</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>h</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>rot</span>:<span class='ty'>float</span></span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>x</span>:<span class='ty'>float</span>, <span class='name'>y</span>:<span class='ty'>float</span>)</span>, <span class='arg'>(<span class='name'>w</span>:<span class='ty'>float</span>, <span class='name'>h</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>rot</span>:<span class='ty'>float</span></span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>x</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>y</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>w</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>h</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>rot</span>:<span class='ty'>float</span></span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>, <span class='name'>a</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>x</span>:<span class='ty'>float</span>, <span class='name'>y</span>:<span class='ty'>float</span>)</span>, <span class='arg'>(<span class='name'>w</span>:<span class='ty'>float</span>, <span class='name'>h</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>rot</span>:<span class='ty'>float</span></span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>, <span class='name'>a</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_sprite'>l_gfx_sprite</h2>
+                 <div class='comment'>Draws a sprite on the screen, in many different ways.
+     Note that the first argument is a sprite id from <a href='#l_load_image'>l_load_image</a></div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>sprite</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>gx</span>:<span class='ty'>int</span>, <span class='name'>gy</span>:<span class='ty'>int</span>)</span>, <span class='arg'><span class='name'>x</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>y</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>w</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>h</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>sprite</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>gx</span>:<span class='ty'>int</span>, <span class='name'>gy</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>x</span>:<span class='ty'>float</span>, <span class='name'>y</span>:<span class='ty'>float</span>)</span>, <span class='arg'>(<span class='name'>w</span>:<span class='ty'>float</span>, <span class='name'>h</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>sprite</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>gx</span>:<span class='ty'>int</span>, <span class='name'>gy</span>:<span class='ty'>int</span>)</span>, <span class='arg'><span class='name'>x</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>y</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>w</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>h</span>:<span class='ty'>float</span></span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>sprite</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>gx</span>:<span class='ty'>int</span>, <span class='name'>gy</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>x</span>:<span class='ty'>float</span>, <span class='name'>y</span>:<span class='ty'>float</span>)</span>, <span class='arg'>(<span class='name'>w</span>:<span class='ty'>float</span>, <span class='name'>h</span>:<span class='ty'>float</span>)</span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>sprite</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>gx</span>:<span class='ty'>int</span>, <span class='name'>gy</span>:<span class='ty'>int</span>)</span>, <span class='arg'><span class='name'>x</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>y</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>w</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>h</span>:<span class='ty'>float</span></span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>, <span class='name'>a</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>sprite</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>gx</span>:<span class='ty'>int</span>, <span class='name'>gy</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>x</span>:<span class='ty'>float</span>, <span class='name'>y</span>:<span class='ty'>float</span>)</span>, <span class='arg'>(<span class='name'>w</span>:<span class='ty'>float</span>, <span class='name'>h</span>:<span class='ty'>float</span>)</span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>, <span class='name'>a</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>sprite</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>gx</span>:<span class='ty'>int</span>, <span class='name'>gy</span>:<span class='ty'>int</span>)</span>, <span class='arg'><span class='name'>x</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>y</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>w</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>h</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>rot</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>sprite</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>gx</span>:<span class='ty'>int</span>, <span class='name'>gy</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>x</span>:<span class='ty'>float</span>, <span class='name'>y</span>:<span class='ty'>float</span>)</span>, <span class='arg'>(<span class='name'>w</span>:<span class='ty'>float</span>, <span class='name'>h</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>rot</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> type ::void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>sprite</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>gx</span>:<span class='ty'>int</span>, <span class='name'>gy</span>:<span class='ty'>int</span>)</span>, <span class='arg'><span class='name'>x</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>y</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>w</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>h</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>rot</span>:<span class='ty'>float</span></span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>sprite</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>gx</span>:<span class='ty'>int</span>, <span class='name'>gy</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>x</span>:<span class='ty'>float</span>, <span class='name'>y</span>:<span class='ty'>float</span>)</span>, <span class='arg'>(<span class='name'>w</span>:<span class='ty'>float</span>, <span class='name'>h</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>rot</span>:<span class='ty'>float</span></span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>sprite</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>gx</span>:<span class='ty'>int</span>, <span class='name'>gy</span>:<span class='ty'>int</span>)</span>, <span class='arg'><span class='name'>x</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>y</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>w</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>h</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>rot</span>:<span class='ty'>float</span></span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>, <span class='name'>a</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>sprite</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>gx</span>:<span class='ty'>int</span>, <span class='name'>gy</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>x</span>:<span class='ty'>float</span>, <span class='name'>y</span>:<span class='ty'>float</span>)</span>, <span class='arg'>(<span class='name'>w</span>:<span class='ty'>float</span>, <span class='name'>h</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>rot</span>:<span class='ty'>float</span></span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>, <span class='name'>a</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_camera_at'>l_gfx_camera_at</h2>
+                 <div class='comment'>Gives out the position of the camera</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>()</span></span> <span class='arrow'>-></span> <span class='ret'> tuple(vec ! [float, float])</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_camera_place'>l_gfx_camera_place</h2>
+                 <div class='comment'>Positions the camera at a specific point in space</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>x</span>:<span class='ty'>float</span>, <span class='name'>y</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>x</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>y</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_camera_angle'>l_gfx_camera_angle</h2>
+                 <div class='comment'>Sets the angle of the camera - in absolute terms</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>angle</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_camera_rotate'>l_gfx_camera_rotate</h2>
+                 <div class='comment'>Rotates the camera - relative to the current rotation</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>by</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_camera_set_zoom'>l_gfx_camera_set_zoom</h2>
+                 <div class='comment'>Specifies the zoom level</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>to</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>sx</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>sy</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>sx</span>:<span class='ty'>float</span>, <span class='name'>sy</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_camera_zoom_by'>l_gfx_camera_zoom_by</h2>
+                 <div class='comment'>Zoomes relative to the current zoom level</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>to</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>sx</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>sy</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>sx</span>:<span class='ty'>float</span>, <span class='name'>sy</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_new'>l_gfx_particle_new</h2>
+                 <div class='comment'>Creates a new particle system. Note specially the return type. Don't edit the return value.</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>()</span></span> <span class='arrow'>-></span> <span class='ret'> tuple(vec ! [string, int])</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_spawn'>l_gfx_particle_spawn</h2>
+                 <div class='comment'>Spawn a new particle for the given particle system</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'><span class='name'>amount</span>:<span class='ty'>int</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_update'>l_gfx_particle_update</h2>
+                 <div class='comment'>Updates the particle system, stepping it forward in time</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'><span class='name'>delta</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_render'>l_gfx_particle_render</h2>
+                 <div class='comment'>Renders the particle system, has to be called each frame</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_add_sprite'>l_gfx_particle_add_sprite</h2>
+                 <div class='comment'>Adds a sprite to the particle system as an alternative when spawning. If nothing is added it's colored rectangles all the way</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>s_name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>sp_name</span>:<span class='ty'>string</span>, <span class='name'>sprite</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>gx</span>:<span class='ty'>int</span>, <span class='name'>gy</span>:<span class='ty'>int</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_x'>l_gfx_particle_x</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_y'>l_gfx_particle_y</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_lifetime'>l_gfx_particle_lifetime</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_vel_angle'>l_gfx_particle_vel_angle</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_vel_magnitude'>l_gfx_particle_vel_magnitude</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_acc_angle'>l_gfx_particle_acc_angle</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_acc_magnitude'>l_gfx_particle_acc_magnitude</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_drag'>l_gfx_particle_drag</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_angle'>l_gfx_particle_angle</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_angle_velocity'>l_gfx_particle_angle_velocity</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_angle_drag'>l_gfx_particle_angle_drag</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_start_sx'>l_gfx_particle_start_sx</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_start_sy'>l_gfx_particle_start_sy</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_end_sx'>l_gfx_particle_end_sx</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_end_sy'>l_gfx_particle_end_sy</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_start_red'>l_gfx_particle_start_red</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_start_green'>l_gfx_particle_start_green</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_start_blue'>l_gfx_particle_start_blue</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_start_alpha'>l_gfx_particle_start_alpha</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_end_red'>l_gfx_particle_end_red</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_end_green'>l_gfx_particle_end_green</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_end_blue'>l_gfx_particle_end_blue</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_end_alpha'>l_gfx_particle_end_alpha</h2>
+                 <div class='comment'>Sets the given particle prop</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span>, <span class='arg'><span class='name'>dist</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_start_color'>l_gfx_particle_start_color</h2>
+                 <div class='comment'>Sets the spawn color of the particles</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> type:: void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>, <span class='name'>a</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_gfx_particle_end_color'>l_gfx_particle_end_color</h2>
+                 <div class='comment'>Sets the spawn color of the particles</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> type:: void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>system</span>:<span class='ty'>int</span>)</span>, <span class='arg'>(<span class='name'>r</span>:<span class='ty'>float</span>, <span class='name'>g</span>:<span class='ty'>float</span>, <span class='name'>b</span>:<span class='ty'>float</span>, <span class='name'>a</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_delta'>l_delta</h2>
+                 <div class='comment'>The time since last the frame in seconds</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>()</span></span> <span class='arrow'>-></span> <span class='ret'> float</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_time'>l_time</h2>
+                 <div class='comment'>An absolute time messurement, but the start time is ill defined</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>()</span></span> <span class='arrow'>-></span> <span class='ret'> float</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_random'>l_random</h2>
+                 <div class='comment'>Returns a uniformly sampled random float between 0 and 1</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>()</span></span> <span class='arrow'>-></span> <span class='ret'> float</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_random_range'>l_random_range</h2>
+                 <div class='comment'>Returns a randomized integer in the given range</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>lo</span>:<span class='ty'>int</span></span>, <span class='arg'><span class='name'>hi</span>:<span class='ty'>int</span></span></span> <span class='arrow'>-></span> <span class='ret'> int</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>lo</span>:<span class='ty'>int</span>, <span class='name'>hi</span>:<span class='ty'>int</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> int</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>lo</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>hi</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> float</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>lo</span>:<span class='ty'>float</span>, <span class='name'>hi</span>:<span class='ty'>float</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> float</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_bind_key'>l_bind_key</h2>
+                 <div class='comment'>Binds a keyboard key to an input name</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>key</span>:<span class='ty'>string</span></span>, <span class='arg'><span class='name'>name</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_bind_quit'>l_bind_quit</h2>
+                 <div class='comment'>Binds the windows quit action (pressing the X in the corner) - plus points if you make it jump</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>name</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_bind_button'>l_bind_button</h2>
+                 <div class='comment'>Binds a controller button to an input name</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>controller</span>:<span class='ty'>int</span></span>, <span class='arg'><span class='name'>button</span>:<span class='ty'>string</span></span>, <span class='arg'><span class='name'>name</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_bind_axis'>l_bind_axis</h2>
+                 <div class='comment'>Binds a controller axis to an input name</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>controller</span>:<span class='ty'>int</span></span>, <span class='arg'><span class='name'>axis</span>:<span class='ty'>string</span></span>, <span class='arg'><span class='name'>name</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_bind_mouse'>l_bind_mouse</h2>
+                 <div class='comment'>Binds a mouse button, allows the following keys: ['left', 'middle', 'right', 'x1', 'x2']</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>button</span>:<span class='ty'>string</span></span>, <span class='arg'><span class='name'>name</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_input_down'>l_input_down</h2>
+                 <div class='comment'>Returns true if the input name is down this frame, e.g. pressed</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>name</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> bool</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_input_up'>l_input_up</h2>
+                 <div class='comment'>Returns true if the input name is up this frame, e.g. not pressed</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>name</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> bool</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_input_pressed'>l_input_pressed</h2>
+                 <div class='comment'>Returns true if the input name started being down this frame, e.g. a tap</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>name</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> bool</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_input_released'>l_input_released</h2>
+                 <div class='comment'>Returns true if the input name started being up this frame, e.g. a release</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>name</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> bool</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_input_value'>l_input_value</h2>
+                 <div class='comment'>Returns the float representation of the input name, usefull for reading controller inputs</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>name</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> float</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_audio_play'>l_audio_play</h2>
+                 <div class='comment'>Plays an audio source. Expects the first value to be a
+     return value from <a href='#l_load_audio'>l_load_audio</a></div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>sound</span>:<span class='ty'>int</span>)</span>, <span class='arg'><span class='name'>looping</span>:<span class='ty'>bool</span></span>, <span class='arg'><span class='name'>gain</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>pitch</span>:<span class='ty'>float</span></span>, <span class='arg'>()</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>name</span>:<span class='ty'>string</span>, <span class='name'>sound</span>:<span class='ty'>int</span>)</span>, <span class='arg'><span class='name'>looping</span>:<span class='ty'>bool</span></span>, <span class='arg'>(<span class='name'>gain</span>:<span class='ty'>float</span>, <span class='name'>gain_variance</span>:<span class='ty'>float</span>)</span>, <span class='arg'>(<span class='name'>pitch</span>:<span class='ty'>float</span>, <span class='name'>pitch_variance</span>:<span class='ty'>float</span>)</span>, <span class='arg'>()</span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_audio_master_gain'>l_audio_master_gain</h2>
+                 <div class='comment'>Controls the master gain of the audio mixer</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>gain</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_mouse'>l_mouse</h2>
+                 <div class='comment'>Gets the current mouse position</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>()</span></span> <span class='arrow'>-></span> <span class='ret'> tuple(vec ! (int, int))</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_mouse_rel'>l_mouse_rel</h2>
+                 <div class='comment'>Gets the relative mouse position since the last frame</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'>()</span></span> <span class='arrow'>-></span> <span class='ret'> tuple(vec ! (int, int))</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_load_image'>l_load_image</h2>
+                 <div class='comment'>Loads an image and turns it into a sprite sheet</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>path</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> tuple</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='l_load_audio'>l_load_audio</h2>
+                 <div class='comment'>Loads a sound and lets you play it using <a href='l_audio_play'>l_audio_play</a></div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>path</span>:<span class='ty'>string</span></span></span> <span class='arrow'>-></span> <span class='ret'> tuple</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='dbg'>dbg</h2>
+                 <div class='comment'>Writes the type and value of anything you enter</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>val</span>:<span class='ty'>value</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='push'>push</h2>
+                 <div class='comment'>Appends an element to the end of a list</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>ls</span>:<span class='ty'>list</span></span>, <span class='arg'><span class='name'>val</span>:<span class='ty'>value</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='clear'>clear</h2>
+                 <div class='comment'>Removes all elements from the list</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>ls</span>:<span class='ty'>list</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='prepend'>prepend</h2>
+                 <div class='comment'>Adds an element to the start of a list</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>ls</span>:<span class='ty'>list</span></span>, <span class='arg'><span class='name'>val</span>:<span class='ty'>value</span></span></span> <span class='arrow'>-></span> <span class='ret'> void</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='len'>len</h2>
+                 <div class='comment'>Gives the length of tuples and lists</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>ls</span>:<span class='ty'>tuple</span></span></span> <span class='arrow'>-></span> <span class='ret'> int</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>ls</span>:<span class='ty'>list</span></span></span> <span class='arrow'>-></span> <span class='ret'> int</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='atan2'>atan2</h2>
+                 <div class='comment'></div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>x</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>y</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> float</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='sin'>sin</h2>
+                 <div class='comment'>The sine function you know and love from trigonometry class</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>t</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> float</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='cos'>cos</h2>
+                 <div class='comment'>The cosine function you know and love from trigonometry class</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>t</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> float</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='as_float'>as_float</h2>
+                 <div class='comment'>Converts the int to a float</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>t</span>:<span class='ty'>int</span></span></span> <span class='arrow'>-></span> <span class='ret'> float</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'>(<span class='name'>t</span>:<span class='ty'>int</span>, <span class='name'>u</span>:<span class='ty'>int</span>)</span></span> <span class='arrow'>-></span> <span class='ret'> tuple(vec ! [float, float])</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='as_int'>as_int</h2>
+                 <div class='comment'>Converts the int to a float</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>t</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> int</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='sqrt'>sqrt</h2>
+                 <div class='comment'>Returns the square root</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>x</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> float</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='abs'>abs</h2>
+                 <div class='comment'>Returns the square root</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>x</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> float</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='clamp'>clamp</h2>
+                 <div class='comment'>Clamps the value 'a' between 'lo' and 'hi'</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>a</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>lo</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>hi</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> float</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>a</span>:<span class='ty'>int</span></span>, <span class='arg'><span class='name'>lo</span>:<span class='ty'>int</span></span>, <span class='arg'><span class='name'>hi</span>:<span class='ty'>int</span></span></span> <span class='arrow'>-></span> <span class='ret'> int</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='min'>min</h2>
+                 <div class='comment'>Returns the smallest</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>a</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>b</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> float</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='max'>max</h2>
+                 <div class='comment'>Returns the largest</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>a</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>b</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> float</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='rem'>rem</h2>
+                 <div class='comment'>Returns the remainder after division</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>x</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>y</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> float</span></li>
+<li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>x</span>:<span class='ty'>int</span></span>, <span class='arg'><span class='name'>y</span>:<span class='ty'>int</span></span></span> <span class='arrow'>-></span> <span class='ret'> int</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='pow'>pow</h2>
+                 <div class='comment'>Raises the first argument to the power of the second argument</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>x</span>:<span class='ty'>float</span></span>, <span class='arg'><span class='name'>y</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> float</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='magnitude_squared'>magnitude_squared</h2>
+                 <div class='comment'>Calculates the squared magnitude of the tuple as a vector</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>Float</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> float</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='magnitude'>magnitude</h2>
+                 <div class='comment'>Calculates the squared magnitude of the tuple as a vector</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>Float</span>:<span class='ty'>float</span></span></span> <span class='arrow'>-></span> <span class='ret'> float</span></li></ul>
+             </div><div class='fun'>
+                 <h2 id='pop'>pop</h2>
+                 <div class='comment'>Removes the last element in the list, and returns it</div>
+                 <ul class='sigs'><li><span class='fn'>fn</span> <span class='args'><span class='arg'><span class='name'>l</span>:<span class='ty'>list</span></span></span> <span class='arrow'>-></span> <span class='ret'> value</span></li></ul>
+             </div>
+</body>
+</html>
