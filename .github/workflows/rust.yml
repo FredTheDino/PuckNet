@@ -1,0 +1,35 @@
+name: Rust
+
+on:
+  push:
+    branches: [ main, docs-autogen ]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install SDL and Python
+      run: sudo apt update && sudo apt install -y libsdl2-dev python
+
+    - name: Build lingonsylt documentation
+      run: (cd sylt && cargo build && cd docs && python3 mad_doc.py docs.json && cp docs.html index.html)
+
+    - name: Upload docs
+      uses: actions/upload-artifact@v2
+      with:
+        name: docs
+        path: |
+          sylt/docs/docs.html
+
+    - name: Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@4.1.4
+      with:
+        branch: gh-pages
+        folder: sylt/docs
