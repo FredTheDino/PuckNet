@@ -22,8 +22,9 @@ player_new :: fn pos: (float, float) -> Player {
             l_gfx_rect' self.pos[0], self.pos[1], 1.0, 1.0, rgb
         },
         update: fn delta: float -> void {
-            self.pos[0] += (l_input_value("right") - l_input_value("left")) * delta
-            self.pos[1] += (l_input_value("up") - l_input_value("down")) * delta
+            dx := (l_input_value("right") - l_input_value("left"))
+            dy := (l_input_value("up") - l_input_value("down"))
+            self.pos += (dx, dy) * (delta, delta)
         }
     }
     ret self
@@ -31,8 +32,7 @@ player_new :: fn pos: (float, float) -> Player {
 
 :Player is :Entity
 
-x := 0.0
-y := 0.0
+entities : [Entity] = []
 
 init :: fn {
     l_bind_key("w", "up")
@@ -42,12 +42,20 @@ init :: fn {
 
     l_bind_quit("quit")
     l_bind_key("ESCAPE", "quit")
+
+    append' entities, player_new' (0.0, 0.0)
 }
 
 update :: fn delta: float -> void {
+    entities -> for_each' fn e: Entity {
+        e.update' delta
+    }
 }
 
 draw :: fn {
+    entities -> for_each' fn e: Entity {
+        e.draw'
+    }
 }
 
 start :: fn {
