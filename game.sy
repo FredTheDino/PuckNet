@@ -18,15 +18,31 @@ player_new :: fn pos: (float, float) -> Player {
         vel: (0.0, 0.0),
         acc: (0.0, 0.0),
         draw: fn -> void {
-            rgb :: (sin(l_time()), cos(l_time()), 0.0)
-            l_gfx_rect' self.pos[0], self.pos[1], 0.1, 0.1, rgb
+            rgb :: (sin(l_time()), cos(l_time()), 1.0)
+            l_gfx_rect' self.pos, (0.1, 0.1), rgb
         },
         update: fn delta: float -> void {
             input := (
                 (l_input_value("right") - l_input_value("left")),
                 (l_input_value("up") - l_input_value("down")),
             )
-            self.pos += input * (delta, delta)
+            force :: 10.0
+            self.acc = input * force
+            self.vel += self.acc * delta
+
+            // Air resistance
+            self.vel *= pow' 0.50, delta
+
+            // Friction
+            speed :: magnitude' self.vel
+            moving_fric :: 0.8 * delta
+            if speed <= moving_fric {
+                self.vel = (0.0, 0.0)
+            } else {
+                self.vel -= (self.vel / speed) * moving_fric
+            }
+
+            self.pos += self.vel * delta
         }
     }
     ret self
@@ -61,6 +77,9 @@ draw :: fn {
 }
 
 start :: fn {
+    // Added for safety - to avoid delta=0
+    l_update'
+
     init'
     loop !l_input_down("quit") {
         l_update'
