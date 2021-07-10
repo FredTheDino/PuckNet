@@ -1,0 +1,15 @@
+[workspace]
+
+members = [
+    "sylt",
+    "sylt-common",
+    "sylt-compiler",
+    "sylt-machine",
+    "sylt-parser",
+    "sylt-std",
+    "sylt-tokenizer",
+    "sylt-typechecker"
+]
+
+[profile.release]
+lto = "thin"
