@@ -40,7 +40,8 @@ player_new :: fn pos: (float, float) -> Player {
 
             // Friction
             speed :: abs(self.vel)
-            moving_fric :: 0.8 * delta
+            break_friction :: 10.0
+            moving_fric :: (0.8 + break_friction * l_input_value("break")) * delta
             if speed <= moving_fric {
                 self.vel = 0.0
             } else {
@@ -62,6 +63,7 @@ init :: fn {
     l_bind_key("a", "left")
     l_bind_key("s", "down")
     l_bind_key("d", "right")
+    l_bind_key("SPACE", "break")
 
     l_bind_quit("quit")
     l_bind_key("ESCAPE", "quit")
