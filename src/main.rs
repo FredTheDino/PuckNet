@@ -1,15 +1,8 @@
 use std::path::Path;
 
 fn main() {
-    let args = sylt::Args {
-        file: Some(Path::new("game.sy").to_path_buf()),
-        is_binary: false,
-        compile_target: None,
-        verbosity: 0,
-        help: false,
-        dump_tree: false,
-        skip_typecheck: false,
-    };
+    let mut args = sylt::Args::parse_args_default_or_exit();
+    args.file = Some(Path::new("game.sy").to_path_buf());
 
     if let Err(errs) = sylt::run_file(&args, sylt::lib_bindings()) {
         for e in errs.iter().take(5) {
