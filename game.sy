@@ -41,11 +41,12 @@ player_new :: fn pos: (float, float) -> Player {
             // Friction
             speed :: abs(self.vel)
             break_fric :: 10.0
-            moving_fric :: (0.8 + break_fric * l_input_value("break")) * delta
-            if speed <= moving_fric {
+            ice_fric :: 0.8
+            ground_fric :: (ice_fric + break_fric * l_input_value("break")) * delta
+            if speed <= ground_fric {
                 self.vel = 0.0
             } else {
-                self.vel -= (self.vel / speed) * moving_fric
+                self.vel -= (self.vel / speed) * ground_fric
             }
 
             self.pos += (cos(self.rot), sin(self.rot)) * self.vel * delta
