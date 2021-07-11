@@ -1,0 +1,34 @@
+// Manifold :: blob {
+//     position: (float, float),
+//     normal: (float, float),
+// }
+// 
+// Shape :: blob {
+//     pos: (float, float),
+//     rad: (float),
+//     line_check: fn (float, float), (float, float) -> bool,
+// 
+//     filter: void | fn (float, float), (float, float) -> bool,
+// }
+// 
+// Circle :: blob {
+//     pos: (float, float),
+//     rad: float,
+// }
+// 
+// Wall :: blob {
+//     normal: (float, float),
+//     dist: float,
+// }
+
+// a  - a point on the first line
+// b  - a point on the second line
+// av - the direction the a-line is pointed
+line_vs_line :: fn a: (float, float), b: (float, float), av: (float, float) -> (float, float)? {
+    ab :: b - a
+    if ab == (0.0, 0.0) {
+        ret nil
+    }
+    dist :: dot' ab, av
+    a + av * dist
+}
