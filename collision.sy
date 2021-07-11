@@ -97,7 +97,4 @@ cricle_vs_circle :: fn a: Circle, b: Circle, movement: (float, float) -> Manifol
         t: -1.0,
         normal: (0.0 , 0.0),
     }
-
-
-
 }
