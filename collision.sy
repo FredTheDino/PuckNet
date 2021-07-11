@@ -90,8 +90,6 @@ cricle_vs_circle :: fn a: Circle, b: Circle, movement: (float, float) -> Manifol
         ret Manifold {
             t: t,
             normal : n,
-
-         
         }
     }
 
