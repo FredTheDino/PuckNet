@@ -16,6 +16,10 @@ friction :: fn v: float, f: float -> float {
     }
 }
 
+reflect :: fn v: (float, float), n: (float, float) -> (float, float){
+    v - 2.0 * n * dot' v, n
+}
+
 Entity :: blob {
     draw: fn -> void,
     update: fn float -> void,
@@ -68,8 +72,7 @@ player_new :: fn pos: (float, float) -> Player {
 
             if input.shoot && self.puck is :Puck {
                 puck: !Puck = self.puck
-                puck.vel = shoot_speed
-                puck.rot = self.rot
+                puck.vel = (cos(self.rot), sin(self.rot)) * shoot_speed
                 puck.held = false
                 puck.hold_cooldown = 0.1
                 self.puck = nil
@@ -122,7 +125,7 @@ player_new :: fn pos: (float, float) -> Player {
             if self.puck is :Puck {
                 puck: !Puck = self.puck
                 puck.pos = self.pos
-                puck.vel = 0.0
+                puck.vel = (0.0, 0.0)
             }
         }
     }
@@ -133,9 +136,7 @@ player_new :: fn pos: (float, float) -> Player {
 
 Puck :: blob {
     pos: (float, float),
-    rot: float,
-    vel: float,
-    acc: float,
+    vel: (float, float),
     held: bool,
     hold_cooldown: float,
     draw: fn -> void,
@@ -147,16 +148,14 @@ puck_new :: fn pos: (float, float) -> Puck {
     self: !Puck = nil
     self = Puck{
         pos: pos,
-        rot: 0.0,
-        vel: 0.0,
-        acc: 0.0,
+        vel: (0.0, 0.0),
         held: false,
         hold_cooldown: 0.0,
         draw: fn -> void {
             rgb :: (1.0, 1.0, 1.0)
-            l_gfx_rect' self.pos, (0.04, 0.04), self.rot, rgb
-            l_gfx_rect' self.pos, (0.04, 0.04), self.rot + 3.14 / 3.0, rgb
-            l_gfx_rect' self.pos, (0.04, 0.04), self.rot + 3.14 * 2.0 / 3.0, rgb
+            l_gfx_rect' self.pos, (0.04, 0.04), 0.0, rgb
+            l_gfx_rect' self.pos, (0.04, 0.04), 0.0 + 3.14 / 3.0, rgb
+            l_gfx_rect' self.pos, (0.04, 0.04), 0.0 + 3.14 * 2.0 / 3.0, rgb
         },
         process_input: fn input: Input, delta: float -> void {
         },
@@ -164,19 +163,39 @@ puck_new :: fn pos: (float, float) -> Puck {
             // Pickup cooldown
             self.hold_cooldown = max' self.hold_cooldown - delta, 0.0
 
-            // Linear motion
-            self.vel += self.acc * delta
-            self.acc = 0.0
-
             // Air resistance
             //air_fric :: 0.20
             //self.vel *= pow' air_fric, delta
 
             // Friction
-            ice_fric :: 0.5
-            self.vel = friction' self.vel, ice_fric * delta
+            ice_fric :: 1.0
+            speed :: magnitude' self.vel
+            self.vel = collision.normalize(self.vel) * friction' speed, ice_fric * delta
 
-            self.pos += (cos(self.rot), sin(self.rot)) * self.vel * delta
+            wall :: collision.Wall {
+                normal : (-1.0, 0.0),
+                dist : 1.0,
+            }
+
+            circle :: collision.Circle {
+                pos : self.pos,
+                rad : 0.1,
+            }
+
+            vel :: self.vel * delta
+            coll :: collision.circle_vs_wall' circle, wall, vel
+            
+            if 0.0 < coll.t && coll.t < 1.0 {
+                self.pos += vel * coll.t
+                self.vel = reflect' self.vel, coll.normal
+                self.pos += self.vel * (1.0 - coll.t) * delta
+
+            }
+            else{
+                self.pos += vel
+
+            }
+
         }
     }
     ret self
