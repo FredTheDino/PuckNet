@@ -1,34 +1,82 @@
-// Manifold :: blob {
-//     position: (float, float),
-//     normal: (float, float),
-// }
-// 
-// Shape :: blob {
-//     pos: (float, float),
-//     rad: (float),
-//     line_check: fn (float, float), (float, float) -> bool,
-// 
-//     filter: void | fn (float, float), (float, float) -> bool,
-// }
-// 
-// Circle :: blob {
-//     pos: (float, float),
-//     rad: float,
-// }
-// 
-// Wall :: blob {
-//     normal: (float, float),
-//     dist: float,
-// }
+Manifold :: blob {
+    t: float,
+    normal: (float, float),
+}
+
+Shape :: blob {
+    pos: (float, float),
+    rad: (float),
+    line_check: fn (float, float), (float, float) -> bool,
+
+    filter: void | fn (float, float), (float, float) -> bool,
+}
+
+Circle :: blob {
+    pos: (float, float),
+    rad: float,
+}
+
+Wall :: blob {
+    normal: (float, float),
+    dist: float,
+}
 
 // a  - a point on the first line
 // b  - a point on the second line
 // av - the direction the a-line is pointed
-line_vs_line :: fn a: (float, float), b: (float, float), av: (float, float) -> (float, float)? {
-    ab :: b - a
-    if ab == (0.0, 0.0) {
-        ret nil
+// Returns the time until it occurs - on no overlap the time is negative
+line_vs_line :: fn a: (float, float), av: (float, float), b: (float, float), bv: (float, float) -> float {
+    // TODO(ed): Normalize `av`
+    top :: (b[0] - a[0]) * bv[1] - (b[1] - a[1]) * bv[0]
+    bot :: av[0] * bv[1] - av[1] * bv[0]
+    // NOTE(ed): This minus sign is here - I don't like it
+    ret -1.0 if bot == 0.0 else top / bot
+}
+
+circle_vs_wall :: fn c: Circle, w: Wall, movement: (float, float) -> Manifold {
+    a :: c.pos
+    tan :: (w.normal[1], w.normal[0])
+    b :: -(w.dist + c.rad) * w.normal
+    near :: line_vs_line' a, movement, b, tan
+    b :: -(w.dist - c.rad) * w.normal
+    far  :: line_vs_line' a, movement, b, tan
+
+    t := near
+    if 0.0 < far || far < near {
+        t = far
     }
-    dist :: dot' ab, av
-    a + av * dist
+
+    n := w.normal
+    if dot(n, movement) < 0.0 {
+        n = -n
+    }
+
+    Manifold {
+        t: t,
+        normal: n,
+    }
+}
+
+cricle_vs_circle :: fn a: Circle, b: Circle, movement: (float, float) -> Manifold {
+    a :: c.pos
+    tan :: (w.normal[1], w.normal[0])
+    b :: -(w.dist + c.rad) * w.normal
+    near :: line_vs_line' a, movement, b, tan
+    b :: -(w.dist - c.rad) * w.normal
+    far  :: line_vs_line' a, movement, b, tan
+
+    t := near
+    if 0.0 < far || far < near {
+        t = far
+    }
+
+    n := w.normal
+    if dot(n, movement) < 0.0 {
+        n = -n
+    }
+
+    Manifold {
+        t: t,
+        normal: n,
+    }
 }

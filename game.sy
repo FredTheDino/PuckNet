@@ -162,7 +162,19 @@ start :: fn {
     // Added for safety - to avoid delta=0
     l_update'
 
-    print collision.line_vs_line' (0.0, 0.0), (1.0, 0.0), (1.0, 1.0)
+    a :: collision.Circle {
+        pos: (0.0, 0.0),
+        rad: 1.0,
+    }
+
+    b :: collision.Wall {
+        normal: (-1.0, 0.0),
+        dist: 4.0,
+    }
+
+    m :: collision.circle_vs_wall' a, b, (1.0, 0.0)
+    print "T"
+    print m.t
 
     init'
     loop !l_input_down("quit") {
