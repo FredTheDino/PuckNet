@@ -6,6 +6,14 @@ angle_distance :: fn a: float, b: float -> float {
     rem(3.14 + b - a, 2.0 * 3.14) - 3.14
 }
 
+friction :: fn v: float, f: float -> float {
+    if abs(v) <= f {
+        ret 0.0
+    } else {
+        ret v - sign(v) * f
+    }
+}
+
 Entity :: blob {
     draw: fn -> void,
     update: fn float -> void,
@@ -38,14 +46,18 @@ player_new :: fn pos: (float, float) -> Player {
             self.tackle_timer = max' 0.0, self.tackle_timer - delta
 
             direction := (l_input_value("left") - l_input_value("right"),
-                         l_input_value("up")   - l_input_value("down"))
-
-            input := magnitude' direction
+                          l_input_value("up")   - l_input_value("down"))
 
             if self.tackle_timer == 0.0 && l_input_pressed("tackle") {
-                self.tackle_timer = 0.5
-                self.vel += 1.0
+                self.tackle_timer = 1.0
+                self.vel += 2.0
             }
+
+            if self.tackle_timer > 0.5 {
+                direction = (0.0, 0.0)
+            }
+
+            input := magnitude' direction
 
             // Linear motion
             force :: 3.0
@@ -53,24 +65,22 @@ player_new :: fn pos: (float, float) -> Player {
             self.vel += self.acc * delta
 
             // Air resistance
-            air_fric :: 0.30
+            air_fric :: 0.20 - self.tackle_timer * 0.1
             self.vel *= pow' air_fric, delta
 
             // Friction
-            speed :: abs(self.vel)
-            break_fric :: 5.0
             ice_fric :: 0.8
-            ground_fric :: (ice_fric + break_fric * l_input_value("break")) * delta
-            if speed <= ground_fric {
-                self.vel = 0.0
-            } else {
-                self.vel -= (self.vel / speed) * ground_fric
+            self.vel = friction' self.vel, ice_fric * delta
+
+            break_fric :: 5.0
+            if l_input_down("break") {
+                self.vel = friction' self.vel, break_fric * delta
             }
 
             self.pos += (cos(self.rot), sin(self.rot)) * self.vel * delta
 
             // Rotation
-            max_rotation :: 4.0 + 6.0 / (1.0 * input + 0.1) // rad/sec
+            max_rotation :: 4.0 + 6.0 / (2.0 * input + 0.1) // rad/sec
             rotation_speed :: 2.0 * 3.14
 
             direction_angle :: angle(direction) if direction != (0.0, 0.0) else self.rot
