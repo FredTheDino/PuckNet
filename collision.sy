@@ -57,26 +57,49 @@ circle_vs_wall :: fn c: Circle, w: Wall, movement: (float, float) -> Manifold {
     }
 }
 
+normalize :: fn vec : ( float, float) -> (float, float) {
+    if magnitude(vec) == 0.0{
+        ret vec
+    }
+
+    ret vec / magnitude(vec)
+}
+
+
 cricle_vs_circle :: fn a: Circle, b: Circle, movement: (float, float) -> Manifold {
-    a :: c.pos
-    tan :: (w.normal[1], w.normal[0])
-    b :: -(w.dist + c.rad) * w.normal
-    near :: line_vs_line' a, movement, b, tan
-    b :: -(w.dist - c.rad) * w.normal
-    far  :: line_vs_line' a, movement, b, tan
+    ab :: b.pos - a.pos
+    mov_norm :: normalize' movement
+    s :: dot' ab, mov_norm
+    c :: a.pos + s * mov_norm
+    bc :: c - b.pos 
 
-    t := near
-    if 0.0 < far || far < near {
-        t = far
+    h :: magnitude' bc
+
+    l2 :: pow((a.rad + b.rad), 2.0) - pow(h, 2.0)
+
+    if l2 > 0.0 {
+        l :: sqrt' l2
+
+        near := magnitude(c) - l
+        far := magnitude(c) + l
+
+        t :: near if > 0.0 else far 
+
+        n :: normalize' a.pos - b.pos + t * mov_norm
+
+        ret Manifold {
+            t: t,
+            normal : n,
+
+         
+        }
     }
 
-    n := w.normal
-    if dot(n, movement) < 0.0 {
-        n = -n
+    ret Manifold{
+        t: -1.0,
+        normal: (0.0 , 0.0),
     }
 
-    Manifold {
-        t: t,
-        normal: n,
-    }
+
+
 }

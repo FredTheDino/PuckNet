@@ -167,15 +167,16 @@ start :: fn {
         rad: 1.0,
     }
 
-    b :: collision.Wall {
-        normal: (-1.0, 0.0),
-        dist: 4.0,
+    b :: collision.Circle {
+        pos: (6.0, 4.0),
+        rad: 1.0
     }
 
-    m :: collision.circle_vs_wall' a, b, (1.0, 0.0)
+    m :: collision.cricle_vs_circle' a, b, (1.0, 1.0)
     print "T"
     print m.t
-
+    print "Normal"
+    print m.normal
     init'
     loop !l_input_down("quit") {
         l_update'
