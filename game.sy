@@ -3,7 +3,7 @@ clamp :: fn v: float, lo: float, hi: float -> float {
 }
 
 angle_distance :: fn a: float, b: float -> float {
-    rem(3.14 + b - a, 2.0 * 3.14) - 3.14
+    angle' (-cos(b - a), sin(b - a))
 }
 
 friction :: fn v: float, f: float -> float {
