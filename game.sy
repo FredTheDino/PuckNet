@@ -19,6 +19,12 @@ Entity :: blob {
     update: fn float -> void,
 }
 
+Input :: blob {
+    dir: (float, float),
+    brake: bool,
+    tackle: bool,
+}
+
 Player :: blob {
     pos: (float, float),
     rot: float,
@@ -26,6 +32,7 @@ Player :: blob {
     acc: float,
     tackle_timer: float,
     draw: fn -> void,
+    process_input: fn Input, float -> void,
     update: fn float -> void,
 }
 
@@ -42,27 +49,39 @@ player_new :: fn pos: (float, float) -> Player {
             rgb :: (sin(l_time()), cos(l_time()), 1.0)
             l_gfx_rect' self.pos, (0.1, 0.1), self.rot, rgb
         },
-        update: fn delta: float -> void {
-            self.tackle_timer = max' 0.0, self.tackle_timer - delta
-
-            direction := (l_input_value("left") - l_input_value("right"),
-                          l_input_value("up")   - l_input_value("down"))
-
-            if self.tackle_timer == 0.0 && l_input_pressed("tackle") {
+        process_input: fn input: Input, delta: float -> void {
+            if self.tackle_timer == 0.0 && input.tackle {
                 self.tackle_timer = 1.0
                 self.vel += 2.0
             }
 
             if self.tackle_timer > 0.5 {
-                direction = (0.0, 0.0)
+                input.dir = (0.0, 0.0)
             }
 
-            input := magnitude' direction
+            force :: 3.0
+            self.acc += force * magnitude' input.dir
+
+            break_fric :: 5.0
+            if input.brake {
+                self.vel = friction' self.vel, break_fric * delta
+            }
+
+            // Rotation
+            max_rotation :: 4.0 + 6.0 / (2.0 * magnitude(input.dir) + 0.1) // rad/sec
+            rotation_speed :: 2.0 * 3.14
+
+            direction_angle :: angle(input.dir) if input.dir != (0.0, 0.0) else self.rot
+            delta_angle :: angle_distance' self.rot, direction_angle
+            rotation :: clamp' delta_angle * rotation_speed, -max_rotation, max_rotation
+            self.rot += rotation * delta
+        },
+        update: fn delta: float -> void {
+            self.tackle_timer = max' 0.0, self.tackle_timer - delta
 
             // Linear motion
-            force :: 3.0
-            self.acc = input * force
             self.vel += self.acc * delta
+            self.acc = 0.0
 
             // Air resistance
             air_fric :: 0.20 - self.tackle_timer * 0.1
@@ -72,21 +91,7 @@ player_new :: fn pos: (float, float) -> Player {
             ice_fric :: 0.8
             self.vel = friction' self.vel, ice_fric * delta
 
-            break_fric :: 5.0
-            if l_input_down("break") {
-                self.vel = friction' self.vel, break_fric * delta
-            }
-
             self.pos += (cos(self.rot), sin(self.rot)) * self.vel * delta
-
-            // Rotation
-            max_rotation :: 4.0 + 6.0 / (2.0 * input + 0.1) // rad/sec
-            rotation_speed :: 2.0 * 3.14
-
-            direction_angle :: angle(direction) if direction != (0.0, 0.0) else self.rot
-            delta_angle :: angle_distance' self.rot, direction_angle
-            rotation :: clamp' delta_angle * rotation_speed, -max_rotation, max_rotation
-            self.rot += rotation * delta
         }
     }
     ret self
@@ -94,6 +99,7 @@ player_new :: fn pos: (float, float) -> Player {
 
 :Player is :Entity
 
+players : [Player] = []
 entities : [Entity] = []
 
 init :: fn {
@@ -101,16 +107,29 @@ init :: fn {
     l_bind_key("a", "left")
     l_bind_key("s", "down")
     l_bind_key("d", "right")
-    l_bind_key("SPACE", "break")
+    l_bind_key("SPACE", "brake")
     l_bind_key("e", "tackle")
 
     l_bind_quit("quit")
     l_bind_key("ESCAPE", "quit")
 
-    push' entities, player_new' (0.0, 0.0)
+    player := player_new' (0.0, 0.0)
+    push' players, player
+    push' entities, player
 }
 
 update :: fn delta: float -> void {
+    input :: Input {
+        dir: (l_input_value("left") - l_input_value("right"),
+              l_input_value("up")   - l_input_value("down")),
+
+        brake: l_input_down("brake"),
+        tackle: l_input_down("tackle"),
+    }
+    players -> for_each' fn p: Player {
+        p.process_input' input, delta
+    }
+
     entities -> for_each' fn e: Entity {
         e.update' delta
     }
