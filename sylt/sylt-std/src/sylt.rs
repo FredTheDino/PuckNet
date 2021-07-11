@@ -186,11 +186,24 @@ sylt_macro::extern_function!(
 sylt_macro::extern_function!(
     "sylt_std::sylt"
     abs
-    "Returns the square root"
+    "Returns the absolute value"
     [One(Float(x))] -> Type::Float => {
         Ok(Float(x.abs()))
     },
 );
+
+sylt_macro::extern_function!(
+    "sylt_std::sylt"
+    sign
+    "Returns the sign of the value"
+    [One(Float(x))] -> Type::Float => {
+        Ok(Float(x.signum()))
+    },
+    [One(Int(x))] -> Type::Float => {
+        Ok(Int(x.signum()))
+    },
+);
+
 
 sylt_macro::extern_function!(
     "sylt_std::sylt"
@@ -240,6 +253,15 @@ sylt_macro::extern_function!(
     "Raises the first argument to the power of the second argument"
     [One(Float(x)), One(Float(y))] -> Type::Float => {
         Ok(Float(x.powf(*y)))
+    },
+);
+
+sylt_macro::extern_function!(
+    "sylt_std::sylt"
+    angle
+    "Calculates the angle of a 2d vector"
+    [Two(Float(x), Float(y))] -> Type::Float => {
+        Ok(Float(y.atan2(-*x)))
     },
 );
 
