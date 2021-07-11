@@ -111,6 +111,12 @@ init :: fn {
     l_bind_key("e", "tackle")
     l_bind_key("q", "swap_player")
 
+    l_bind_axis(0, "LEFTX", "right")
+    l_bind_axis(0, "LEFTY", "down")
+    l_bind_button(0, "A", "brake")
+    l_bind_button(0, "B", "tackle")
+    l_bind_button(0, "LEFTSHOULDER", "swap_player")
+
     l_bind_quit("quit")
     l_bind_key("ESCAPE", "quit")
 
@@ -126,6 +132,7 @@ init :: fn {
 current_player := 0
 update :: fn delta: float -> void {
     input :: Input {
+        // TODO: Normalize this
         dir: (l_input_value("left") - l_input_value("right"),
               l_input_value("up")   - l_input_value("down")),
 
