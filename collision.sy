@@ -1,6 +1,8 @@
 Manifold :: blob {
     t: float,
     normal: (float, float),
+    a: Circle | Wall,
+    b: Circle | Wall,
 }
 
 Circle :: blob {
@@ -14,6 +16,12 @@ Wall :: blob {
 }
 
 Body :: blob {
+    pos: (float, float),
+    vel: (float, float),
+}
+
+CircleBody :: blob {
+    rad: float,
     pos: (float, float),
     vel: (float, float),
 }
@@ -49,12 +57,14 @@ circle_vs_wall :: fn c: Circle, w: Wall, movement: (float, float) -> Manifold {
     Manifold {
         t: t,
         normal: n,
+        a: c,
+        b: w,
     }
 }
 
 // Checks the collision - movement is the relative
 // movement of the two objects seen from `a`.
-cricle_vs_circle :: fn a: Circle, b: Circle, movement: (float, float) -> Manifold {
+circle_vs_circle :: fn a: Circle, b: Circle, movement: (float, float) -> Manifold {
     mov_norm :: normalize' movement
     s :: dot' b.pos - a.pos, mov_norm
     c :: a.pos + s * mov_norm
@@ -66,6 +76,8 @@ cricle_vs_circle :: fn a: Circle, b: Circle, movement: (float, float) -> Manifol
         ret Manifold{
             t: -1.0,
             normal: (0.0 , 0.0),
+            a: a,
+            b: b,
         }
     }
 
@@ -79,5 +91,7 @@ cricle_vs_circle :: fn a: Circle, b: Circle, movement: (float, float) -> Manifol
     Manifold {
         t: t,
         normal : n,
+        a: a,
+        b: b,
     }
 }
