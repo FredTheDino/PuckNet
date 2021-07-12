@@ -11,7 +11,7 @@ init :: fn {
 
 update :: fn delta:float {
     if l_input_pressed("send") {
-        n_rpc_server' f, [1]
+        n_rpc_server' f, 1
     }
 }
 
