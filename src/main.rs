@@ -1,5 +1,10 @@
+use std::path::PathBuf;
+
 fn main() {
-    let args = sylt::Args::parse_args_default_or_exit();
+    let mut args = sylt::Args::parse_args_default_or_exit();
+    if args.file.is_none() {
+        args.file.insert(PathBuf::from("game.sy"));
+    }
 
     if let Err(errs) = sylt::run_file(&args, sylt::lib_bindings()) {
         for e in errs.iter().take(5) {
