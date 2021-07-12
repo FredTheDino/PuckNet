@@ -71,7 +71,7 @@ player_new :: fn pos: (float, float) -> Player {
         },
         process_input: fn input: Input, delta: float -> void {
 
-            shoot_speed :: self.vel + 2.0
+            shoot_speed :: self.vel + 2.0 + 100.0
 
             if input.shoot && self.puck is :Puck {
                 puck: !Puck = self.puck
@@ -213,15 +213,14 @@ init :: fn {
     l_bind_quit("quit")
     l_bind_key("ESCAPE", "quit")
 
-    player := player_new' (0.0, 0.0)
+    player := player_new' (-0.3, 0.0)
     push' players, player
     push' entities, player
     push' bodies, player
 
     player.puck = puck
 
-
-    player := player_new' (1.0, 0.0)
+    player := player_new' (0.3, 0.0)
     push' players, player
     push' entities, player
     push' bodies, player
@@ -229,21 +228,22 @@ init :: fn {
     push' entities, puck
     push' bodies, puck
 
+    d := 0.8
     push' walls, collision.Wall {
         normal: (1.0, 0.0),
-        pos: (1.0, 0.0),
+        pos: (d, 0.0),
     }
     push' walls, collision.Wall {
         normal: (1.0, 0.0),
-        pos: (-1.0, 0.0),
+        pos: (-d, 0.0),
     }
     push' walls, collision.Wall {
         normal: (0.0, 1.0),
-        pos: (0.0, 1.0),
+        pos: (0.0, d),
     }
     push' walls, collision.Wall {
         normal: (0.0, 1.0),
-        pos: (0.0, -1.0),
+        pos: (0.0, -d),
     }
 }
 
@@ -269,9 +269,11 @@ update :: fn delta: float -> void {
         p.try_grab' puck
     }
 
-    // TODO(ed): Limit this some how? 100 collisions? Something else?
-    t := 0.0
-    loop t < 1.0 {
+    iter := 1000
+    t := 1.0
+    loop t > 0.0 && iter > 0 {
+        iter -= 1
+        is_collision := false
         next_col := collision.Manifold {
             t: 2.0,
             normal: (0.0, 0.0),
@@ -286,52 +288,63 @@ update :: fn delta: float -> void {
         }
 
         // Find next collision
-        a_i := -1
-        bodies -> for_each' fn a: collision.CircleBody {
-            a_i += 1
+        a_i := 0
+        // TODO(ed): Write this with for_each, when the upvalue bug is fixed.
+        loop a_i < len(bodies) {
+            a := bodies[a_i]
             b_i := -1
             bodies -> for_each' fn b: collision.CircleBody {
                 b_i += 1
                 // Skip the ones we've seen
-                if a_i <= b_i {
+                ret
+                if a_i >= b_i {
                     ret
                 }
-                col :: collision.circle_vs_circle' a, b, a.vel - b.vel
-                if col.t < 0.0 || next_col.t < col.t {
+                if b is :Puck {
+                    ret
+                }
+                col :: collision.circle_vs_circle' a, b, delta * t * (a.vel - b.vel)
+                if col.t <= 0.0 || next_col.t < col.t {
                     ret
                 }
                 next_col = col
+                is_collision = true
             }
             walls -> for_each' fn w: collision.Wall {
-                col :: collision.circle_vs_wall' a, w, a.vel
-                // if col.t < 0.0 || next_col.t < col.t {
-                //     ret
-                // }
+                col :: collision.circle_vs_wall' a, w, delta * t * a.vel
+                if col.t <= 0.0 || next_col.t < col.t {
+                    ret
+                }
                 next_col = col
+                is_collision = true
             }
+            a_i += 1
         }
 
         // Step up to the next collision
         step := min' t, next_col.t
-        bodies -> for_each' fn c: collision.CircleBody {
+        bodies -> for_each' fn c: collision.Body {
             c.pos += c.vel * step * delta
         }
-        t -= step
+
+        true <=> :collision.Body is :Player
 
         // Solve the collision
-        if next_col.t == step {
+        if is_collision {
             energy_kept :: 0.9
             n :: next_col.normal
-            if next_col.a is :collision.CircleBody {
+            if :collision.Body is next_col.a {
                 a :!collision.CircleBody = next_col.a
                 a.vel = energy_kept * reflect' a.vel, n
             }
-            if next_col.b is :collision.CircleBody {
+            if :collision.Body is next_col.b {
                 b :!collision.CircleBody = next_col.b
                 b.vel = energy_kept * reflect' b.vel, n
             }
         }
+        t -= step
     }
+    if iter == 0 { <!> }
 
     entities -> for_each' fn e: Entity {
         e.update' delta

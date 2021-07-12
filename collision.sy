@@ -47,12 +47,12 @@ circle_vs_wall :: fn c: Circle, w: Wall, movement: (float, float) -> Manifold {
     tan :: (w.normal[1], w.normal[0])
 
     b :: w.pos + c.rad * n
-    near :: line_vs_line' a, movement, b, tan
+    t1 :: line_vs_line' a, movement, b, tan
 
     b :: w.pos - c.rad * n
-    far  :: line_vs_line' a, movement, b, tan
+    t2 :: line_vs_line' a, movement, b, tan
 
-    t :: near if > 0.0 else far
+    t :: min(t1, t2) if > 0.0 else max(t1, t2)
 
     Manifold {
         t: t,
@@ -85,6 +85,7 @@ circle_vs_circle :: fn a: Circle, b: Circle, movement: (float, float) -> Manifol
     near := magnitude(c) - l
     far := magnitude(c) + l
 
+    true <=> near < far
     t :: near if > 0.0 else far
     n :: normalize' a.pos - b.pos + t * mov_norm
 
