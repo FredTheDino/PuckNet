@@ -65,33 +65,37 @@ circle_vs_wall :: fn c: Circle, w: Wall, movement: (float, float) -> Manifold {
 // Checks the collision - movement is the relative
 // movement of the two objects seen from `a`.
 circle_vs_circle :: fn a: Circle, b: Circle, movement: (float, float) -> Manifold {
+    error :: Manifold{
+        t: -1.0,
+        normal: (0.0 , 0.0),
+        a: a,
+        b: b,
+    }
+
+
+    speed :: magnitude' movement
+    if speed == 0.0 {
+        ret error
+    }
+
+    movement_dir :: movement / speed
     distance :: b.pos - a.pos
-    t_to_center :: dot' distance, movement
-    closest :: a.pos + t_to_center * movement
+    t_to_center :: dot' distance, movement_dir
+    closest :: a.pos + t_to_center * movement_dir
     p_to_c_squared :: magnitude_squared' closest - b.pos
     discriminant :: pow(a.rad + b.rad, 2.0) - p_to_c_squared
 
     if discriminant < 0.0 {
-        ret Manifold{
-            t: -1.0,
-            normal: (0.0 , 0.0),
-            a: a,
-            b: b,
-        }
+        ret error
     }
 
-    delta :: sqrt' discriminant
+    delta :: sqrt(discriminant)
 
-    t := t_to_center - delta
+    t := (t_to_center - delta) / speed
     if t < 0.0 || 1.0 < t {
-        t = t_to_center + delta
+        t = (t_to_center + delta) / speed
         if t < 0.0 || 1.0 < t {
-            ret Manifold{
-                t: -1.0,
-                normal: (0.0 , 0.0),
-                a: a,
-                b: b,
-            }
+            ret error
         }
     }
 

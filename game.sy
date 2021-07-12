@@ -192,7 +192,7 @@ puck : Puck = puck_new' (0.0, 0.0)
 
 bodies : [collision.CircleBody] = []
 walls : [collision.Wall] = []
-
+corners : [collision.Circle] = []
 
 init :: fn {
     l_bind_key("w", "up")
@@ -223,7 +223,7 @@ init :: fn {
     player := player_new' (0.3, 0.0)
     push' players, player
     push' entities, player
-    push' bodies, player
+    // push' bodies, player
 
     push' entities, puck
     push' bodies, puck
@@ -237,13 +237,14 @@ init :: fn {
         normal: (1.0, 0.0),
         pos: (-d, 0.0),
     }
-    push' walls, collision.Wall {
-        normal: (0.0, -1.0),
-        pos: (0.0, d),
+
+    push' corners, collision.Circle {
+        rad: d,
+        pos: (0.0, 1.0 - d),
     }
-    push' walls, collision.Wall {
-        normal: (0.0, 1.0),
-        pos: (0.0, -d),
+    push' corners, collision.Circle {
+        rad: d,
+        pos: (0.0, -1.0 + d),
     }
 }
 
@@ -312,6 +313,17 @@ update :: fn delta: float -> void {
             walls -> for_each' fn w: collision.Wall {
                 col :: collision.circle_vs_wall' a, w, delta * t * a.vel
                 if col.t <= 0.0 || next_col.t < col.t {
+                    ret
+                }
+                next_col = col
+                is_collision = true
+            }
+            corners -> for_each' fn c: collision.Circle {
+                col :: collision.circle_vs_circle' a, c, delta * t * a.vel
+                if col.t <= 0.0 || next_col.t < col.t {
+                    ret
+                }
+                if sign(col.normal[1]) != sign(c.pos[1]) {
                     ret
                 }
                 next_col = col
