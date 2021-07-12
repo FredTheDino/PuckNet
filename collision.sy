@@ -33,6 +33,8 @@ line_vs_line :: fn a: (float, float), av: (float, float), b: (float, float), bv:
     ret -1.0 if bot == 0.0 else top / bot
 }
 
+// Checks the collision - movement is the relative
+// movement of the two objects seen from `a`.
 circle_vs_wall :: fn c: Circle, w: Wall, movement: (float, float) -> Manifold {
     a :: c.pos
     tan :: (w.normal[1], w.normal[0])
@@ -57,44 +59,32 @@ circle_vs_wall :: fn c: Circle, w: Wall, movement: (float, float) -> Manifold {
     }
 }
 
-normalize :: fn vec : ( float, float) -> (float, float) {
-    if magnitude(vec) == 0.0{
-        ret vec
-    }
-
-    ret vec / magnitude(vec)
-}
-
-
+// Checks the collision - movement is the relative
+// movement of the two objects seen from `a`.
 cricle_vs_circle :: fn a: Circle, b: Circle, movement: (float, float) -> Manifold {
-    ab :: b.pos - a.pos
     mov_norm :: normalize' movement
-    s :: dot' ab, mov_norm
+    s :: dot' b.pos - a.pos, mov_norm
     c :: a.pos + s * mov_norm
-    bc :: c - b.pos
+    h :: magnitude' c - b.pos
 
-    h :: magnitude' bc
+    l2 :: pow(a.rad + b.rad, 2.0) - pow(h, 2.0)
 
-    l2 :: pow((a.rad + b.rad), 2.0) - pow(h, 2.0)
-
-    if l2 > 0.0 {
-        l :: sqrt' l2
-
-        near := magnitude(c) - l
-        far := magnitude(c) + l
-
-        t :: near if > 0.0 else far
-
-        n :: normalize' a.pos - b.pos + t * mov_norm
-
-        ret Manifold {
-            t: t,
-            normal : n,
+    if l2 < 0.0 {
+        ret Manifold{
+            t: -1.0,
+            normal: (0.0 , 0.0),
         }
     }
 
-    ret Manifold{
-        t: -1.0,
-        normal: (0.0 , 0.0),
+    l :: sqrt' l2
+    near := magnitude(c) - l
+    far := magnitude(c) + l
+
+    t :: near if > 0.0 else far
+    n :: normalize' a.pos - b.pos + t * mov_norm
+
+    Manifold {
+        t: t,
+        normal : n,
     }
 }
