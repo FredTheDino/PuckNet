@@ -1,5 +1,10 @@
 f :: fn a:int {
     print a
+    n_rpc_clients' g, a
+}
+
+g :: fn a:int {
+    print a
 }
 
 start :: fn {
