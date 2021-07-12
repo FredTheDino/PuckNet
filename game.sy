@@ -4,15 +4,19 @@ clamp :: fn v: float, lo: float, hi: float -> float {
     min' hi, max' lo, v
 }
 
-angle_distance :: fn a: float, b: float -> float {
-    angle' (cos(b - a), sin(b - a))
+dir :: fn rot: float -> (float, float) {
+    (cos(rot), sin(rot))
 }
 
-friction :: fn v: float, f: float -> float {
-    if abs(v) <= f {
-        ret 0.0
+angle_distance :: fn a: float, b: float -> float {
+    angle' dir' b - a
+}
+
+friction :: fn v: (float, float), f: float -> (float, float) {
+    if magnitude(v) <= f {
+        ret (0.0, 0.0)
     } else {
-        ret v - sign(v) * f
+        ret v - normalize(v) * f
     }
 }
 
@@ -31,7 +35,7 @@ Input :: blob {
 Player :: blob {
     pos: (float, float),
     rot: float,
-    vel: float,
+    vel: (float, float),
     acc: float,
     puck: Puck?,
     try_grab: fn Puck -> void,
@@ -43,10 +47,11 @@ Player :: blob {
 
 player_new :: fn pos: (float, float) -> Player {
     self: !Player = nil
-    self = Player{
+
+    self = Player {
         pos: pos,
         rot: 0.0,
-        vel: 0.0,
+        vel: (0.0, 0.0),
         acc: 0.0,
         puck: nil,
         try_grab: fn puck: Puck -> void {
@@ -68,7 +73,7 @@ player_new :: fn pos: (float, float) -> Player {
 
             if input.shoot && self.puck is :Puck {
                 puck: !Puck = self.puck
-                puck.vel = (cos(self.rot), sin(self.rot)) * shoot_speed
+                puck.vel = dir(self.rot) * shoot_speed
                 puck.held = false
                 puck.hold_cooldown = 0.1
                 self.puck = nil
@@ -104,7 +109,7 @@ player_new :: fn pos: (float, float) -> Player {
             self.tackle_timer = max' 0.0, self.tackle_timer - delta
 
             // Linear motion
-            self.vel += self.acc * delta
+            self.vel += dir(self.rot) * self.acc * delta
             self.acc = 0.0
 
             // Air resistance
@@ -115,7 +120,7 @@ player_new :: fn pos: (float, float) -> Player {
             ice_fric :: 0.8
             self.vel = friction' self.vel, ice_fric * delta
 
-            self.pos += (cos(self.rot), sin(self.rot)) * self.vel * delta
+            self.pos += self.vel * delta
 
             // Puck
             if self.puck is :Puck {
@@ -164,7 +169,7 @@ puck_new :: fn pos: (float, float) -> Puck {
             // Friction
             ice_fric :: 1.0
             speed :: magnitude' self.vel
-            self.vel = collision.normalize(self.vel) * friction' speed, ice_fric * delta
+            self.vel = friction' self.vel, ice_fric * delta
 
             wall :: collision.Wall {
                 normal: (1.0, 0.0),
