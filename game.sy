@@ -16,10 +16,6 @@ friction :: fn v: float, f: float -> float {
     }
 }
 
-reflect :: fn v: (float, float), n: (float, float) -> (float, float){
-    v - 2.0 * n * dot' v, n
-}
-
 Entity :: blob {
     draw: fn -> void,
     update: fn float -> void,
