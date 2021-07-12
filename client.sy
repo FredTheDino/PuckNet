@@ -8,6 +8,7 @@ g :: fn a:int {
 
 init :: fn {
     l_bind_key("f", "send")
+    l_bind_key("q", "disconnect")
 
     l_bind_quit("quit")
     l_bind_key("ESCAPE", "quit")
@@ -16,6 +17,9 @@ init :: fn {
 update :: fn delta:float {
     if l_input_pressed("send") {
         n_rpc_server' f, 1
+    }
+    if l_input_pressed("disconnect") {
+        n_rpc_disconnect'
     }
 }
 
