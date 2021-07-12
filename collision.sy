@@ -4,17 +4,18 @@ Manifold :: blob {
 }
 
 Circle :: blob {
-    pos: (float, float),
     rad: float,
+    pos: (float, float),
 }
 
 Wall :: blob {
     normal: (float, float),
-    point: (float, float),
+    pos: (float, float),
 }
 
 Body :: blob {
-
+    pos: (float, float),
+    vel: (float, float),
 }
 
 // a  - a point on the first line
@@ -37,10 +38,10 @@ circle_vs_wall :: fn c: Circle, w: Wall, movement: (float, float) -> Manifold {
     a :: c.pos
     tan :: (w.normal[1], w.normal[0])
 
-    b :: w.point + c.rad * n
+    b :: w.pos + c.rad * n
     near :: line_vs_line' a, movement, b, tan
 
-    b :: w.point - c.rad * n
+    b :: w.pos - c.rad * n
     far  :: line_vs_line' a, movement, b, tan
 
     t :: near if > 0.0 else far

@@ -33,9 +33,10 @@ Input :: blob {
 }
 
 Player :: blob {
+    rad: float,
     pos: (float, float),
-    rot: float,
     vel: (float, float),
+    rot: float,
     acc: float,
     puck: Puck?,
     try_grab: fn Puck -> void,
@@ -49,6 +50,7 @@ player_new :: fn pos: (float, float) -> Player {
     self: !Player = nil
 
     self = Player {
+        rad: 0.1,
         pos: pos,
         rot: 0.0,
         vel: (0.0, 0.0),
@@ -134,8 +136,11 @@ player_new :: fn pos: (float, float) -> Player {
 }
 
 :Player is :Entity
+:Player is :collision.Circle
+:Player is :collision.Body
 
 Puck :: blob {
+    rad: float,
     pos: (float, float),
     vel: (float, float),
     held: bool,
@@ -148,6 +153,7 @@ Puck :: blob {
 puck_new :: fn pos: (float, float) -> Puck {
     self: !Puck = nil
     self = Puck{
+        rad: 0.1,
         pos: pos,
         vel: (0.0, 0.0),
         held: false,
@@ -173,12 +179,12 @@ puck_new :: fn pos: (float, float) -> Puck {
 
             wall :: collision.Wall {
                 normal: (1.0, 0.0),
-                point: (1.0, 0.0),
+                pos: (1.0, 0.0),
             }
 
             circle :: collision.Circle {
-                pos : self.pos,
                 rad : 0.1,
+                pos : self.pos,
             }
 
             vel :: self.vel * delta
@@ -188,9 +194,7 @@ puck_new :: fn pos: (float, float) -> Puck {
                 self.pos += vel * coll.t
                 self.vel = reflect' self.vel, coll.normal
                 self.pos += self.vel * (1.0 - coll.t) * delta
-
-            }
-            else{
+            } else {
                 self.pos += vel
 
             }
@@ -201,6 +205,8 @@ puck_new :: fn pos: (float, float) -> Puck {
 }
 
 :Puck is :Entity
+:Puck is :collision.Circle
+:Puck is :collision.Body
 
 players : [Player] = []
 entities : [Entity] = []
