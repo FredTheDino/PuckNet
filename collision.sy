@@ -3,14 +3,6 @@ Manifold :: blob {
     normal: (float, float),
 }
 
-Shape :: blob {
-    pos: (float, float),
-    rad: (float),
-    line_check: fn (float, float), (float, float) -> bool,
-
-    filter: void | fn (float, float), (float, float) -> bool,
-}
-
 Circle :: blob {
     pos: (float, float),
     rad: float,
@@ -18,7 +10,11 @@ Circle :: blob {
 
 Wall :: blob {
     normal: (float, float),
-    dist: float,
+    point: (float, float),
+}
+
+Body :: blob {
+
 }
 
 // a  - a point on the first line
@@ -36,22 +32,18 @@ line_vs_line :: fn a: (float, float), av: (float, float), b: (float, float), bv:
 // Checks the collision - movement is the relative
 // movement of the two objects seen from `a`.
 circle_vs_wall :: fn c: Circle, w: Wall, movement: (float, float) -> Manifold {
+    n :: w.normal if dot(w.normal, movement) < 0.0 else -w.normal
+
     a :: c.pos
     tan :: (w.normal[1], w.normal[0])
-    b :: -(w.dist + c.rad) * w.normal
+
+    b :: w.point + c.rad * n
     near :: line_vs_line' a, movement, b, tan
-    b :: -(w.dist - c.rad) * w.normal
+
+    b :: w.point - c.rad * n
     far  :: line_vs_line' a, movement, b, tan
 
-    t := near
-    if 0.0 < far || far < near {
-        t = far
-    }
-
-    n := w.normal
-    if dot(n, movement) < 0.0 {
-        n = -n
-    }
+    t :: near if > 0.0 else far
 
     Manifold {
         t: t,

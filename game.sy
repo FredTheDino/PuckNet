@@ -167,8 +167,8 @@ puck_new :: fn pos: (float, float) -> Puck {
             self.vel = collision.normalize(self.vel) * friction' speed, ice_fric * delta
 
             wall :: collision.Wall {
-                normal : (-1.0, 0.0),
-                dist : 1.0,
+                normal: (1.0, 0.0),
+                point: (1.0, 0.0),
             }
 
             circle :: collision.Circle {
