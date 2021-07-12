@@ -5,7 +5,7 @@ clamp :: fn v: float, lo: float, hi: float -> float {
 }
 
 angle_distance :: fn a: float, b: float -> float {
-    angle' (-cos(b - a), sin(b - a))
+    angle' (cos(b - a), sin(b - a))
 }
 
 friction :: fn v: float, f: float -> float {
@@ -149,7 +149,6 @@ puck_new :: fn pos: (float, float) -> Puck {
         pos: pos,
         rot: 0.0,
         vel: 0.0,
-        acc: 0.0,
         held: false,
         hold_cooldown: 0.0,
         draw: fn -> void {
@@ -165,9 +164,6 @@ puck_new :: fn pos: (float, float) -> Puck {
             self.hold_cooldown = max' self.hold_cooldown - delta, 0.0
 
             // Linear motion
-            self.vel += self.acc * delta
-            self.acc = 0.0
-
             // Air resistance
             //air_fric :: 0.20
             //self.vel *= pow' air_fric, delta
@@ -224,7 +220,7 @@ current_player := 0
 update :: fn delta: float -> void {
     input :: Input {
         // TODO: Normalize this
-        dir: (l_input_value("left") - l_input_value("right"),
+        dir: (l_input_value("right") - l_input_value("left"),
               l_input_value("up")   - l_input_value("down")),
 
         brake: l_input_down("brake"),

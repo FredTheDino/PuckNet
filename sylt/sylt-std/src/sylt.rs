@@ -261,7 +261,7 @@ sylt_macro::extern_function!(
     angle
     "Calculates the angle of a 2d vector"
     [Two(Float(x), Float(y))] -> Type::Float => {
-        Ok(Float(y.atan2(-*x)))
+        Ok(Float(y.atan2(*x)))
     },
 );
 
@@ -311,6 +311,21 @@ pub fn magnitude<'t>(ctx: RuntimeContext<'t>) -> Result<Value, RuntimeError> {
         unreachable!();
     }
 }
+
+sylt_macro::extern_function!(
+    "sylt_std::sylt"
+    normalize
+    "Returns a unit length vector pointing in the same direction."
+    [Two(Float(x), Float(y))] -> Type::Float => {
+        let length = (x * x + y * y).sqrt();
+        let (x, y) = if length != 0.0 {
+            (x / length, y / length)
+        } else {
+            (*x, *y)
+        };
+        Ok(Tuple(Rc::new(vec![Float(x), Float(y)])))
+    },
+);
 
 
 sylt_macro::extern_function!(
