@@ -296,11 +296,10 @@ update :: fn delta: float -> void {
             bodies -> for_each' fn b: collision.CircleBody {
                 b_i += 1
                 // Skip the ones we've seen
-                ret
                 if a_i >= b_i {
                     ret
                 }
-                if b is :Puck {
+                if a is :Puck || b is :Puck {
                     ret
                 }
                 col :: collision.circle_vs_circle' a, b, delta * t * (a.vel - b.vel)
