@@ -4,15 +4,19 @@ clamp :: fn v: float, lo: float, hi: float -> float {
     min' hi, max' lo, v
 }
 
-angle_distance :: fn a: float, b: float -> float {
-    angle' (cos(b - a), sin(b - a))
+dir :: fn rot: float -> (float, float) {
+    (cos(rot), sin(rot))
 }
 
-friction :: fn v: float, f: float -> float {
-    if abs(v) <= f {
-        ret 0.0
+angle_distance :: fn a: float, b: float -> float {
+    angle' dir' b - a
+}
+
+friction :: fn v: (float, float), f: float -> (float, float) {
+    if magnitude(v) <= f {
+        ret (0.0, 0.0)
     } else {
-        ret v - sign(v) * f
+        ret v - normalize(v) * f
     }
 }
 
@@ -29,9 +33,10 @@ Input :: blob {
 }
 
 Player :: blob {
+    rad: float,
     pos: (float, float),
+    vel: (float, float),
     rot: float,
-    vel: float,
     acc: float,
     puck: Puck?,
     try_grab: fn Puck -> void,
@@ -43,10 +48,12 @@ Player :: blob {
 
 player_new :: fn pos: (float, float) -> Player {
     self: !Player = nil
-    self = Player{
+
+    self = Player {
+        rad: 0.1,
         pos: pos,
         rot: 0.0,
-        vel: 0.0,
+        vel: (0.0, 0.0),
         acc: 0.0,
         puck: nil,
         try_grab: fn puck: Puck -> void {
@@ -68,8 +75,7 @@ player_new :: fn pos: (float, float) -> Player {
 
             if input.shoot && self.puck is :Puck {
                 puck: !Puck = self.puck
-                puck.vel = shoot_speed
-                puck.rot = self.rot
+                puck.vel = dir(self.rot) * shoot_speed
                 puck.held = false
                 puck.hold_cooldown = 0.1
                 self.puck = nil
@@ -105,7 +111,7 @@ player_new :: fn pos: (float, float) -> Player {
             self.tackle_timer = max' 0.0, self.tackle_timer - delta
 
             // Linear motion
-            self.vel += self.acc * delta
+            self.vel += dir(self.rot) * self.acc * delta
             self.acc = 0.0
 
             // Air resistance
@@ -116,13 +122,11 @@ player_new :: fn pos: (float, float) -> Player {
             ice_fric :: 0.8
             self.vel = friction' self.vel, ice_fric * delta
 
-            self.pos += (cos(self.rot), sin(self.rot)) * self.vel * delta
-
             // Puck
             if self.puck is :Puck {
                 puck: !Puck = self.puck
                 puck.pos = self.pos
-                puck.vel = 0.0
+                puck.vel = (0.0, 0.0)
             }
         }
     }
@@ -130,12 +134,14 @@ player_new :: fn pos: (float, float) -> Player {
 }
 
 :Player is :Entity
+:Player is :collision.Circle
+:Player is :collision.Body
+:Player is :collision.CircleBody
 
 Puck :: blob {
+    rad: float,
     pos: (float, float),
-    rot: float,
-    vel: float,
-    acc: float,
+    vel: (float, float),
     held: bool,
     hold_cooldown: float,
     draw: fn -> void,
@@ -146,16 +152,16 @@ Puck :: blob {
 puck_new :: fn pos: (float, float) -> Puck {
     self: !Puck = nil
     self = Puck{
+        rad: 0.1,
         pos: pos,
-        rot: 0.0,
-        vel: 0.0,
+        vel: (0.0, 0.0),
         held: false,
         hold_cooldown: 0.0,
         draw: fn -> void {
             rgb :: (1.0, 1.0, 1.0)
-            l_gfx_rect' self.pos, (0.04, 0.04), self.rot, rgb
-            l_gfx_rect' self.pos, (0.04, 0.04), self.rot + 3.14 / 3.0, rgb
-            l_gfx_rect' self.pos, (0.04, 0.04), self.rot + 3.14 * 2.0 / 3.0, rgb
+            l_gfx_rect' self.pos, (0.04, 0.04), 0.0, rgb
+            l_gfx_rect' self.pos, (0.04, 0.04), 0.0 + 3.14 / 3.0, rgb
+            l_gfx_rect' self.pos, (0.04, 0.04), 0.0 + 3.14 * 2.0 / 3.0, rgb
         },
         process_input: fn input: Input, delta: float -> void {
         },
@@ -164,25 +170,29 @@ puck_new :: fn pos: (float, float) -> Puck {
             self.hold_cooldown = max' self.hold_cooldown - delta, 0.0
 
             // Linear motion
-            // Air resistance
-            //air_fric :: 0.20
-            //self.vel *= pow' air_fric, delta
 
             // Friction
-            ice_fric :: 0.5
+            ice_fric :: 1.0
+            speed :: magnitude' self.vel
             self.vel = friction' self.vel, ice_fric * delta
-
-            self.pos += (cos(self.rot), sin(self.rot)) * self.vel * delta
         }
     }
     ret self
 }
 
 :Puck is :Entity
+:Puck is :collision.Circle
+:Puck is :collision.Body
+:Puck is :collision.CircleBody
 
 players : [Player] = []
 entities : [Entity] = []
+
 puck : Puck = puck_new' (0.0, 0.0)
+
+bodies : [collision.CircleBody] = []
+walls : [collision.Wall] = []
+corners : [collision.Circle] = []
 
 init :: fn {
     l_bind_key("w", "up")
@@ -203,17 +213,39 @@ init :: fn {
     l_bind_quit("quit")
     l_bind_key("ESCAPE", "quit")
 
-    player := player_new' (0.0, 0.0)
+    player := player_new' (-0.3, 0.0)
     push' players, player
     push' entities, player
+    push' bodies, player
 
     player.puck = puck
 
-    player := player_new' (1.0, 0.0)
+    player := player_new' (0.3, 0.0)
     push' players, player
     push' entities, player
+    // push' bodies, player
 
     push' entities, puck
+    push' bodies, puck
+
+    d := 0.8
+    push' walls, collision.Wall {
+        normal: (-1.0, 0.0),
+        pos: (d, 0.0),
+    }
+    push' walls, collision.Wall {
+        normal: (1.0, 0.0),
+        pos: (-d, 0.0),
+    }
+
+    push' corners, collision.Circle {
+        rad: d,
+        pos: (0.0, 1.0 - d),
+    }
+    push' corners, collision.Circle {
+        rad: d,
+        pos: (0.0, -1.0 + d),
+    }
 }
 
 current_player := 0
@@ -237,6 +269,95 @@ update :: fn delta: float -> void {
     players -> for_each' fn p: Player {
         p.try_grab' puck
     }
+
+    iter := 1000
+    t := 1.0
+    loop t > 0.0 && iter > 0 {
+        iter -= 1
+        is_collision := false
+        next_col := collision.Manifold {
+            t: 2.0,
+            normal: (0.0, 0.0),
+            a: collision.Wall {
+                pos: (0.0, 0.0),
+                normal: (0.0, 0.0),
+            },
+            b: collision.Wall {
+                pos: (0.0, 0.0),
+                normal: (0.0, 0.0),
+            },
+        }
+
+        // Find next collision
+        a_i := 0
+        // TODO(ed): Write this with for_each, when the upvalue bug is fixed.
+        loop a_i < len(bodies) {
+            a := bodies[a_i]
+            b_i := -1
+            bodies -> for_each' fn b: collision.CircleBody {
+                b_i += 1
+                // Skip the ones we've seen
+                if a_i >= b_i {
+                    ret
+                }
+                if a is :Puck || b is :Puck {
+                    ret
+                }
+                col :: collision.circle_vs_circle' a, b, delta * t * (a.vel - b.vel)
+                if col.t <= 0.0 || next_col.t < col.t {
+                    ret
+                }
+                next_col = col
+                is_collision = true
+            }
+            walls -> for_each' fn w: collision.Wall {
+                col :: collision.circle_vs_wall' a, w, delta * t * a.vel
+                if col.t <= 0.0 || next_col.t < col.t {
+                    ret
+                }
+                next_col = col
+                is_collision = true
+            }
+            corners -> for_each' fn c: collision.Circle {
+                col :: collision.circle_vs_circle' a, c, delta * t * a.vel
+                if col.t <= 0.0 || next_col.t < col.t {
+                    ret
+                }
+                if sign(col.normal[1]) != sign(c.pos[1]) {
+                    ret
+                }
+                next_col = col
+                is_collision = true
+            }
+            a_i += 1
+        }
+
+        // Step up to the next collision
+        step := min' t, next_col.t
+        bodies -> for_each' fn c: collision.Body {
+            c.pos += c.vel * step * delta
+        }
+
+        true <=> :collision.Body is :Player
+
+        // Solve the collision
+        if is_collision {
+            energy_kept :: 0.7
+            n :: next_col.normal
+            if :collision.Body is next_col.a {
+                a :!collision.CircleBody = next_col.a
+                a.pos += n * 0.01
+                a.vel = energy_kept * reflect' a.vel, n
+            }
+            if :collision.Body is next_col.b {
+                b :!collision.CircleBody = next_col.b
+                b.pos -= n * 0.01
+                b.vel = energy_kept * reflect' b.vel, n
+            }
+        }
+        t -= step
+    }
+    if iter == 0 { <!> }
 
     entities -> for_each' fn e: Entity {
         e.update' delta
@@ -263,11 +384,6 @@ start :: fn {
         rad: 1.0
     }
 
-    m :: collision.cricle_vs_circle' a, b, (1.0, 1.0)
-    print "T"
-    print m.t
-    print "Normal"
-    print m.normal
     init'
     loop !l_input_down("quit") {
         l_update'
@@ -276,4 +392,3 @@ start :: fn {
         draw'
     }
 }
-
