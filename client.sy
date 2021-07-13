@@ -1,47 +1,20 @@
-B :: blob {
-    a: int,
-    b: int,
-}
-
-f :: fn b:B {
-    n_rpc_clients' g, b
-}
-
-g :: fn b:B {
-    print b.a
-    print b.b
-}
-
-init :: fn {
-    l_bind_key("f", "send")
-    l_bind_key("q", "disconnect")
-
-    l_bind_quit("quit")
-    l_bind_key("ESCAPE", "quit")
-}
-
-update :: fn delta:float {
-    if l_input_pressed("send") {
-        n_rpc_server' f, B {
-            a: 0,
-            b: 1,
-        }
-    }
-    if l_input_pressed("disconnect") {
-        n_rpc_disconnect'
-    }
-}
+use game
 
 start :: fn {
-    n_rpc_connect' "127.0.0.1"
-    l_update'
+    game.bind_keys'
 
-    init'
+    n_rpc_connect' "127.0.0.1"
+
     loop !l_input_down("quit") {
         n_rpc_resolve'
 
         l_update'
         l_render'
-        update' l_delta'
+
+        input := game.poll_input'
+        n_rpc_server' game.process_input, input
+
+        game.update' l_delta'
+        game.draw'
     }
 }

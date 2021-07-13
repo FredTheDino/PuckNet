@@ -1,20 +1,19 @@
-B :: blob {
-    a: int,
-    b: int,
-}
-
-f :: fn b:B {
-    n_rpc_clients' g, b
-}
-
-g :: fn b:B {
-    print b.a
-    print b.b
-}
+use game
 
 start :: fn {
+    game.init'
+    l_bind_quit("quit")
+
     n_rpc_start_server'
-    loop {
+    loop !l_input_down("quit") {
         n_rpc_resolve'
+
+        l_update'
+        l_render'
+
+        game.update' l_delta'
+        game.draw'
+
+        n_rpc_clients' game.set_entities game.entities
     }
 }
