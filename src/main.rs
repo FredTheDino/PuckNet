@@ -5,8 +5,8 @@ use std::path::PathBuf;
 struct Args {
     #[options(short = "s", long = "server", help = "Start as a server")]
     is_server: bool,
-    #[options(short = "l", long = "local", help = "Start as a local instance")]
-    is_local: bool,
+    #[options(short = "c", long = "client", help = "Start as a client")]
+    is_client: bool,
     #[options(short = "p", long = "port", help = "The port to use when starting/connecting to a server")]
     port: u16,
     #[options(short = "v", no_long, count, help = "Increase verbosity, up to max 2")]
@@ -19,12 +19,12 @@ fn main() {
     let args = Args::parse_args_default_or_exit();
 
     let args = sylt::Args {
-        file: if args.is_local {
-            PathBuf::from("game.sy")
+        file: if args.is_client {
+            PathBuf::from("client.sy")
         } else if args.is_server {
             PathBuf::from("server.sy")
         } else {
-            PathBuf::from("client.sy")
+            PathBuf::from("game.sy")
         },
         verbosity: args.verbosity,
 
