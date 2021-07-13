@@ -21,6 +21,7 @@ Body :: blob {
 }
 
 CircleBody :: blob {
+    mass: float,
     rad: float,
     pos: (float, float),
     vel: (float, float),
@@ -77,7 +78,7 @@ circle_vs_circle :: fn a: Circle, b: Circle, movement: (float, float) -> Manifol
     if speed == 0.0 {
         ret error
     }
-
+  
     movement_dir :: movement / speed
     distance :: b.pos - a.pos
     t_to_center :: dot' distance, movement_dir
