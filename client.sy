@@ -1,8 +1,20 @@
 use game
 
 start :: fn {
+    game.bind_keys'
+
     n_rpc_connect' "127.0.0.1"
-    loop {
+
+    loop !l_input_down("quit") {
         n_rpc_resolve'
+
+        l_update'
+        l_render'
+
+        input := game.poll_input'
+        n_rpc_server' game.process_input, input
+
+        game.update' l_delta'
+        game.draw'
     }
 }

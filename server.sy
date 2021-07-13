@@ -1,8 +1,17 @@
 use game
 
 start :: fn {
+    game.init'
+    l_bind_quit("quit")
+
     n_rpc_start_server'
-    loop {
+    loop !l_input_down("quit") {
         n_rpc_resolve'
+
+        l_update'
+        l_render'
+
+        game.update' l_delta'
+        game.draw'
     }
 }
