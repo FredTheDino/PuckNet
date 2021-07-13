@@ -29,14 +29,8 @@ arena_new :: fn pos: (float, float) -> Arena {
             collision.Wall{ normal: ( 1.0, 0.0), pos: (-scale,       0.0) },
         ],
         corners: [
-            //collision.Circle {
-            //    rad: scale,
-            //    pos: (0.0, 1.0 - d),
-            //},
-            //collision.Circle {
-            //    rad: d,
-            //    pos: (0.0, -1.0 + d),
-            //},
+            collision.Circle { rad: scale / 8.0, pos: (-0.78,  0.28) * scale },
+            //collision.Circle { rad: scale / 4.0, pos: (-0.75, -0.25) * scale },
         ],
     }
     ret self

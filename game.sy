@@ -243,14 +243,9 @@ init :: fn {
         push' walls, wall
     }
 
-    //push' corners, collision.Circle {
-    //    rad: d,
-    //    pos: (0.0, 1.0 - d),
-    //}
-    //push' corners, collision.Circle {
-    //    rad: d,
-    //    pos: (0.0, -1.0 + d),
-    //}
+    arena.corners -> for_each' fn corner: collision.Circle {
+        push' corners, corner
+    }
 }
 
 current_player := 0
@@ -328,7 +323,7 @@ update :: fn delta: float -> void {
                 if col.t <= 0.0 || next_col.t < col.t {
                     ret
                 }
-                if sign(col.normal[1]) != sign(c.pos[1]) {
+                if sign(col.normal[1]) == sign(c.pos[1]) || sign(col.normal[0]) == sign(c.pos[0]) || magnitude(a.pos) < magnitude(c.pos) {
                     ret
                 }
                 next_col = col
