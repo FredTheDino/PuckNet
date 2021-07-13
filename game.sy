@@ -173,47 +173,12 @@ puck_new :: fn pos: (float, float) -> Puck {
             // Pickup cooldown
             self.hold_cooldown = max' self.hold_cooldown - delta, 0.0
 
-<<<<<<< HEAD
-            // Air resistance
-            //air_fric :: 0.20
-            //self.vel *= pow' air_fric, delta
-=======
             // Linear motion
->>>>>>> d221d38602751b3122eb176a27bc75432069da68
 
             // Friction
             ice_fric :: 1.0
             speed :: magnitude' self.vel
-<<<<<<< HEAD
-            self.vel = collision.normalize(self.vel) * friction' speed, ice_fric * delta
-
-            wall :: collision.Wall {
-                normal : (-1.0, 0.0),
-                dist : 1.0,
-            }
-
-            circle :: collision.Circle {
-                pos : self.pos,
-                rad : 0.1,
-            }
-
-            vel :: self.vel * delta
-            coll :: collision.circle_vs_wall' circle, wall, vel
-            
-            if 0.0 < coll.t && coll.t < 1.0 {
-                self.pos += vel * coll.t
-                self.vel = reflect' self.vel, coll.normal
-                self.pos += self.vel * (1.0 - coll.t) * delta
-
-            }
-            else{
-                self.pos += vel
-
-            }
-
-=======
             self.vel = friction' self.vel, ice_fric * delta
->>>>>>> d221d38602751b3122eb176a27bc75432069da68
         }
     }
     ret self
