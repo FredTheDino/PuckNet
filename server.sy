@@ -1,0 +1,14 @@
+f :: fn a:int {
+    n_rpc_clients' g, a
+}
+
+g :: fn a:int {
+    print a
+}
+
+start :: fn {
+    n_rpc_start_server'
+    loop {
+        n_rpc_resolve'
+    }
+}
