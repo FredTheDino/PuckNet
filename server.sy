@@ -1,9 +1,15 @@
-f :: fn a:int {
-    n_rpc_clients' g, a
+B :: blob {
+    a: int,
+    b: int,
 }
 
-g :: fn a:int {
-    print a
+f :: fn b:B {
+    n_rpc_clients' g, b
+}
+
+g :: fn b:B {
+    print b.a
+    print b.b
 }
 
 start :: fn {
