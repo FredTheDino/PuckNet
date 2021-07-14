@@ -151,6 +151,7 @@ Puck :: blob {
     draw: fn -> void,
     update: fn float -> void,
 }
+
 // we might need to tweek mass numbers
 puck_new :: fn pos: (float, float) -> Puck {
     self: !Puck = nil
@@ -170,8 +171,6 @@ puck_new :: fn pos: (float, float) -> Puck {
         update: fn delta: float -> void {
             // Pickup cooldown
             self.hold_cooldown = max' self.hold_cooldown - delta, 0.0
-
-            // Linear motion
 
             // Friction
             ice_fric :: 1.0
@@ -256,7 +255,7 @@ poll_input :: fn -> Input {
     Input {
         // TODO: Normalize this
         dir: (l_input_value("right") - l_input_value("left"),
-              l_input_value("up")   - l_input_value("down")),
+              l_input_value("up")    - l_input_value("down")),
 
         brake: l_input_down("brake"),
         tackle: l_input_pressed("tackle"),
@@ -382,12 +381,9 @@ update :: fn delta: float -> void {
             tot_mass :: (a.mass + b.mass)
 
             a.pos += n * 0.01
-            a.vel += n * -relative_v * a.mass / tot_mass 
+            a.vel += n * -relative_v * a.mass / tot_mass
             b.pos -= n * 0.01
             b.vel += n * relative_v * b.mass / tot_mass
-            
-            
-            
         }
         t -= step
     }
@@ -411,8 +407,6 @@ draw :: fn {
 start :: fn {
     // Added for safety - to avoid delta=0
     l_update'
-
-    
 
     bind_keys'
     init'
