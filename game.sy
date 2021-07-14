@@ -418,11 +418,21 @@ start :: fn {
     // Added for safety - to avoid delta=0
     l_update'
 
+    [0, 1] -> for_each' fn _:int {
+        player := player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5))
+        push' players, player
+        push' entities, player
+        push' bodies, player
+    }
+    num_players += 1
+    player_id = 0
+
     bind_keys'
     init'
     loop !l_input_down("quit") {
         l_update'
         l_render'
+        process_input' poll_input'
         update' l_delta'
         draw'
     }
