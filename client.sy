@@ -4,6 +4,14 @@ start :: fn {
     game.bind_keys'
 
     n_rpc_connect' "127.0.0.1"
+    n_rpc_server' game.player_join
+
+    loop game.player_id == -1 {
+        n_rpc_resolve'
+
+        l_update'
+        l_render'
+    }
 
     loop !l_input_down("quit") {
         n_rpc_resolve'

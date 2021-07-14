@@ -30,7 +30,7 @@ Input :: blob {
     brake: bool,
     tackle: bool,
     shoot: bool,
-    swap: bool,
+    player: int,
 }
 
 Player :: blob {
@@ -186,6 +186,8 @@ puck_new :: fn pos: (float, float) -> Puck {
 :Puck is :collision.Body
 :Puck is :collision.CircleBody
 
+// TODO(ed): Make this into a {int:[Player]} - so we
+// can drop connections smoothly? Or no?
 players : [Player] = []
 entities : [Entity] = []
 
@@ -216,18 +218,6 @@ bind_keys :: fn {
 }
 
 init :: fn {
-    player := player_new' (-0.3, 0.0)
-    push' players, player
-    push' entities, player
-    push' bodies, player
-
-    player.puck = puck
-
-    player := player_new' (0.3, 0.0)
-    push' players, player
-    push' entities, player
-    push' bodies, player
-
     push' entities, puck
     push' bodies, puck
 
@@ -251,7 +241,35 @@ init :: fn {
     }
 }
 
+num_players := 0
+player_join :: fn {
+    // TODO(ed): This is a bad idea - since we can
+    // have a race condition here.
+    // We probably want to respond to ONLY that client.
+    n_rpc_clients' assign_player_id, num_players
+
+    [0, 1] -> for_each' fn _:int {
+        player := player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5))
+        push' players, player
+        push' entities, player
+        push' bodies, player
+    }
+    num_players += 1
+}
+
+assign_player_id :: fn id:int {
+    if player_id == -1 {
+        player_id = id
+    }
+}
+
+current_player := 0
+player_id := -1
 poll_input :: fn -> Input {
+    if l_input_pressed("swap_player") {
+        current_player += 1
+        current_player = rem' current_player, 2
+    }
     Input {
         // TODO: Normalize this
         dir: (l_input_value("right") - l_input_value("left"),
@@ -260,19 +278,15 @@ poll_input :: fn -> Input {
         brake: l_input_down("brake"),
         tackle: l_input_pressed("tackle"),
         shoot: l_input_pressed("shoot"),
-        swap: l_input_pressed("swap_player")
+
+        player: 2 * player_id + current_player,
     }
 }
 
 process_input :: fn input: Input {
-    if input.swap {
-        current_player += 1
-        current_player = rem' current_player, len' players
-    }
-    players[current_player].process_input' input, l_delta'
+    players[input.player].process_input' input, l_delta'
 }
 
-current_player := 0
 update :: fn delta: float -> void {
     players -> for_each' fn p: Player {
         p.try_grab' puck
@@ -312,6 +326,7 @@ update :: fn delta: float -> void {
                     ret
                 }
                 col :: collision.circle_vs_circle' a, b, delta * t * (a.vel - b.vel)
+                // TODO(ed): Don't capture other bodies.
                 if col.t <= 0.0 || next_col.t < col.t {
                     ret
                 }
@@ -350,14 +365,9 @@ update :: fn delta: float -> void {
 
         // Solve the collision
         if is_collision {
-            // elastic collision
-            // m1 * vi1 + m2 * vi2 = m1 * vf1 + m2 * vf2
-
-
+            // Elastic collision
             energy_kept :: 0.7
             n :: next_col.normal
-
-
 
             a :!collision.CircleBody = next_col.a
             if !:collision.CircleBody is a {
