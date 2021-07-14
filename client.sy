@@ -6,7 +6,7 @@ start :: fn {
     n_rpc_connect' "127.0.0.1"
     n_rpc_server' game.player_join
 
-    loop game.player_id == -1 {
+    loop game.player_id == -1 && !l_input_down("quit") {
         n_rpc_resolve'
 
         l_update'
