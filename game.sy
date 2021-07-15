@@ -266,6 +266,10 @@ poll_input :: fn -> Input {
         delta_x :: abs' players[a].pos[0] - players[b].pos[0]
         weight :: min' 1.0, 0.4 + delta_x * 0.5
         x :: -(players[a].pos[0] * weight + players[b].pos[0] * (1.0 - weight))
+        curr_x :: l_gfx_camera_at()[0]
+
+        speed :: min' 1.0, 4.0 * l_delta'
+        x :: x * speed + curr_x * (1.0 - speed)
         l_gfx_camera_place' x, 0.0
     }
 
