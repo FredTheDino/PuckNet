@@ -86,7 +86,7 @@ player_new :: fn pos: (float, float) -> Player {
                 self.puck = nil
             }
 
-            if self.tackle_timer == 0.0 && input.tackle {
+            if self.tackle_timer == 0.0 && input.tackle && self.puck is nil {
                 self.tackle_timer = 1.0
                 self.vel += dir(self.rot) * 2.0
             }
@@ -359,7 +359,7 @@ update :: fn delta: float -> void {
         // Solve the collision
         if is_collision {
             // Elastic collision
-            energy_kept :: 0.7
+            energy_kept :: 0.9
             n :: next_col.normal
 
             a :!collision.CircleBody = next_col.a
@@ -380,7 +380,21 @@ update :: fn delta: float -> void {
                     vel: (0.0, 0.0),
                 }
             }
-            relative_v :: (1.0+energy_kept) * (dot(a.vel, n) - dot(b.vel, n))
+
+            if :Player is a && :Player is b {
+                a :!Player : a
+                b :!Player : b
+                if :Puck is a.puck && magnitude_squared(a.vel) < magnitude_squared(b.vel) {
+                    b.puck = a.puck
+                    a.puck = nil
+                }
+                if :Puck is b.puck && magnitude_squared(a.vel) > magnitude_squared(b.vel) {
+                    a.puck = b.puck
+                    b.puck = nil
+                }
+            }
+
+            relative_v :: (1.0 + energy_kept) * (dot(a.vel, n) - dot(b.vel, n))
             tot_mass :: (a.mass + b.mass)
 
             skin :: 0.001
