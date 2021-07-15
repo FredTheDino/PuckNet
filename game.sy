@@ -154,21 +154,23 @@ Puck :: blob {
 }
 // we might need to tweek mass numbers
 puck_new :: fn pos: (float, float) -> Puck {
+    circle_rad :: 0.02
     self: !Puck = nil
     self = Puck{
         mass: 0.5,
-        rad: 0.02,
+        rad: sqrt(circle_rad * circle_rad * 2.0),
         pos: pos,
         vel: (0.0, 0.0),
         held: false,
         hold_cooldown: 0.0,
         draw: fn -> void {
             rgb :: (0.0, 0.0, 0.0)
-            l_gfx_rect' self.pos, (0.04, 0.04), 0.0, rgb
-            l_gfx_rect' self.pos, (0.04, 0.04), 3.14 * 1.0 / 5.0, rgb
-            l_gfx_rect' self.pos, (0.04, 0.04), 3.14 * 2.0 / 5.0, rgb
-            l_gfx_rect' self.pos, (0.04, 0.04), 3.14 * 3.0 / 5.0, rgb
-            l_gfx_rect' self.pos, (0.04, 0.04), 3.14 * 4.0 / 5.0, rgb
+            rad :: (circle_rad, circle_rad) * 2.0
+            l_gfx_rect' self.pos, rad, 0.0, rgb
+            l_gfx_rect' self.pos, rad, 3.14 * 1.0 / 5.0, rgb
+            l_gfx_rect' self.pos, rad, 3.14 * 2.0 / 5.0, rgb
+            l_gfx_rect' self.pos, rad, 3.14 * 3.0 / 5.0, rgb
+            l_gfx_rect' self.pos, rad, 3.14 * 4.0 / 5.0, rgb
         },
         process_input: fn input: Input, delta: float -> void {
         },
@@ -374,7 +376,7 @@ update :: fn delta: float -> void {
 
             skin :: 0.001
             a.pos += n * skin
-            a.vel += n * -relative_v * a.mass / tot_mass 
+            a.vel += n * -relative_v * a.mass / tot_mass
             b.pos -= n * skin
             b.vel += n * relative_v * b.mass / tot_mass
         }
@@ -397,7 +399,7 @@ start :: fn {
     // Added for safety - to avoid delta=0
     l_update'
 
-    
+
 
     init'
     loop !l_input_down("quit") {

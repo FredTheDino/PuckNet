@@ -73,11 +73,11 @@ circle_vs_circle :: fn a: Circle, b: Circle, movement: (float, float) -> Manifol
         b: b,
     }
 
-
     speed :: magnitude' movement
     if speed == 0.0 {
         ret error
     }
+
     movement_dir :: movement / speed
     distance :: b.pos - a.pos
     t_to_center :: dot' distance, movement_dir
