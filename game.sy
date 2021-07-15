@@ -76,7 +76,7 @@ player_new :: fn pos: (float, float) -> Player {
 
 
             if input.shoot && self.puck is :Puck {
-                shoot_speed :: 2.0 * magnitude' self.vel
+                shoot_speed :: 2.0 + magnitude' self.vel
 
                 puck: !Puck = self.puck
                 puck.vel = dir(self.rot) * shoot_speed
@@ -202,8 +202,8 @@ entities : [Entity] = []
 puck : Puck = puck_new' (0.0, 0.0)
 
 bodies : [collision.CircleBody] = []
-walls : [collision.Wall] = []
-corners : [collision.Circle] = []
+walls : [collision.Wall] = arena.walls
+corners : [collision.Circle] = arena.corners
 
 init :: fn {
     l_bind_key("w", "up")
@@ -242,13 +242,6 @@ init :: fn {
     push' bodies, puck
 
     d := 0.8
-    arena.walls -> for_each' fn wall: collision.Wall {
-        push' walls, wall
-    }
-
-    arena.corners -> for_each' fn corner: collision.Circle {
-        push' corners, corner
-    }
 }
 
 current_player := 0
@@ -326,7 +319,9 @@ update :: fn delta: float -> void {
                 if col.t <= 0.0 || next_col.t < col.t {
                     ret
                 }
-                if sign(col.normal[1]) == sign(c.pos[1]) || sign(col.normal[0]) == sign(c.pos[0]) || magnitude(a.pos) < magnitude(c.pos) {
+                if (sign(col.normal[1]) == sign(c.pos[1])
+                    || sign(col.normal[0]) == sign(c.pos[0])
+                    || magnitude_squared(a.pos) < magnitude_squared(c.pos)) {
                     ret
                 }
                 next_col = col

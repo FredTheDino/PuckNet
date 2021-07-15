@@ -3,15 +3,17 @@ use collision
 use game
 
 Arena :: blob {
-    pos: (float, float),
     draw: fn -> void,
     update: fn float -> void,
     walls: [collision.Wall],
     corners: [collision.Circle],
 }
 
+:Arena is :game.Entity
+
 arena_new :: fn pos: (float, float) -> Arena {
 
+    pos :: (0.0, 0.0)
     scale :: 1.0
 
     r :: scale / 7.0
@@ -20,9 +22,8 @@ arena_new :: fn pos: (float, float) -> Arena {
 
     self: !Arena = nil
     self = Arena{
-        pos: pos,
         draw: fn -> void {
-            l_gfx_sprite' assets.arena, (0, 0), self.pos, (2.0, 1.0) * scale
+            l_gfx_sprite' assets.arena, (0, 0), pos, (2.0, 1.0) * scale
         },
         update: fn delta: float {
         },
