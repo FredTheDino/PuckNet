@@ -14,11 +14,11 @@ Arena :: blob {
 arena_new :: fn pos: (float, float) -> Arena {
 
     pos :: (0.0, 0.0)
-    scale :: 1.0
+    scale :: 2.0
 
     r :: scale / 7.0
-    x :: 0.80
-    y :: 0.30
+    x :: 0.80 * scale
+    y :: 0.30 * scale
 
     self: !Arena = nil
     self = Arena{
