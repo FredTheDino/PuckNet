@@ -1,0 +1,44 @@
+use assets
+use collision
+use game
+
+Arena :: blob {
+    draw: fn -> void,
+    update: fn float -> void,
+    walls: [collision.Wall],
+    corners: [collision.Circle],
+}
+
+:Arena is :game.Entity
+
+arena_new :: fn pos: (float, float) -> Arena {
+
+    pos :: (0.0, 0.0)
+    scale :: 1.0
+
+    r :: scale / 7.0
+    x :: 0.80
+    y :: 0.30
+
+    self: !Arena = nil
+    self = Arena{
+        draw: fn -> void {
+            l_gfx_sprite' assets.arena, (0, 0), pos, (2.0, 1.0) * scale
+        },
+        update: fn delta: float {
+        },
+        walls: [
+            collision.Wall{ normal: (0.0, -1.0), pos: (0.0,  scale / 2.0) },
+            collision.Wall{ normal: (0.0,  1.0), pos: (0.0, -scale / 2.0) },
+            collision.Wall{ normal: (-1.0, 0.0), pos: ( scale,       0.0) },
+            collision.Wall{ normal: ( 1.0, 0.0), pos: (-scale,       0.0) },
+        ],
+        corners: [
+            collision.Circle { rad: r, pos: (-x,  y) * scale },
+            collision.Circle { rad: r, pos: (-x, -y) * scale },
+            collision.Circle { rad: r, pos: ( x, -y) * scale },
+            collision.Circle { rad: r, pos: ( x,  y) * scale },
+        ],
+    }
+    ret self
+}
