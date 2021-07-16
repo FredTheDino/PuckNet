@@ -295,7 +295,6 @@ update :: fn delta: float -> void {
         p.try_grab' puck
     }
 
-
     iter := 1000
     t := 1.0
     loop t > 0.0 && iter > 0 {
