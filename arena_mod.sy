@@ -42,8 +42,8 @@ arena_new :: fn pos: (float, float) -> Arena {
             collision.Circle { rad: -r, pos: ( x,  y) },
         ],
         goals: [
-            collision.Circle { rad: scale / 9.0, pos: (x, y) *  0.85 },
-            collision.Circle { rad: scale / 9.0, pos: (x, y) * -0.85 },
+            collision.Circle { rad: scale / 11.0, pos: (x, y) *  0.85 },
+            collision.Circle { rad: scale / 11.0, pos: (x, y) * -0.85 },
         ],
     }
     ret self
