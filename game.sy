@@ -150,6 +150,9 @@ player_new :: fn pos: (float, float), team: int -> Player {
                 // Without velocity the collisions won't work...
                 puck.vel = self.vel
             }
+
+            // Particles
+            particles.skate' self
         }
     }
     ret self
@@ -472,6 +475,8 @@ set_entities :: fn incoming_entities: [Entity], incoming_players: [Player] {
 
 draw :: fn {
     arena.draw'
+    particles.render'
+
     entities -> for_each' fn e: Entity {
         e.draw'
     }
@@ -484,7 +489,6 @@ draw :: fn {
     arena.goals -> for_each' fn g: collision.Circle {
         particles.goal_small' g.pos
     }
-    particles.render'
 }
 
 start :: fn {

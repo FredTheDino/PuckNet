@@ -1,3 +1,5 @@
+use game
+
 goal_parts :: l_gfx_particle_new'
 
 goal :: fn pos: (float, float) {
@@ -14,21 +16,50 @@ goal_small :: fn pos: (float, float) {
     l_gfx_particle_spawn(goal_parts, 10)
 }
 
+skate_parts :: l_gfx_particle_new'
+
+skate :: fn player: game.Player {
+    offset :: (0., -player.rad) / 2.
+    l_gfx_particle_x(skate_parts, (player.pos[0], player.pos[0]) + offset)
+    l_gfx_particle_y(skate_parts, (player.pos[1], player.pos[1]) + offset)
+
+    if l_random() < l_delta() * 20. && magnitude_squared(player.vel) > 0.001 {
+        l_gfx_particle_spawn(skate_parts, 1)
+    }
+}
+
 init :: fn {
-    l_gfx_particle_vel_angle' goal_parts, (0.0, 9.0)
-    l_gfx_particle_vel_magnitude' goal_parts, (0.2, 0.3)
-    l_gfx_particle_acc_magnitude' goal_parts, (0.0, 0.0)
-    l_gfx_particle_drag' goal_parts, (0.9, 0.9)
+    l_gfx_particle_vel_angle(goal_parts, (0.0, 9.0))
+    l_gfx_particle_vel_magnitude(goal_parts, (0.2, 0.3))
+    l_gfx_particle_acc_magnitude(goal_parts, (0.0, 0.0))
+    l_gfx_particle_drag(goal_parts, (0.9, 0.9))
     l_gfx_particle_start_sx(goal_parts, (0.02, 0.02))
     l_gfx_particle_start_sy(goal_parts, (0.02, 0.02))
     l_gfx_particle_end_sx(goal_parts, (0.02, 0.02))
     l_gfx_particle_end_sy(goal_parts, (0.02, 0.02))
+
+    l_gfx_particle_vel_magnitude(skate_parts, (0.01, 0.01))
+    l_gfx_particle_acc_magnitude(skate_parts, (0.0, 0.0))
+    l_gfx_particle_start_sx(skate_parts, (0.02, 0.02))
+    l_gfx_particle_start_sy(skate_parts, (0.02, 0.02))
+    l_gfx_particle_end_sx(skate_parts, (0.02, 0.02))
+    l_gfx_particle_end_sy(skate_parts, (0.02, 0.02))
+    l_gfx_particle_start_red(skate_parts, (0.7, 0.7))
+    l_gfx_particle_end_red(skate_parts, (0.7, 0.7))
+    l_gfx_particle_start_green(skate_parts, (0.8, 0.8))
+    l_gfx_particle_end_green(skate_parts, (0.8, 0.8))
+    l_gfx_particle_start_blue(skate_parts, (0.8, 0.8))
+    l_gfx_particle_end_blue(skate_parts, (0.8, 0.8))
+    l_gfx_particle_start_alpha(skate_parts, (1.0, 1.0))
+    l_gfx_particle_end_alpha(skate_parts, (0.0, 0.0))
 }
 
 update :: fn delta: float {
     l_gfx_particle_update' goal_parts, delta
+    l_gfx_particle_update' skate_parts, delta
 }
 
 render :: fn {
     l_gfx_particle_render' goal_parts
+    l_gfx_particle_render' skate_parts
 }
