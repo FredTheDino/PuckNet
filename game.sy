@@ -54,7 +54,6 @@ Player :: blob {
 
 player_new :: fn pos: (float, float), team: int -> Player {
 
-    scale :: 1.5 / 100.
     sprites :: assets.player1 if team == 0 else assets.player2
 
     self: !Player = nil
@@ -84,7 +83,11 @@ player_new :: fn pos: (float, float), team: int -> Player {
             widths :: [-12.0, 13.0, 12.0, 13.0]
             width :: widths[segment]
             height :: 15.
-            l_gfx_sprite' sprite, (0, 0), self.pos, (width, height) * scale
+            scale :: 3.
+            offset :: (0., self.rad)
+            // Hitbox
+            // l_gfx_rect' self.pos, (self.rad, self.rad) * 2., self.rot, (0., 0., 0.)
+            l_gfx_sprite' sprite, (0, 0), self.pos + offset, (width, height) / height * self.rad * scale
         },
         process_input: fn input: Input, delta: float -> void {
             if input.shoot && self.puck is :Puck {
