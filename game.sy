@@ -85,9 +85,30 @@ player_new :: fn pos: (float, float), team: int -> Player {
             height :: 15.
             scale :: 3.
             offset :: (0., self.rad)
+
+            // Puck (if held)
+            puck_offsets :: [(0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0)]
+            puck_before :: segment < 3
+            draw_puck :: fn {
+                if self.puck is :Puck {
+                    //self.puck.pos += puck_offsets[segment]
+                    self.puck.draw'
+                    //self.puck.pos -= puck_offsets[segment]
+                }
+            }
+
             // Hitbox
             // l_gfx_rect' self.pos, (self.rad, self.rad) * 2., self.rot, (0., 0., 0.)
+
+            if (puck_before) {
+                draw_puck'
+            }
+
             l_gfx_sprite' sprite, (0, 0), self.pos + offset, (width, height) / height * self.rad * scale
+
+            if (!puck_before) {
+                draw_puck'
+            }
         },
         process_input: fn input: Input, delta: float -> void {
             if input.shoot && self.puck is :Puck {
@@ -488,11 +509,17 @@ set_entities :: fn incoming_entities: [Entity], incoming_players: [Player] {
 draw :: fn {
     arena.draw'
     entities -> for_each' fn e: Entity {
-        e.draw'
+        if !(e is :Puck) {
+            e.draw'
+        }
     }
     entities -> for_each' fn e: Entity {
         if e is :Puck {
-            e.draw'
+            p: !Puck = e
+            // The holder will draw the puck in the right place if there is one
+            if p.holder is :void {
+                e.draw'
+            }
         }
     }
 
