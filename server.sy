@@ -14,6 +14,6 @@ start :: fn {
         game.update' l_delta'
         game.draw'
 
-        n_rpc_clients' game.set_entities game.entities
+        n_rpc_clients' game.set_entities, game.entities, game.players
     }
 }
