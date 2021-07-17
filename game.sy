@@ -287,17 +287,16 @@ poll_input :: fn -> Input {
     }
 
     if player_id != -1 {
-        // a :: player_id + current_player
-        // b :: player_id + rem' current_player + 1, 2
-        // delta_x :: abs' players[a].pos[0] - players[b].pos[0]
-        // weight :: min' 1.0, 0.4 + delta_x * 0.5
-        // x :: -(players[a].pos[0] * weight + players[b].pos[0] * (1.0 - weight))
-        // curr_x :: l_gfx_camera_at()[0]
+        a :: player_id + current_player
+        b :: player_id + rem' current_player + 1, 2
+        delta_x :: abs' players[a].pos[0] - players[b].pos[0]
+        weight :: min' 1.0, 0.4 + delta_x * 0.5
+        x :: -(players[a].pos[0] * weight + players[b].pos[0] * (1.0 - weight))
+        curr_x :: l_gfx_camera_at()[0]
 
-        // speed :: min' 1.0, 4.0 * l_delta'
-        // x :: x * speed + curr_x * (1.0 - speed)
-        // l_gfx_camera_place' x, 0.0
-        l_gfx_camera_set_zoom' 0.5
+        speed :: min' 1.0, 4.0 * l_delta'
+        x :: x * speed + curr_x * (1.0 - speed)
+        l_gfx_camera_place' x, 0.0
     }
 
     Input {
@@ -479,8 +478,9 @@ update :: fn delta: float -> void {
     }
 }
 
-set_entities :: fn incoming_entities: [Entity] {
+set_entities :: fn incoming_entities: [Entity], incoming_players: [Player] {
     entities = incoming_entities
+    players = incoming_players
 }
 
 draw :: fn {
