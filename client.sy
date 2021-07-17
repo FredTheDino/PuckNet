@@ -22,8 +22,8 @@ start :: fn {
         l_update'
         l_render'
         time += l_delta'
-        if time >= 1.0 {
-            time -= 1.0
+        if time >= tick {
+            time -= tick
 
             input := game.poll_input'
             n_rpc_server' game.set_input, input
