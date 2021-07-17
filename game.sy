@@ -290,6 +290,10 @@ assign_player_id :: fn id:int {
 current_player := 0
 player_id := -1
 poll_input :: fn -> Input {
+    if len(players) == 0 {
+        ret
+    }
+
     if l_input_pressed("swap_player") {
         current_player += 1
         current_player = rem' current_player, 2
