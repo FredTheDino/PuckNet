@@ -6,7 +6,7 @@ start :: fn {
     n_rpc_connect' "mattfolk.xyz"
     n_rpc_server' game.player_join
 
-    loop len(game.players) == 0 && !l_input_down("quit") {
+    loop (len(game.players) <= 2 * game.player_id || game.player_id == -1) && !l_input_down("quit") {
         n_rpc_resolve'
 
         l_update'
