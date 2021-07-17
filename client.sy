@@ -16,7 +16,7 @@ start :: fn {
     game.init'
     tick :: 1.0 / 60.0
     time :: 0.0
-    input: Input? = nil
+    input: game.Input? = nil
     loop !l_input_down("quit") {
         n_rpc_resolve'
 
@@ -27,7 +27,8 @@ start :: fn {
         if input is nil {
             input = new_input
         } else {
-            input = merge_input(input, new_input)
+            input_: !game.Input = input
+            input = game.merge_inputs(input_, new_input)
         }
         if time >= tick {
             time -= tick
