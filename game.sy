@@ -86,28 +86,29 @@ player_new :: fn pos: (float, float), team: int -> Player {
             scale :: 3.
             offset :: (0., self.rad)
 
-            // Puck (if held)
-            puck_offsets :: [(0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0)]
-            puck_before :: segment < 3
-            draw_puck :: fn {
-                if self.puck is :Puck {
-                    //self.puck.pos += puck_offsets[segment]
-                    self.puck.draw'
-                    //self.puck.pos -= puck_offsets[segment]
-                }
-            }
-
             // Hitbox
             // l_gfx_rect' self.pos, (self.rad, self.rad) * 2., self.rot, (0., 0., 0.)
 
-            if (puck_before) {
-                draw_puck'
+            // Puck (if held)
+            puck_offsets :: [(1.0, 0.0), (1.0, 0.0), (-1.0, 0.0), (-1.0, -0.5)]
+            puck_before :: segment < 3
+
+            // Puck (if held)
+            if (puck_before && self.puck is :Puck) {
+                p: !Puck = self.puck
+                p.pos += puck_offsets[segment] * self.rad
+                p.draw'
+                p.pos -= puck_offsets[segment] * self.rad
             }
 
             l_gfx_sprite' sprite, (0, 0), self.pos + offset, (width, height) / height * self.rad * scale
 
-            if (!puck_before) {
-                draw_puck'
+            // Puck (if held)
+            if (!puck_before && self.puck is :Puck) {
+                p: !Puck = self.puck
+                p.pos += puck_offsets[segment] * self.rad
+                p.draw'
+                p.pos -= puck_offsets[segment] * self.rad
             }
         },
         process_input: fn input: Input, delta: float -> void {
