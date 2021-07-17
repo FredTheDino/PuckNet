@@ -93,14 +93,6 @@ player_new :: fn pos: (float, float), team: int -> Player {
         },
         process_input: fn input: Input, delta: float -> void {
             if self.puck is :Puck {
-                if input.charge {
-                    self.charge += delta
-                    break_fric :: 3.0
-                    self.vel = friction' self.vel, break_fric * delta
-                } else {
-                    self.charge = 0.0
-                }
-
                 if input.shoot && self.puck is :Puck {
                     shoot_speed :: max(sin(0.15 + self.charge * 2.0) * 1.2, -1.0) + 1.5
 
@@ -109,6 +101,14 @@ player_new :: fn pos: (float, float), team: int -> Player {
                     puck.hold_cooldown = 0.1
                     puck.holder = nil
                     self.puck = nil
+                    self.charge = 0.0
+                }
+
+                if input.charge {
+                    self.charge += delta
+                    break_fric :: 3.0
+                    self.vel = friction' self.vel, break_fric * delta
+                } else {
                     self.charge = 0.0
                 }
             }
