@@ -95,8 +95,9 @@ player_new :: fn pos: (float, float), team: int -> Player {
             if self.input is nil {
                 ret
             }
+            input: !Input = self.input
 
-            if self.input.shoot && self.puck is :Puck {
+            if input.shoot && self.puck is :Puck {
                 shoot_speed :: 2.0 + magnitude' self.vel
 
                 puck: !Puck = self.puck
@@ -106,28 +107,28 @@ player_new :: fn pos: (float, float), team: int -> Player {
                 self.puck = nil
             }
 
-            if self.tackle_timer == 0.0 && self.input.tackle && self.puck is nil {
+            if self.tackle_timer == 0.0 && input.tackle && self.puck is nil {
                 self.tackle_timer = 1.0
                 self.vel += dir(self.rot) * 2.0
             }
 
             if self.tackle_timer > 0.5 {
-                self.input.dir = (0.0, 0.0)
+                input.dir = (0.0, 0.0)
             }
 
             force :: 3.0
-            self.acc += force * magnitude' self.input.dir
+            self.acc += force * magnitude' input.dir
 
             break_fric :: 5.0
-            if self.input.brake {
+            if input.brake {
                 self.vel = friction' self.vel, break_fric * delta
             }
 
             // Rotation
-            max_rotation :: 4.0 + 6.0 / (2.0 * magnitude(self.input.dir) + 0.1) // rad/sec
+            max_rotation :: 4.0 + 6.0 / (2.0 * magnitude(input.dir) + 0.1) // rad/sec
             rotation_speed :: 2.0 * 3.14
 
-            direction_angle :: angle(self.input.dir) if self.input.dir != (0.0, 0.0) else self.rot
+            direction_angle :: angle(input.dir) if input.dir != (0.0, 0.0) else self.rot
             delta_angle :: angle_distance' self.rot, direction_angle
             rotation :: clamp' delta_angle * rotation_speed, -max_rotation, max_rotation
             self.rot += rotation * delta
@@ -539,7 +540,10 @@ start :: fn {
     loop !l_input_down("quit") {
         l_update'
         l_render'
-        process_input' poll_input'
+
+        set_input' poll_input'
+        process_input' l_delta'
+
         update' l_delta'
         draw'
     }
