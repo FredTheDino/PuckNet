@@ -22,7 +22,7 @@ start :: fn {
         l_render'
 
         input := game.poll_input'
-        n_rpc_server' game.process_input, input
+        n_rpc_server' game.set_input, input
 
         game.update' l_delta'
         game.draw'

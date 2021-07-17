@@ -47,8 +47,9 @@ Player :: blob {
     puck: Puck?,
     try_grab: fn Puck -> void,
     tackle_timer: float,
+    input: Input?,
     draw: fn -> void,
-    process_input: fn Input, float -> void,
+    process_input: fn float -> void,
     update: fn float -> void,
 }
 
@@ -74,6 +75,7 @@ player_new :: fn pos: (float, float), team: int -> Player {
             }
         },
         tackle_timer: 0.0,
+        input: nil,
         draw: fn -> void {
             segment :: ((1 if self.rot > 1./4. * pi else 0) +
                         (1 if self.rot > 3./4. * pi else 0) +
@@ -89,8 +91,12 @@ player_new :: fn pos: (float, float), team: int -> Player {
             // l_gfx_rect' self.pos, (self.rad, self.rad) * 2., self.rot, (0., 0., 0.)
             l_gfx_sprite' sprite, (0, 0), self.pos + offset, (width, height) / height * self.rad * scale
         },
-        process_input: fn input: Input, delta: float -> void {
-            if input.shoot && self.puck is :Puck {
+        process_input: fn delta: float -> void {
+            if self.input is nil {
+                ret
+            }
+
+            if self.input.shoot && self.puck is :Puck {
                 shoot_speed :: 2.0 + magnitude' self.vel
 
                 puck: !Puck = self.puck
@@ -100,28 +106,28 @@ player_new :: fn pos: (float, float), team: int -> Player {
                 self.puck = nil
             }
 
-            if self.tackle_timer == 0.0 && input.tackle && self.puck is nil {
+            if self.tackle_timer == 0.0 && self.input.tackle && self.puck is nil {
                 self.tackle_timer = 1.0
                 self.vel += dir(self.rot) * 2.0
             }
 
             if self.tackle_timer > 0.5 {
-                input.dir = (0.0, 0.0)
+                self.input.dir = (0.0, 0.0)
             }
 
             force :: 3.0
-            self.acc += force * magnitude' input.dir
+            self.acc += force * magnitude' self.input.dir
 
             break_fric :: 5.0
-            if input.brake {
+            if self.input.brake {
                 self.vel = friction' self.vel, break_fric * delta
             }
 
             // Rotation
-            max_rotation :: 4.0 + 6.0 / (2.0 * magnitude(input.dir) + 0.1) // rad/sec
+            max_rotation :: 4.0 + 6.0 / (2.0 * magnitude(self.input.dir) + 0.1) // rad/sec
             rotation_speed :: 2.0 * 3.14
 
-            direction_angle :: angle(input.dir) if input.dir != (0.0, 0.0) else self.rot
+            direction_angle :: angle(self.input.dir) if self.input.dir != (0.0, 0.0) else self.rot
             delta_angle :: angle_distance' self.rot, direction_angle
             rotation :: clamp' delta_angle * rotation_speed, -max_rotation, max_rotation
             self.rot += rotation * delta
@@ -309,7 +315,6 @@ poll_input :: fn -> Input {
     }
 
     Input {
-        // TODO: Normalize this
         dir: normalize((l_input_value("right") - l_input_value("left"),
                         l_input_value("up")    - l_input_value("down"))),
 
@@ -321,8 +326,14 @@ poll_input :: fn -> Input {
     }
 }
 
-process_input :: fn input: Input {
-    players[input.player].process_input' input, l_delta'
+set_input :: fn input: Input {
+    players[input.player].input = input
+}
+
+process_input :: fn delta: float {
+    players -> for_each' fn p: Player {
+        p.process_input delta
+    }
 }
 
 update :: fn delta: float -> void {
