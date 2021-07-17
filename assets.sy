@@ -1,1 +1,1 @@
-arena :: l_load_image' "res/Rink.png", (200, 100)
+arena :: l_load_image' "res/rink.png", (200, 100)
