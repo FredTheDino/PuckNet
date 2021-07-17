@@ -328,12 +328,29 @@ poll_input :: fn -> Input {
 }
 
 set_input :: fn input: Input {
-    players[input.player].input = input
+    if players[input.player].input is nil {
+        players[input.player].input = input
+    } else {
+        player_input: !Input = players[input.player].input
+        players[input.player].input = merge_inputs(player_input, input)
+    }
+}
+
+merge_inputs :: fn current: Input, new: Input -> Input {
+    current.player <=> new.player
+    Input {
+        dir: new.dir,
+        brake: current.brake | new.brake,
+        tackle: current.tackle | new.tackle,
+        shoot: current.shoot | new.shoot,
+        player: new.player,
+    }
 }
 
 process_input :: fn delta: float {
     players -> for_each' fn p: Player {
         p.process_input' delta
+        p.input = nil
     }
 }
 

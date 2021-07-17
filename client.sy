@@ -14,15 +14,20 @@ start :: fn {
     }
 
     game.init'
-
+    tick :: 1.0 / 60.0
+    time :: 0.0
     loop !l_input_down("quit") {
         n_rpc_resolve'
 
         l_update'
         l_render'
+        time += l_delta'
+        if time >= 1.0 {
+            time -= 1.0
 
-        input := game.poll_input'
-        n_rpc_server' game.set_input, input
+            input := game.poll_input'
+            n_rpc_server' game.set_input, input
+        }
 
         game.update' l_delta'
         game.draw'
