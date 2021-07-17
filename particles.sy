@@ -1,0 +1,34 @@
+goal_parts :: l_gfx_particle_new'
+
+goal :: fn pos: (float, float) {
+    l_gfx_particle_vel_magnitude' goal_parts, (0.2, 1.2)
+    l_gfx_particle_x(goal_parts, (pos[0], pos[0]))
+    l_gfx_particle_y(goal_parts, (pos[1], pos[1]))
+    l_gfx_particle_spawn(goal_parts, 400)
+    l_gfx_particle_vel_magnitude' goal_parts, (0.2, 0.3)
+}
+
+goal_small :: fn pos: (float, float) {
+    l_gfx_particle_x(goal_parts, (pos[0], pos[0]))
+    l_gfx_particle_y(goal_parts, (pos[1], pos[1]))
+    l_gfx_particle_spawn(goal_parts, 10)
+}
+
+init :: fn {
+    l_gfx_particle_vel_angle' goal_parts, (0.0, 9.0)
+    l_gfx_particle_vel_magnitude' goal_parts, (0.2, 0.3)
+    l_gfx_particle_acc_magnitude' goal_parts, (0.0, 0.0)
+    l_gfx_particle_drag' goal_parts, (0.9, 0.9)
+    l_gfx_particle_start_sx(goal_parts, (0.02, 0.02))
+    l_gfx_particle_start_sy(goal_parts, (0.02, 0.02))
+    l_gfx_particle_end_sx(goal_parts, (0.02, 0.02))
+    l_gfx_particle_end_sy(goal_parts, (0.02, 0.02))
+}
+
+update :: fn delta: float {
+    l_gfx_particle_update' goal_parts, delta
+}
+
+render :: fn {
+    l_gfx_particle_render' goal_parts
+}
