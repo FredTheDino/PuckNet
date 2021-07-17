@@ -260,15 +260,13 @@ bind_keys :: fn {
     l_bind_key("a", "left")
     l_bind_key("s", "down")
     l_bind_key("d", "right")
-    l_bind_key("Left SHIFT", "tackle")
     l_bind_key("q", "swap_player")
     l_bind_key("SPACE", "shoot")
 
     l_bind_axis(0, "LEFTX", "right")
     l_bind_axis(0, "LEFTY", "down")
-    l_bind_button(0, "B", "tackle")
     l_bind_button(0, "Y", "swap_player")
-    l_bind_button(0, "X", "shoot")
+    l_bind_button(0, "A", "shoot")
 
     l_bind_quit("quit")
     l_bind_key("ESCAPE", "quit")
@@ -327,7 +325,7 @@ poll_input :: fn -> Input {
         dir: normalize((l_input_value("right") - l_input_value("left"),
                         l_input_value("up")    - l_input_value("down"))),
 
-        tackle: l_input_pressed("tackle"),
+        tackle: l_input_pressed("shoot"),
         charge: l_input_down("shoot"),
         shoot: l_input_released("shoot"),
 
