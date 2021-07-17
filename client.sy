@@ -31,8 +31,9 @@ start :: fn {
             input = game.merge_inputs(input_, new_input)
         }
         if time >= tick {
+            // print "tick"
+            // print time
             time -= tick
-
             n_rpc_server' game.set_input, input
             input = nil
         }
