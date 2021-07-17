@@ -338,9 +338,9 @@ set_input :: fn input: Input {
 
 merge_inputs :: fn current: Input, new: Input -> Input {
     if current.player != new.player {
-        new
+        ret new
     } else {
-        Input {
+        ret Input {
             dir: new.dir,
             brake: current.brake || new.brake,
             tackle: current.tackle || new.tackle,
