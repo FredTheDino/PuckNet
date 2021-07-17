@@ -1,5 +1,8 @@
 use arena_mod
+use assets
 use collision
+
+pi :: 3.14159265358979
 
 clamp :: fn v: float, lo: float, hi: float -> float {
     min' hi, max' lo, v
@@ -49,9 +52,11 @@ Player :: blob {
     update: fn float -> void,
 }
 
-player_new :: fn pos: (float, float) -> Player {
-    self: !Player = nil
+player_new :: fn pos: (float, float), team: int -> Player {
 
+    sprites :: assets.player1 if team == 0 else assets.player2
+
+    self: !Player = nil
     self = Player {
         mass: 100.0,
         rad: 0.05,
@@ -70,8 +75,19 @@ player_new :: fn pos: (float, float) -> Player {
         },
         tackle_timer: 0.0,
         draw: fn -> void {
-            rgb :: (0.4, 0.4, 0.4)
-            l_gfx_rect' self.pos, (0.1, 0.1), self.rot, rgb
+            segment :: ((1 if self.rot > 1./4. * pi else 0) +
+                        (1 if self.rot > 3./4. * pi else 0) +
+                        (1 if self.rot > 5./4. * pi else 0) -
+                        (3 if self.rot > 7./4. * pi else 0))
+            sprite :: sprites[segment]
+            widths :: [-12.0, 13.0, 12.0, 13.0]
+            width :: widths[segment]
+            height :: 15.
+            scale :: 3.
+            offset :: (0., self.rad)
+            // Hitbox
+            // l_gfx_rect' self.pos, (self.rad, self.rad) * 2., self.rot, (0., 0., 0.)
+            l_gfx_sprite' sprite, (0, 0), self.pos + offset, (width, height) / height * self.rad * scale
         },
         process_input: fn input: Input, delta: float -> void {
             if input.shoot && self.puck is :Puck {
@@ -109,6 +125,7 @@ player_new :: fn pos: (float, float) -> Player {
             delta_angle :: angle_distance' self.rot, direction_angle
             rotation :: clamp' delta_angle * rotation_speed, -max_rotation, max_rotation
             self.rot += rotation * delta
+            self.rot = rem' self.rot, 2. * pi
         },
         update: fn delta: float -> void {
             self.tackle_timer = max' 0.0, self.tackle_timer - delta
@@ -247,7 +264,7 @@ player_join :: fn {
     n_rpc_clients' assign_player_id, num_players
 
     [0, 1] -> for_each' fn _:int {
-        player := player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5))
+        player := player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5)), _
         push' players, player
         push' entities, player
         push' bodies, player
@@ -493,7 +510,7 @@ start :: fn {
     l_set_window_size' (800, 800)
 
     [0, 1] -> for_each' fn _:int {
-        player := player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5))
+        player := player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5)), _
         push' players, player
         push' entities, player
         push' bodies, player
