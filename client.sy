@@ -13,6 +13,8 @@ start :: fn {
         l_render'
     }
 
+    game.init'
+
     loop !l_input_down("quit") {
         n_rpc_resolve'
 
