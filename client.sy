@@ -3,7 +3,7 @@ use game
 start :: fn {
     game.bind_keys'
 
-    n_rpc_connect' "fuffens.xyz"
+    n_rpc_connect' "mattfolk.xyz"
     n_rpc_server' game.player_join
 
     loop len(game.players) == 0 && !l_input_down("quit") {
