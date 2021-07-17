@@ -333,7 +333,7 @@ set_input :: fn input: Input {
 
 process_input :: fn delta: float {
     players -> for_each' fn p: Player {
-        p.process_input delta
+        p.process_input' delta
     }
 }
 
