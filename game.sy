@@ -31,9 +31,9 @@ Entity :: blob {
 
 Input :: blob {
     dir: (float, float),
-    brake: bool,
     tackle: bool,
     shoot: bool,
+    charge: bool,
     player: int,
 }
 
@@ -44,6 +44,7 @@ Player :: blob {
     vel: (float, float),
     rot: float,
     acc: float,
+    charge: float,
     puck: Puck?,
     try_grab: fn Puck -> void,
     tackle_timer: float,
@@ -65,6 +66,7 @@ player_new :: fn pos: (float, float), team: int -> Player {
         rot: 0.0,
         vel: (0.0, 0.0),
         acc: 0.0,
+        charge: 0.0,
         puck: nil,
         try_grab: fn puck: Puck -> void {
             if (magnitude(self.pos - puck.pos) < 0.05
@@ -119,14 +121,25 @@ player_new :: fn pos: (float, float), team: int -> Player {
             }
             input: !Input = self.input
 
-            if input.shoot && self.puck is :Puck {
-                shoot_speed :: 2.0 + magnitude' self.vel
+            if self.puck is :Puck {
+                if input.shoot && self.puck is :Puck {
+                    shoot_speed :: max(sin(0.15 + self.charge * 2.0) * 1.2, -1.0) + 1.5
 
-                puck: !Puck = self.puck
-                puck.vel = dir(self.rot) * shoot_speed
-                puck.hold_cooldown = 0.1
-                puck.holder = nil
-                self.puck = nil
+                    puck: !Puck = self.puck
+                    puck.vel = dir(self.rot) * shoot_speed
+                    puck.hold_cooldown = 0.1
+                    puck.holder = nil
+                    self.puck = nil
+                    self.charge = 0.0
+                }
+
+                if input.charge {
+                    self.charge += delta
+                    break_fric :: 3.0
+                    self.vel = friction' self.vel, break_fric * delta
+                } else {
+                    self.charge = 0.0
+                }
             }
 
             if self.tackle_timer == 0.0 && input.tackle && self.puck is nil {
@@ -140,11 +153,6 @@ player_new :: fn pos: (float, float), team: int -> Player {
 
             force :: 3.0
             self.acc += force * magnitude' input.dir
-
-            break_fric :: 5.0
-            if input.brake {
-                self.vel = friction' self.vel, break_fric * delta
-            }
 
             // Rotation
             max_rotation :: 4.0 + 6.0 / (2.0 * magnitude(input.dir) + 0.1) // rad/sec
@@ -250,17 +258,15 @@ bind_keys :: fn {
     l_bind_key("a", "left")
     l_bind_key("s", "down")
     l_bind_key("d", "right")
-    l_bind_key("SPACE", "brake")
-    l_bind_key("e", "tackle")
+    l_bind_key("Left SHIFT", "tackle")
     l_bind_key("q", "swap_player")
-    l_bind_key("f", "shoot")
+    l_bind_key("SPACE", "shoot")
 
     l_bind_axis(0, "LEFTX", "right")
     l_bind_axis(0, "LEFTY", "down")
-    l_bind_button(0, "A", "brake")
     l_bind_button(0, "B", "tackle")
-    l_bind_button(0, "LEFTSHOULDER", "swap_player")
-    l_bind_button(0, "RIGHTSHOULDER", "shoot")
+    l_bind_button(0, "Y", "swap_player")
+    l_bind_button(0, "X", "shoot")
 
     l_bind_quit("quit")
     l_bind_key("ESCAPE", "quit")
@@ -338,9 +344,9 @@ poll_input :: fn -> Input {
         dir: normalize((l_input_value("right") - l_input_value("left"),
                         l_input_value("up")    - l_input_value("down"))),
 
-        brake: l_input_down("brake"),
         tackle: l_input_pressed("tackle"),
-        shoot: l_input_pressed("shoot"),
+        charge: l_input_down("shoot"),
+        shoot: l_input_released("shoot"),
 
         player: 2 * player_id + current_player,
     }
@@ -361,7 +367,7 @@ merge_inputs :: fn current: Input, new: Input -> Input {
     } else {
         ret Input {
             dir: new.dir,
-            brake: current.brake || new.brake,
+            charge: current.charge || new.charge,
             tackle: current.tackle || new.tackle,
             shoot: current.shoot || new.shoot,
             player: new.player,
