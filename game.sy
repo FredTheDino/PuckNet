@@ -256,6 +256,15 @@ init :: fn {
     l_gfx_particle_end_sy(goal_parts, (0.02, 0.02))
 }
 
+spawn_particles :: fn {
+    l_gfx_particle_vel_magnitude' goal_parts, (0.2, 1.2)
+    l_gfx_particle_x(goal_parts, (g.pos[0], g.pos[0]))
+    l_gfx_particle_y(goal_parts, (g.pos[1], g.pos[1]))
+    l_gfx_particle_spawn(goal_parts, 400)
+    l_gfx_particle_vel_magnitude' goal_parts, (0.2, 0.3)
+
+}
+
 num_players := 0
 player_join :: fn {
     // TODO(ed): This is a bad idea - since we can
@@ -391,12 +400,8 @@ update :: fn delta: float -> void {
                     col :: collision.circle_vs_circle' a, g, delta * t * a.vel
                     if 0.0 <= col.t && col.t < t {
 
-                        l_gfx_particle_vel_magnitude' goal_parts, (0.2, 1.2)
-                        l_gfx_particle_x(goal_parts, (g.pos[0], g.pos[0]))
-                        l_gfx_particle_y(goal_parts, (g.pos[1], g.pos[1]))
-                        l_gfx_particle_spawn(goal_parts, 400)
-                        l_gfx_particle_vel_magnitude' goal_parts, (0.2, 0.3)
-
+                        spawn_particles'
+                        n_rpc_clients' spawn_particles
                         puck.vel *= 0.0
                         puck.pos *= 0.0
                         if :Player is puck.holder {
