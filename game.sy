@@ -256,10 +256,10 @@ init :: fn {
     l_gfx_particle_end_sy(goal_parts, (0.02, 0.02))
 }
 
-spawn_particles :: fn {
+spawn_particles :: fn pos:(float, float) {
     l_gfx_particle_vel_magnitude' goal_parts, (0.2, 1.2)
-    l_gfx_particle_x(goal_parts, (g.pos[0], g.pos[0]))
-    l_gfx_particle_y(goal_parts, (g.pos[1], g.pos[1]))
+    l_gfx_particle_x(goal_parts, (pos[0], pos[0]))
+    l_gfx_particle_y(goal_parts, (pos[1], pos[1]))
     l_gfx_particle_spawn(goal_parts, 400)
     l_gfx_particle_vel_magnitude' goal_parts, (0.2, 0.3)
 
@@ -400,8 +400,8 @@ update :: fn delta: float -> void {
                     col :: collision.circle_vs_circle' a, g, delta * t * a.vel
                     if 0.0 <= col.t && col.t < t {
 
-                        spawn_particles'
-                        n_rpc_clients' spawn_particles
+                        spawn_particles' g.pos
+                        n_rpc_clients' spawn_particles, g.pos
                         puck.vel *= 0.0
                         puck.pos *= 0.0
                         if :Player is puck.holder {
