@@ -5,6 +5,7 @@ player1_side :: l_load_image' "res/player1_side.png", (12, 15)
 player2_back :: l_load_image' "res/player2_back.png", (13, 15)
 player2_front :: l_load_image' "res/player2_front.png", (13, 15)
 player2_side :: l_load_image' "res/player2_side.png", (12, 15)
+puck :: l_load_image' "res/puck.png", (7, 6)
 
 player1 :: [
     player1_side,
