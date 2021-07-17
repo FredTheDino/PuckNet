@@ -182,13 +182,10 @@ puck_new :: fn pos: (float, float) -> Puck {
         holder: nil,
         hold_cooldown: 0.0,
         draw: fn -> void {
-            rgb :: (0.0, 0.0, 0.0)
             rad :: (circle_rad, circle_rad) * 2.0
-            l_gfx_rect' self.pos, rad, 0.0, rgb
-            l_gfx_rect' self.pos, rad, 3.14 * 1.0 / 5.0, rgb
-            l_gfx_rect' self.pos, rad, 3.14 * 2.0 / 5.0, rgb
-            l_gfx_rect' self.pos, rad, 3.14 * 3.0 / 5.0, rgb
-            l_gfx_rect' self.pos, rad, 3.14 * 4.0 / 5.0, rgb
+            width :: 7.
+            height :: 6.
+            l_gfx_sprite' assets.puck, (0, 0), self.pos, (width, height) / height * self.rad * 1.65
         },
         update: fn delta: float -> void {
             // Pickup cooldown
