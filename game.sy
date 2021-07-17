@@ -287,8 +287,8 @@ poll_input :: fn -> Input {
     }
 
     if player_id != -1 {
-        a :: player_id + current_player
-        b :: player_id + rem' current_player + 1, 2
+        a :: 2 * player_id + current_player
+        b :: 2 * player_id + rem' current_player + 1, 2
         delta_x :: abs' players[a].pos[0] - players[b].pos[0]
         weight :: min' 1.0, 0.4 + delta_x * 0.5
         x :: -(players[a].pos[0] * weight + players[b].pos[0] * (1.0 - weight))
