@@ -9,6 +9,8 @@ struct Args {
     is_server: bool,
     #[options(short = "c", long = "client", help = "Start as a client")]
     is_client: bool,
+    #[options(short = "b", long = "browser", help = "Starts the server browser")]
+    is_browser: bool,
     #[options(short = "p", long = "port", help = "The port to use when starting/connecting to a server")]
     port: u16,
     #[options(short = "v", no_long, count, help = "Increase verbosity, up to max 2")]
@@ -27,6 +29,8 @@ fn main() {
             PathBuf::from("client.sy")
         } else if args.is_server {
             PathBuf::from("server.sy")
+        } else if args.is_browser {
+            PathBuf::from("browser.sy")
         } else {
             PathBuf::from("game.sy")
         },

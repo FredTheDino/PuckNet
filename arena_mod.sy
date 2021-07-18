@@ -13,7 +13,6 @@ Arena :: blob {
 :Arena is :game.Entity
 
 arena_new :: fn pos: (float, float) -> Arena {
-
     pos :: (0.0, 0.0)
     scale :: 2.0
 
@@ -46,5 +45,6 @@ arena_new :: fn pos: (float, float) -> Arena {
             collision.Circle { rad: scale / 11.0, pos: (x, y) * -0.85 },
         ],
     }
+
     ret self
 }
