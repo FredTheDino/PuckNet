@@ -1,0 +1,16 @@
+use text
+
+draw :: fn {
+    text.draw_text' -1., 0., 1.0, "Hello, World!"
+}
+
+start :: fn {
+    l_bind_quit("quit")
+
+    loop !l_input_down("quit") {
+        l_update'
+        l_render'
+
+        draw'
+    }
+}
