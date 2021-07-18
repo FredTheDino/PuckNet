@@ -2,7 +2,7 @@ use crate as sylt_std;
 
 use std::cell::RefCell;
 use std::io::Write;
-use std::net::{TcpListener, TcpStream};
+use std::net::{Shutdown, TcpListener, TcpStream};
 use std::ops::DerefMut;
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -256,16 +256,24 @@ pub fn n_rpc_server(ctx: RuntimeContext<'_>) -> Result<Value, RuntimeError> {
     })
 }
 
-#[sylt_macro::sylt_doc(n_rpc_disconnect, "Disconnect from the currently connected server.", [] Type::Void)]
+#[sylt_macro::sylt_doc(n_rpc_disconnect, "Disconnects from the currently connected RPC server.", [] Type::Bool)]
 #[sylt_macro::sylt_link(n_rpc_disconnect, "sylt_std::network")]
 pub fn n_rpc_disconnect(ctx: RuntimeContext<'_>) -> Result<Value, RuntimeError> {
     if ctx.typecheck {
-        return Ok(Value::Nil);
+        return Ok(Value::Bool(true));
     }
 
-    SERVER_HANDLE.with(|server_handle| server_handle.borrow_mut().take());
-
-    Ok(Value::Nil)
+    SERVER_HANDLE.with(|server_handle| {
+        match server_handle.borrow_mut().take() {
+            Some(server) => {
+                if server.shutdown(Shutdown::Both).is_err() {
+                    eprintln!("Error disconnecting from connected server");
+                }
+                Ok(Value::Bool(true))
+            }
+            None => Ok(Value::Bool(false)),
+        }
+    })
 }
 
 #[sylt_macro::sylt_doc(n_rpc_resolve, "Resolves the queued RPCs that has been received since the last resolve.", [] Type::Void)]
