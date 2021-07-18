@@ -357,10 +357,20 @@ merge_inputs :: fn current: Input, new: Input -> Input {
     }
 }
 
+clear_input :: fn input: Input -> Input {
+    Input {
+        dir: input.dir,
+        charge: false,
+        tackle: false,
+        shoot: false,
+        player: input.player,
+    }
+}
+
 process_input :: fn delta: float {
     players -> for_each' fn p: Player {
         p.process_input' delta
-        p.input = nil
+        p.input = clear_input(p.input)
     }
 }
 
