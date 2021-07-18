@@ -12,7 +12,6 @@ start :: fn {
         l_render'
 
         game.process_input' l_delta'
-
         game.update' l_delta'
         game.draw'
 

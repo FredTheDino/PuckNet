@@ -2,6 +2,7 @@ use arena_mod
 use assets
 use collision
 use particles
+use tick
 
 pi :: 3.14159265358979
 
@@ -356,10 +357,23 @@ merge_inputs :: fn current: Input, new: Input -> Input {
     }
 }
 
+clear_input :: fn input: Input -> Input {
+    Input {
+        dir: input.dir,
+        charge: false,
+        tackle: false,
+        shoot: false,
+        player: input.player,
+    }
+}
+
 process_input :: fn delta: float {
     players -> for_each' fn p: Player {
         p.process_input' delta
-        p.input = nil
+        if p.input is :Input {
+            input: !Input = p.input
+            p.input = clear_input(input)
+        }
     }
 }
 
