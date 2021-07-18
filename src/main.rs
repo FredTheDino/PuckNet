@@ -3,6 +3,8 @@ use std::path::PathBuf;
 
 #[derive(Default, Debug, Options)]
 struct Args {
+    #[options(free)]
+    file: Option<PathBuf>,
     #[options(short = "s", long = "server", help = "Start as a server")]
     is_server: bool,
     #[options(short = "c", long = "client", help = "Start as a client")]
@@ -20,8 +22,10 @@ struct Args {
 fn main() {
     let args = Args::parse_args_default_or_exit();
 
-    let sylt_args = sylt::Args {
-        file: if args.is_client {
+    let args = sylt::Args {
+        file: if let Some(file) = args.file {
+            file
+        } else if args.is_client {
             PathBuf::from("client.sy")
         } else if args.is_server {
             PathBuf::from("server.sy")
@@ -35,7 +39,7 @@ fn main() {
         ..sylt::Args::default()
     };
 
-    if let Err(errs) = sylt::run_file(&sylt_args, sylt::lib_bindings()) {
+    if let Err(errs) = sylt::run_file(&args, sylt::lib_bindings()) {
         for e in errs.iter().take(5) {
             eprintln!("{}", e);
         }

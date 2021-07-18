@@ -1,4 +1,5 @@
 arena := ("", 0)
+font := ("", 0)
 player1_back := ("", 0)
 player1_front := ("", 0)
 player1_side := ("", 0)
@@ -13,6 +14,7 @@ player2 : [(str, int)] = []
 
 load_assets :: fn {
     arena = l_load_image' "res/rink.png", (200, 100)
+    font = l_load_image' "res/font.png", (14, 18)
     player1_back = l_load_image' "res/player1_back.png", (13, 15)
     player1_front = l_load_image' "res/player1_front.png", (13, 15)
     player1_side = l_load_image' "res/player1_side.png", (12, 15)
