@@ -20,7 +20,7 @@ struct Args {
 fn main() {
     let args = Args::parse_args_default_or_exit();
 
-    let mut sylt_args = sylt::Args {
+    let sylt_args = sylt::Args {
         file: if args.is_client {
             PathBuf::from("client.sy")
         } else if args.is_server {
@@ -34,11 +34,6 @@ fn main() {
 
         ..sylt::Args::default()
     };
-
-    if args.is_browser {
-        // Don't load lingon in the typechecker
-        // sylt_args.skip_typecheck = true;
-    }
 
     if let Err(errs) = sylt::run_file(&sylt_args, sylt::lib_bindings()) {
         for e in errs.iter().take(5) {
