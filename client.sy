@@ -3,7 +3,7 @@ use game
 start :: fn {
     game.bind_keys'
 
-    n_rpc_connect' "mattfolk.xyz"
+    n_rpc_connect' "127.0.0.1"
     n_rpc_server' game.player_join
 
     loop (len(game.players) <= 2 * game.player_id || game.player_id == -1) && !l_input_down("quit") {
@@ -31,10 +31,11 @@ start :: fn {
             input = game.merge_inputs(input_, new_input)
         }
         if time >= tick {
-            // print "tick"
-            // print time
             time -= tick
-            n_rpc_server' game.set_input, input
+            if !n_rpc_server(game.set_input, input) {
+                //TODO(gu): Do something clever here? Like going back to server connect menu.
+                n_rpc_disconnect'
+            }
             input = nil
         }
 

@@ -246,6 +246,7 @@ pub fn n_rpc_server(ctx: RuntimeContext<'_>) -> Result<Value, RuntimeError> {
             match stream.write(&serialized) {
                 Ok(_) => Ok(Value::Bool(true)),
                 Err(e) => {
+                    //TODO(gu): Disconnect here?
                     eprintln!("Error sending data to server: {:?}", e);
                     Ok(Value::Bool(false))
                 },
