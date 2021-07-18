@@ -1,6 +1,6 @@
 use game
 
-goal_parts :: l_gfx_particle_new'
+goal_parts : (str, int) = ("", 0)
 
 goal :: fn pos: (float, float) {
     l_gfx_particle_vel_magnitude' goal_parts, (0.2, 1.2)
@@ -16,7 +16,7 @@ goal_small :: fn pos: (float, float) {
     l_gfx_particle_spawn(goal_parts, 10)
 }
 
-skate_parts :: l_gfx_particle_new'
+skate_parts : !(str, int) = ("", 0)
 
 skate :: fn player: game.Player {
     offset :: (0., -player.rad) / 2.
@@ -29,6 +29,9 @@ skate :: fn player: game.Player {
 }
 
 init :: fn {
+    goal_parts = l_gfx_particle_new'
+    skate_parts = l_gfx_particle_new'
+
     l_gfx_particle_vel_angle(goal_parts, (0.0, 9.0))
     l_gfx_particle_vel_magnitude(goal_parts, (0.2, 0.3))
     l_gfx_particle_acc_magnitude(goal_parts, (0.0, 0.0))

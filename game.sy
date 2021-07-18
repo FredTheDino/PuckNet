@@ -276,6 +276,7 @@ init :: fn {
     push' entities, puck
     push' bodies, puck
     particles.init'
+    assets.load_assets'
 }
 
 num_players := 0
@@ -298,6 +299,17 @@ assign_player_id :: fn id:int {
     if player_id == -1 {
         player_id = id
     }
+}
+
+servers: {str} = {}
+broadcast_server :: fn ip:str {
+    add' servers, ip
+    n_rpc_clients' set_servers, servers
+}
+
+set_servers :: fn incoming_servers:{str} {
+    servers = incoming_servers
+    print servers
 }
 
 current_player := 0
