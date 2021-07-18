@@ -1,11 +1,11 @@
-arena : !(str, int) = ("", 0)
-player1_back : !(str, int) = ("", 0)
-player1_front : !(str, int) = ("", 0)
-player1_side : !(str, int) = ("", 0)
-player2_back : !(str, int) = ("", 0)
-player2_front : !(str, int) = ("", 0)
-player2_side : !(str, int) = ("", 0)
-puck : !(str, int) = ("", 0)
+arena := ("", 0)
+player1_back := ("", 0)
+player1_front := ("", 0)
+player1_side := ("", 0)
+player2_back := ("", 0)
+player2_front := ("", 0)
+player2_side := ("", 0)
+puck := ("", 0)
 
 player1 : [(str, int)] = []
 
