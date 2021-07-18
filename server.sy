@@ -5,17 +5,14 @@ start :: fn {
     l_bind_quit("quit")
 
     n_rpc_start_server'
-    update_ticker := game.tick.ticker_new' 60.0
     loop !l_input_down("quit") {
         n_rpc_resolve'
 
         l_update'
         l_render'
 
-        if update_ticker.next(l_delta()) {
-            game.process_input' update_ticker.rate
-            game.update' update_ticker.rate
-        }
+        game.process_input' l_delta'
+        game.update' l_delta'
         game.draw'
 
         n_rpc_clients' game.set_entities, game.entities, game.players
