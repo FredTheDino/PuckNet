@@ -2,6 +2,7 @@ use arena_mod
 use assets
 use collision
 use particles
+use tick
 
 pi :: 3.14159265358979
 

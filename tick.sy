@@ -1,0 +1,25 @@
+time := 0.0
+
+Ticker :: blob {
+    rate: float,
+    time: float,
+    next: fn float -> bool,
+}
+
+ticker_new :: fn rate: float -> Ticker {
+    self: !Ticker = nil
+    self = Ticker {
+        rate: 1.0 / rate,
+        time: 0.0,
+        next: fn delta: float -> bool {
+            should_tick := false
+            self.time += delta
+            if self.time >= self.rate {
+                self.time -= self.rate
+                should_tick = true
+            }
+            should_tick
+        }
+    }
+    self
+}
