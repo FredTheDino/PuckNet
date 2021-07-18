@@ -93,7 +93,8 @@ player_join :: fn {
     // TODO(ed): This is a bad idea - since we can
     // have a race condition here.
     // We probably want to respond to ONLY that client.
-    n_rpc_clients' assign_player_id, num_players
+    ip := n_rpc_current_request_ip'
+    n_rpc_client_ip' ip, assign_player_id, num_players
 
     [0, 1] -> for_each' fn id:int {
         player := entity.player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5)), id, id, num_players
