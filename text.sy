@@ -1,0 +1,25 @@
+use assets
+
+glyph_tile :: fn c: int -> (int, int) {
+    //TODO(gu): The y is inverted in the engine somewhere.
+    (rem(c, 18), 5 - (c / 18))
+}
+
+x_inc :: 0.42
+x_scale_global :: 0.08
+y_scale_global :: 0.1
+
+draw_text :: fn x: float, y: float, scale: float, s: str {
+    x := x
+    as_chars(s) -> for_each' fn c: int -> {
+        draw_char' x, y, scale, c
+        x += x_scale_global * scale
+    }
+}
+
+draw_char :: fn x: float, y: float, scale: float, c: int {
+    c >= 32 <=> true  // unprintable
+    c <= 126 <=> true // upper bound
+    scale := (x_scale_global, y_scale_global) * scale
+    l_gfx_sprite' assets.font, glyph_tile(c - 32), (x, y), scale, (1., 0., 0., 1.)
+}
