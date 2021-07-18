@@ -90,9 +90,6 @@ reset_state :: fn {
 
 num_players := 0
 player_join :: fn {
-    // TODO(ed): This is a bad idea - since we can
-    // have a race condition here.
-    // We probably want to respond to ONLY that client.
     ip := n_rpc_current_request_ip'
     n_rpc_client_ip' ip, assign_player_id, num_players
 
