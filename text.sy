@@ -13,7 +13,7 @@ draw_text :: fn x: float, y: float, scale: float, s: str {
     x := x
     as_chars(s) -> for_each' fn c: int -> {
         draw_char' x, y, scale, c
-        x += x_scale_global * scale
+        x += x_scale_global * scale * 0.85
     }
 }
 
