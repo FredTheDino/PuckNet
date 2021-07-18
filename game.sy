@@ -364,6 +364,8 @@ process_input :: fn delta: float {
 }
 
 update :: fn delta: float -> void {
+    arena.update' delta
+
     players -> for_each' fn p: Player {
         p.try_grab' puck
     }
@@ -434,21 +436,21 @@ update :: fn delta: float -> void {
             // TODO(ed): For 100% accuracy - this needs to move out
             // of the loop, and be checked afterwards.
             if a is :Puck {
-                arena.goals -> for_each' fn g: collision.Circle {
-                    col :: collision.circle_vs_circle' a, g, delta * t * a.vel
-                    if 0.0 <= col.t && col.t < t {
+                //arena.goals -> for_each' fn g: collision.Circle {
+                //    col :: collision.circle_vs_circle' a, g, delta * t * a.vel
+                //    if 0.0 <= col.t && col.t < t {
 
-                        particles.goal' g.pos
-                        n_rpc_clients' particles.goal, g.pos
-                        puck.vel *= 0.0
-                        puck.pos *= 0.0
-                        if :Player is puck.holder {
-                            holder: !Player = puck.holder
-                            holder.puck = nil
-                        }
-                        puck.holder = nil
-                    }
-                }
+                //        particles.goal' g.pos
+                //        n_rpc_clients' particles.goal, g.pos
+                //        puck.vel *= 0.0
+                //        puck.pos *= 0.0
+                //        if :Player is puck.holder {
+                //            holder: !Player = puck.holder
+                //            holder.puck = nil
+                //        }
+                //        puck.holder = nil
+                //    }
+                //}
             }
             a_i += 1
         }
@@ -547,9 +549,9 @@ draw :: fn {
         }
     }
 
-    arena.goals -> for_each' fn g: collision.Circle {
-        particles.goal_small' g.pos
-    }
+    //arena.goals -> for_each' fn g: collision.Circle {
+    //    particles.goal_small' g.pos
+    //}
 }
 
 start :: fn {

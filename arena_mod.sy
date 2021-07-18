@@ -2,12 +2,47 @@ use assets
 use collision
 use game
 
+Goal :: blob {
+    pos: (float, float),
+    vel: (float, float),
+    draw: fn -> void,
+    update: fn float -> void,
+}
+
+:Goal is :game.Entity
+
+goal_new :: fn pos: (float, float), dir: float, arena_scale: float -> Goal {
+
+    scale :: 13. / 100. * arena_scale
+    moving_dir := 1.
+
+    self: !Goal = nil
+    self = Goal{
+        pos: pos,
+        vel: (0.0, 0.5),
+        draw: fn {
+            width :: 8. / 13.* scale
+            height :: 13. / 13. * scale
+            offset :: (arena_scale * .89 - width / 2., 0.) * dir
+            l_gfx_sprite' assets.goal, (0, 0), self.pos + offset, (width * dir, height)
+        },
+        update: fn delta: float {
+            if abs(self.pos[1]) > arena_scale * .8 / 2. {
+                self.vel = (self.vel[0], -sign(self.pos[1]) * abs(self.vel[1]))
+            }
+            self.pos += self.vel * delta
+        }
+    }
+
+    ret self
+}
+
 Arena :: blob {
     draw: fn -> void,
     update: fn float -> void,
     walls: [collision.Wall],
     corners: [collision.Circle],
-    goals: [collision.Circle],
+    goals: [Goal],
 }
 
 :Arena is :game.Entity
@@ -25,8 +60,12 @@ arena_new :: fn pos: (float, float) -> Arena {
     self = Arena{
         draw: fn -> void {
             l_gfx_sprite' assets.arena, (0, 0), pos, (2.0, 1.0) * scale
+            self.goals[0].draw'
+            self.goals[1].draw'
         },
         update: fn delta: float {
+            self.goals[0].update' delta
+            self.goals[1].update' delta
         },
         walls: [
             collision.Wall{ normal: (0.0, -1.0), pos: (0.0,  scale / 2.0) },
@@ -42,8 +81,10 @@ arena_new :: fn pos: (float, float) -> Arena {
             collision.Circle { rad: -r, pos: ( x,  y) },
         ],
         goals: [
-            collision.Circle { rad: scale / 11.0, pos: (x, y) *  0.85 },
-            collision.Circle { rad: scale / 11.0, pos: (x, y) * -0.85 },
+            goal_new(pos, 1., scale),
+            goal_new(pos, -1., scale),
+            //collision.Circle { rad: scale / 11.0, pos: (x, y) *  0.85 },
+            //collision.Circle { rad: scale / 11.0, pos: (x, y) * -0.85 },
         ],
     }
     ret self
