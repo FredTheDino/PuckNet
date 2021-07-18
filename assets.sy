@@ -6,7 +6,11 @@ player1_side := ("", 0)
 player2_back := ("", 0)
 player2_front := ("", 0)
 player2_side := ("", 0)
+
 puck := ("", 0)
+
+border := ("", 0)
+ads := ("", 0)
 
 player1 : [(str, int)] = []
 
@@ -21,7 +25,10 @@ load_assets :: fn {
     player2_back = l_load_image' "res/player2_back.png", (13, 15)
     player2_front = l_load_image' "res/player2_front.png", (13, 15)
     player2_side = l_load_image' "res/player2_side.png", (12, 15)
+
     puck = l_load_image' "res/puck.png", (7, 6)
+    border = l_load_image' "res/border.png", (200, 40)
+    ads = l_load_image' "res/ads.png", (401, 20)
 
     player1 = [
         player1_side,
