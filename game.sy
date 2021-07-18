@@ -370,7 +370,10 @@ clear_input :: fn input: Input -> Input {
 process_input :: fn delta: float {
     players -> for_each' fn p: Player {
         p.process_input' delta
-        p.input = clear_input(p.input)
+        if p.input is :Input {
+            input: !Input = p.input
+            p.input = clear_input(input)
+        }
     }
 }
 
