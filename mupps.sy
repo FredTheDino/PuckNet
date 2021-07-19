@@ -38,11 +38,22 @@ draw :: fn {
     // the distance to the goals.
     exitement :: sin(t)
 
-    muppets -> for_each(fn m: Mupp {
-        mupp :: assets.mupps[m.sprite]
-        scale :: as_float(mupp[1][1]) / as_float(mupp[1][0])
-        uni_scale :: 0.1
-        pos :: 0.08 * m.pos + 0.1 * (0.0, sin((t + 100.0) * exitement * exitement * m.bobbiness)) * m.bobbiness
-        l_gfx_sprite(mupp[0], (0, 0), pos, (uni_scale) * (1.0, scale), m.rgb)
-    })
+    if !debug_assertions() {
+        vibrations :: (t + 100.0) * exitement * exitement
+        muppets -> for_each(fn m: Mupp {
+            mupp :: assets.mupps[m.sprite]
+            scale :: as_float(mupp[1][1]) / as_float(mupp[1][0])
+            uni_scale :: 0.1
+            pos :: 0.08 * m.pos + (0.0, 0.1 * m.bobbiness * sin(vibrations * m.bobbiness))
+            l_gfx_sprite(mupp[0], (0, 0), pos, (uni_scale) * (1.0, scale), m.rgb)
+        })
+    } else {
+        muppets -> for_each(fn m: Mupp {
+            mupp :: assets.mupps[m.sprite]
+            scale :: as_float(mupp[1][1]) / as_float(mupp[1][0])
+            uni_scale :: 0.1
+            pos :: 0.08 * m.pos
+            l_gfx_sprite(mupp[0], (0, 0), pos, (uni_scale) * (1.0, scale), m.rgb)
+        })
+    }
 }
