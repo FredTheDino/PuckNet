@@ -133,7 +133,7 @@ player_new :: fn pos: (float, float), team: int -> Player {
 
             if self.puck is :Puck {
                 if input.shoot {
-                    shoot_speed :: max(sin(charge_osc * self.charge + charge_start_osc_offset) * 1.2, -1.0) + 1.5
+                    shoot_speed :: max(sin(charge_osc * self.charge + charge_start_osc_offset) * 1.2, -1.0) + 1.8
                     puck: !Puck = self.puck
                     puck.vel = dir(self.rot) * shoot_speed
                     puck.hold_cooldown = 0.1
