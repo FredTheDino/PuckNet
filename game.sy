@@ -139,7 +139,8 @@ player_new :: fn pos: (float, float), team: int, num: int, owner: int -> Player 
             }
             input: !Input = self.input
 
-            if self.puck is :Puck {
+            // Shooting
+            if self.puck is :Puck && (((input.charge || input.shoot) && self.charge != 0.0) || (input.tackle && self.charge == 0.0)) {
                 if input.shoot {
                     shoot_speed :: max(sin(charge_osc * self.charge + charge_start_osc_offset) * 1.2, -1.0) + 1.8
                     puck: !Puck = self.puck
@@ -159,6 +160,7 @@ player_new :: fn pos: (float, float), team: int, num: int, owner: int -> Player 
                 }
             }
 
+            // Tackling
             if self.tackle_timer == 0.0 && input.tackle && self.puck is nil {
                 self.tackle_timer = 1.0
                 self.vel += dir(self.rot) * 2.0
