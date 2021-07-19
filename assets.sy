@@ -1,17 +1,21 @@
-arena := ("", 0)
-font := ("", 0)
+empty_asset :: ("", 0)
 
-puck := ("", 0)
+arena := empty_asset
+font := empty_asset
+
+puck := empty_asset
 
 border := ("", 0)
 ads := ("", 0)
 
+arrow := empty_asset
 player1 : [(str, int)] = []
 player2 : [(str, int)] = []
 mupps : [((str, int), (int, int))] = []
 
 load_assets :: fn {
     arena = l_load_image' "res/rink.png", (200, 100)
+    arrow = l_load_image' "res/arrow.png", (5, 7)
     font = l_load_image' "res/font.png", (14, 18)
     player1_back :: l_load_image' "res/player1_back.png", (13, 15)
     player1_front :: l_load_image' "res/player1_front.png", (13, 15)
