@@ -104,10 +104,11 @@ player_new :: fn pos: (float, float), team: int, num: int, owner: int -> Player 
 
             // Arrow (if current player)
             if self.player_num == game.current_player && self.owner_id == game.player_id {
-                color := (1., 0., 0., 1.) if team == 0 else (0., 1., 0., 1.)
-                // How much the shot charge moves the arrow out (linearly)
+                // Red/green matches player colors.
+                color := (1., 0., 0., 1.) if team == 0 else (0.1176, 0.7608, 0.2275, 1.)
+                // How much the shot charge moves the arrow out (linearly).
                 charge_offset := (sin(charge_osc * self.charge + charge_start_osc_offset) * 0.08) + 0.08
-                // The sum arrow offset (relative to the player sprite)
+                // The sum arrow offset (relative to the player sprite).
                 arrow_offset := (cos(self.rot), sin(self.rot)) * (0.10 + charge_offset)
                 l_gfx_sprite' assets.arrow, (0, 0), self.pos + offset + arrow_offset, (5., 7.) / height * self.rad * scale, self.rot + pi, color
             }
