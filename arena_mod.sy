@@ -10,6 +10,13 @@ Arena :: blob {
     goals: [collision.Circle],
 }
 
+Mupp :: blob {
+    pos: (float, float),
+    bobbiness: float,
+    rgb: (float, float, float),
+    sprite: int,
+}
+
 :Arena is :game.Entity
 
 arena_new :: fn pos: (float, float) -> Arena {
@@ -23,7 +30,23 @@ arena_new :: fn pos: (float, float) -> Arena {
     self: !Arena = nil
     self = Arena{
         draw: fn -> void {
-            l_gfx_sprite' assets.arena, (0, 0), pos, (2.0, 1.0) * scale
+            gray :: (0.2, 0.2, 0.2)
+            l_gfx_rect((0.0, 0.0), (20.0, 20.0), gray)
+
+            t :: rem( 0.1 * l_time(), 4.0 * scale)
+
+            l_gfx_sprite(assets.ads, (0, 0), pos + (t, (scale - 0.2) / 1.5), (4.0, 4.0 * 20.0 / 401.0) * scale)
+            l_gfx_sprite(assets.ads, (0, 0), pos + (t - 4.0 * scale, (scale - 0.2) / 1.5), (4.0, 4.0 * 20.0 / 401.0) * scale)
+
+            l_gfx_sprite(assets.ads, (0, 0), pos + (t - 4.0 * scale, (scale - 0.2) / 1.5), (4.0, 4.0 * 20.0 / 401.0) * scale)
+
+            l_gfx_rect(-scale * 1.3, 0.0, scale, 3.0, gray)
+            l_gfx_rect(scale * 1.3, 0.0, scale, 3.0, gray)
+
+            l_gfx_sprite(assets.arena, (0, 0), pos, (2.0, 1.0) * scale)
+            l_gfx_sprite(assets.border, (0, 0), pos + (0.0, scale / 2.0), (2.0, 2.0 * 40.0 / 200.0) * scale)
+            // TODO(ed): Move this to a custom file - it needs to be
+            // rendered on top of the player
         },
         update: fn delta: float {
         },
