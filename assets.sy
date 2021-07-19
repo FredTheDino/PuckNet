@@ -1,31 +1,33 @@
 empty_asset :: ("", 0)
 
 arena := empty_asset
-arrow := empty_asset
 font := empty_asset
-player1_back := empty_asset
-player1_front := empty_asset
-player1_side := empty_asset
-player2_back := empty_asset
-player2_front := empty_asset
-player2_side := empty_asset
+
 puck := empty_asset
 
-player1 : [(str, int)] = []
+border := ("", 0)
+ads := ("", 0)
 
+arrow := empty_asset
+player1 : [(str, int)] = []
 player2 : [(str, int)] = []
+mupps : [((str, int), (int, int))] = []
 
 load_assets :: fn {
     arena = l_load_image' "res/rink.png", (200, 100)
     arrow = l_load_image' "res/arrow.png", (5, 7)
     font = l_load_image' "res/font.png", (14, 18)
-    player1_back = l_load_image' "res/player1_back.png", (13, 15)
-    player1_front = l_load_image' "res/player1_front.png", (13, 15)
-    player1_side = l_load_image' "res/player1_side.png", (12, 15)
-    player2_back = l_load_image' "res/player2_back.png", (13, 15)
-    player2_front = l_load_image' "res/player2_front.png", (13, 15)
-    player2_side = l_load_image' "res/player2_side.png", (12, 15)
+    player1_back :: l_load_image' "res/player1_back.png", (13, 15)
+    player1_front :: l_load_image' "res/player1_front.png", (13, 15)
+    player1_side :: l_load_image' "res/player1_side.png", (12, 15)
+    player2_back :: l_load_image' "res/player2_back.png", (13, 15)
+    player2_front :: l_load_image' "res/player2_front.png", (13, 15)
+    player2_side :: l_load_image' "res/player2_side.png", (12, 15)
+
     puck = l_load_image' "res/puck.png", (7, 6)
+    border = l_load_image' "res/border.png", (200, 40)
+    ads = l_load_image' "res/ads.png", (401, 20)
+
 
     player1 = [
         player1_side,
@@ -39,6 +41,13 @@ load_assets :: fn {
         player2_back,
         player2_side,
         player2_front,
+    ]
+
+    mupps = [
+        (l_load_image("res/crowd1.png", (9, 21)), (9, 21)),
+        (l_load_image("res/crowd2.png", (8, 13)), (8, 13)),
+        (l_load_image("res/crowd3.png", (10, 19)), (10, 19))
+        (l_load_image("res/crowd3.png", (8, 13)), (8, 13)),
     ]
 }
 

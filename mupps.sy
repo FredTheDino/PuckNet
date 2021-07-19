@@ -1,0 +1,59 @@
+use assets
+
+Mupp :: blob {
+    pos: (float, float),
+    bobbiness: float,
+    rgb: (float, float, float),
+    sprite: int,
+}
+
+muppets:[Mupp]: []
+init :: fn {
+    place_mupps :: fn lo_x: float, hi_x: float, lo_y: float, hi_y: float {
+        y := hi_y
+        loop y > lo_y {
+            x := lo_x
+            loop x < hi_x {
+                muppets -> push' Mupp {
+                    pos: (x + 0.5 * rem(y, 2.0), y) + (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5)),
+                    bobbiness: l_random_range(0.1, 0.5),
+                    rgb: (l_random_range(0.2, 0.4), l_random_range(0.2, 0.4), l_random_range(0.2, 0.4)),
+                    sprite: l_random_range(0, 3),
+                }
+                x += 1.0
+            }
+            y -= 1.0
+        }
+    }
+
+    place_mupps(-45.5, -26.0, -20.0,  20.0)
+    place_mupps( 26.0,  45.5, -20.0,  20.0)
+    place_mupps(-26.0,  26.0, -20.0, -13.0)
+}
+
+draw :: fn {
+    t :: l_time()
+
+    // This should be broken out and modified by
+    // the distance to the goals.
+    exitement :: sin(t)
+
+    if !debug_assertions() {
+        vibrations :: (t + 100.0) * exitement * exitement
+        muppets -> for_each(fn m: Mupp {
+            mupp :: assets.mupps[m.sprite]
+            scale :: as_float(mupp[1][1]) / as_float(mupp[1][0])
+            uni_scale :: 0.1
+            pos :: 0.08 * m.pos + (0.0, 0.1 * m.bobbiness * sin(vibrations * m.bobbiness))
+            l_gfx_sprite(mupp[0], (0, 0), pos, (uni_scale) * (1.0, scale), m.rgb)
+        })
+    } else {
+        muppets -> for_each(fn m: Mupp {
+            mupp :: assets.mupps[m.sprite]
+            scale :: as_float(mupp[1][1]) / as_float(mupp[1][0])
+            uni_scale :: 0.1
+            pos :: 0.08 * m.pos
+            l_gfx_sprite(mupp[0], (0, 0), pos, (uni_scale) * (1.0, scale), m.rgb)
+        })
+    }
+}

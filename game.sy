@@ -3,6 +3,7 @@ use assets
 use collision
 use particles
 use tick
+use mupps
 
 pi :: 3.14159265358979
 
@@ -290,6 +291,7 @@ bind_keys :: fn {
 init :: fn {
     push' entities, puck
     push' bodies, puck
+    mupps.init'
     particles.init'
     assets.load_assets'
 }
@@ -346,6 +348,7 @@ poll_input :: fn -> Input {
         speed :: min' 1.0, 4.0 * l_delta'
         x :: x * speed + curr_x * (1.0 - speed)
         l_gfx_camera_place' x, 0.0
+        l_gfx_camera_set_zoom' 0.7
     }
 
     Input {
@@ -590,6 +593,8 @@ draw :: fn {
     arena.goals -> for_each' fn g: collision.Circle {
         particles.goal_small' g.pos
     }
+
+    mupps.draw'
 }
 
 start :: fn {
