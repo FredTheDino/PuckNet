@@ -29,7 +29,6 @@ init :: fn {
     place_mupps(-45.5, -26.0, -20.0,  20.0)
     place_mupps( 26.0,  45.5, -20.0,  20.0)
     place_mupps(-26.0,  26.0, -20.0, -13.0)
-    print len(muppets)
 }
 
 draw :: fn {
