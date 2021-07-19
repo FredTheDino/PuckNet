@@ -1,0 +1,245 @@
+use assets
+use collision
+use game
+use particles
+use util
+
+pi :: 3.14159265358979
+
+Entity :: blob {
+    draw: fn -> void,
+    update: fn float -> void,
+}
+
+Input :: blob {
+    dir: (float, float),
+    tackle: bool,
+    shoot: bool,
+    charge: bool,
+    player: int,
+}
+
+Player :: blob {
+    mass: float,
+    rad: float,
+    pos: (float, float),
+    vel: (float, float),
+    rot: float,
+    acc: float,
+    charge: float,
+    puck: Puck?,
+    try_grab: fn Puck -> void,
+    tackle_timer: float,
+    input: Input?,
+    player_num: int,
+    owner_id: int,
+    draw: fn -> void,
+    process_input: fn float -> void,
+    update: fn float -> void,
+}
+
+player_new :: fn pos: (float, float), team: int, num: int, owner: int -> Player {
+    sprites :: assets.player1 if team == 0 else assets.player2
+    charge_osc := 4.0
+    charge_start_osc_offset := pi * 7./4.
+
+    self: !Player = nil
+    self = Player {
+        mass: 100.0,
+        rad: 0.05,
+        pos: pos,
+        rot: 0.0,
+        vel: (0.0, 0.0),
+        acc: 0.0,
+        charge: 0.0,
+        puck: nil,
+        try_grab: fn puck: Puck -> void {
+            if (magnitude(self.pos - puck.pos) < 0.05
+                && puck.holder is nil
+                && puck.hold_cooldown == 0.0) {
+                self.puck = puck
+                puck.holder = self
+            }
+        },
+        tackle_timer: 0.0,
+        input: nil,
+        player_num: num,
+        owner_id: owner,
+        draw: fn -> void {
+            segment :: ((1 if self.rot > 1./4. * pi else 0) +
+                        (1 if self.rot > 3./4. * pi else 0) +
+                        (1 if self.rot > 5./4. * pi else 0) -
+                        (3 if self.rot > 7./4. * pi else 0))
+            sprite :: sprites[segment]
+            widths :: [-12.0, 13.0, 12.0, 13.0]
+            width :: widths[segment]
+            height :: 15.
+            scale :: 3.
+            offset :: (0., self.rad)
+
+            // Hitbox
+            // l_gfx_rect' self.pos, (self.rad, self.rad) * 2., self.rot, (0., 0., 0.)
+
+            // Puck (if held)
+            puck_offsets :: [(1.0, 0.0), (1.0, 0.0), (-1.0, 0.0), (-1.0, -0.5)]
+            puck_before :: segment < 3
+
+            // Puck (if held)
+            if (puck_before && self.puck is :Puck) {
+                p: !Puck = self.puck
+                p.pos += puck_offsets[segment] * self.rad
+                p.draw'
+                p.pos -= puck_offsets[segment] * self.rad
+            }
+
+            l_gfx_sprite' sprite, (0, 0), self.pos + offset, (width, height) / height * self.rad * scale
+
+            // Puck (if held)
+            if (!puck_before && self.puck is :Puck) {
+                p: !Puck = self.puck
+                p.pos += puck_offsets[segment] * self.rad
+                p.draw'
+                p.pos -= puck_offsets[segment] * self.rad
+            }
+
+            // Arrow (if current player)
+            if self.player_num == game.current_player && self.owner_id == game.player_id {
+                // Red/green matches player colors.
+                color := (1., 0., 0., 1.) if team == 0 else (0.1176, 0.7608, 0.2275, 1.)
+                // How much the shot charge moves the arrow out (linearly).
+                charge_offset := (sin(charge_osc * self.charge + charge_start_osc_offset) * 0.08) + 0.08
+                // The sum arrow offset (relative to the player sprite).
+                arrow_offset := (cos(self.rot), sin(self.rot)) * (0.10 + charge_offset)
+                l_gfx_sprite' assets.arrow, (0, 0), self.pos + offset + arrow_offset, (5., 7.) / height * self.rad * scale, self.rot + pi, color
+            }
+        },
+        process_input: fn delta: float -> void {
+            if self.input is nil {
+                ret
+            }
+            input: !Input = self.input
+
+            // Shooting
+            if self.puck is :Puck && (((input.charge || input.shoot) && self.charge != 0.0) || (input.tackle && self.charge == 0.0)) {
+                if input.shoot {
+                    shoot_speed :: max(sin(charge_osc * self.charge + charge_start_osc_offset) * 1.2, -1.0) + 1.8
+                    puck: !Puck = self.puck
+                    puck.vel = util.dir(self.rot) * shoot_speed
+                    puck.hold_cooldown = 0.1
+                    puck.holder = nil
+                    self.puck = nil
+                    self.charge = 0.0
+                }
+
+                if input.charge {
+                    self.charge += delta
+                    break_fric :: 3.0
+                    self.vel = util.friction' self.vel, break_fric * delta
+                } else {
+                    self.charge = 0.0
+                }
+            }
+
+            // Tackling
+            if self.tackle_timer == 0.0 && input.tackle && self.puck is nil {
+                self.tackle_timer = 1.0
+                self.vel += util.dir(self.rot) * 2.0
+            }
+
+            if self.tackle_timer > 0.5 {
+                input.dir = (0.0, 0.0)
+            }
+
+            force :: 3.0
+            self.acc += force * magnitude' input.dir
+
+            // Rotation
+            max_rotation :: 4.0 + 6.0 / (2.0 * magnitude(input.dir) + 0.1) // rad/sec
+            rotation_speed :: 2.0 * 3.14
+
+            direction_angle :: angle(input.dir) if input.dir != (0.0, 0.0) else self.rot
+            delta_angle :: util.angle_distance' self.rot, direction_angle
+            rotation :: util.clamp' delta_angle * rotation_speed, -max_rotation, max_rotation
+            self.rot += rotation * delta
+            self.rot = rem' self.rot, 2. * pi
+        },
+        update: fn delta: float -> void {
+            self.tackle_timer = max' 0.0, self.tackle_timer - delta
+
+            // Linear motion
+            self.vel += util.dir(self.rot) * self.acc * delta
+            self.acc = 0.0
+
+            // Air resistance
+            air_fric :: 0.20 - self.tackle_timer * 0.1
+            self.vel *= pow' air_fric, delta
+
+            // Friction
+            ice_fric :: 0.8
+            self.vel = util.friction' self.vel, ice_fric * delta
+
+            // Puck
+            if self.puck is :Puck {
+                puck: !Puck = self.puck
+                puck.pos = self.pos
+                // Without velocity the collisions won't work...
+                puck.vel = self.vel
+            }
+
+            // Particles
+            particles.skate' self
+        }
+    }
+    ret self
+}
+
+:Player is :Entity
+:Player is :collision.Circle
+:Player is :collision.Body
+:Player is :collision.CircleBody
+
+Puck :: blob {
+    mass: float,
+    rad: float,
+    pos: (float, float),
+    vel: (float, float),
+    holder: Player?,
+    hold_cooldown: float,
+    draw: fn -> void,
+    update: fn float -> void,
+}
+
+// we might need to tweek mass numbers
+puck_new :: fn pos: (float, float) -> Puck {
+    circle_rad :: 0.02
+    self: !Puck = nil
+    self = Puck{
+        mass: 0.5,
+        rad: sqrt(circle_rad * circle_rad * 2.0),
+        pos: pos,
+        vel: (0.0, 0.0),
+        holder: nil,
+        hold_cooldown: 0.0,
+        draw: fn -> void {
+            rad :: (circle_rad, circle_rad) * 2.0
+            width :: 7.
+            height :: 6.
+            l_gfx_sprite' assets.puck, (0, 0), self.pos, (width, height) / height * self.rad * 1.65
+        },
+        update: fn delta: float -> void {
+            // Pickup cooldown
+            self.hold_cooldown = max' self.hold_cooldown - delta, 0.0
+
+            // Friction
+            ice_fric :: 1.0
+            speed :: magnitude' self.vel
+            self.vel = util.friction' self.vel, ice_fric * delta
+        }
+    }
+    ret self
+}
+
+:Puck is :Entity
+:Puck is :collision.Circle
+:Puck is :collision.Body
+:Puck is :collision.CircleBody

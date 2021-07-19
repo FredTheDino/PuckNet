@@ -1,5 +1,6 @@
 use assets
 use collision
+use entity
 use game
 
 Goal :: blob {
@@ -11,7 +12,7 @@ Goal :: blob {
     update: fn float -> void,
 }
 
-:Goal is :game.Entity
+:Goal is :entity.Entity
 :Goal is :collision.Circle
 
 goal_new :: fn pos: (float, float), dir: float, arena_scale: float -> Goal {
@@ -64,7 +65,7 @@ Mupp :: blob {
     sprite: int,
 }
 
-:Arena is :game.Entity
+:Arena is :entity.Entity
 
 arena_new :: fn pos: (float, float) -> Arena {
     pos :: (0.0, 0.0)

@@ -1,3 +1,4 @@
+use entity
 use game
 
 goal_parts := ("", 0)
@@ -18,7 +19,7 @@ goal_small :: fn pos: (float, float) {
 
 skate_parts := ("", 0)
 
-skate :: fn player: game.Player {
+skate :: fn player: entity.Player {
     offset :: (0., -player.rad) / 2.
     l_gfx_particle_x(skate_parts, (player.pos[0], player.pos[0]) + offset)
     l_gfx_particle_y(skate_parts, (player.pos[1], player.pos[1]) + offset)
