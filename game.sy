@@ -364,8 +364,6 @@ process_input :: fn delta: float {
 }
 
 update :: fn delta: float -> void {
-    arena.update' delta
-
     players -> for_each' fn p: Player {
         p.try_grab' puck
     }
@@ -400,7 +398,7 @@ update :: fn delta: float -> void {
                 if a_i >= b_i {
                     ret
                 }
-                if a is :Puck || b is :Puck {
+                if :Puck is a || :Puck is b {
                     ret
                 }
                 col :: collision.circle_vs_circle' a, b, delta * t * (a.vel - b.vel)
@@ -432,25 +430,58 @@ update :: fn delta: float -> void {
                 next_col = col
                 is_collision = true
             }
-
+            // Goal outside collision
+            arena.goals -> for_each' fn g: arena_mod.Goal {
+                col :: collision.circle_vs_circle' a, g.cage, delta * t * (a.vel - g.cage.vel)
+                if col.t <= 0.0 || next_col.t < col.t {
+                    ret
+                }
+                if abs(a.pos[0]) > abs(g.cage.pos[0]) || sign(col.normal[0]) == sign(g.cage.pos[0]) {
+                    ret
+                }
+                next_col = col
+                is_collision = true
+            }
+            // Goal inside collision
+            arena.goals -> for_each' fn g: arena_mod.Goal {
+                a.rad = -a.rad
+                col :: collision.circle_vs_circle' a, g.cage, delta * t * (a.vel - g.cage.vel)
+                a.rad = -a.rad
+                if col.t <= 0.0 || next_col.t < col.t {
+                    ret
+                }
+                if abs(a.pos[0]) > abs(g.cage.pos[0]) || sign(col.normal[0]) != sign(g.cage.pos[0]) {
+                    ret
+                }
+                next_col = col
+                is_collision = true
+            }
+            a_i += 1
+        }
+        // Find next collision
+        a_i := 0
+        // TODO(ed): Write this with for_each, when the upvalue bug is fixed.
+        loop a_i < len(bodies) {
+            a := bodies[a_i]
+            b_i := -1
             // TODO(ed): For 100% accuracy - this needs to move out
             // of the loop, and be checked afterwards.
-            if a is :Puck {
-                //arena.goals -> for_each' fn g: collision.Circle {
-                //    col :: collision.circle_vs_circle' a, g, delta * t * a.vel
-                //    if 0.0 <= col.t && col.t < t {
+            if :Puck is a {
+                arena.goals -> for_each' fn g: collision.Circle {
+                    col :: collision.circle_vs_circle' a, g, delta * t * a.vel
+                    if 0.0 <= col.t && col.t < t {
 
-                //        particles.goal' g.pos
-                //        n_rpc_clients' particles.goal, g.pos
-                //        puck.vel *= 0.0
-                //        puck.pos *= 0.0
-                //        if :Player is puck.holder {
-                //            holder: !Player = puck.holder
-                //            holder.puck = nil
-                //        }
-                //        puck.holder = nil
-                //    }
-                //}
+                        particles.goal' g.pos
+                        n_rpc_clients' particles.goal, g.pos
+                        puck.vel *= 0.0
+                        puck.pos *= 0.0
+                        if :Player is puck.holder {
+                            holder: !Player = puck.holder
+                            holder.puck = nil
+                        }
+                        puck.holder = nil
+                    }
+                }
             }
             a_i += 1
         }
@@ -460,6 +491,7 @@ update :: fn delta: float -> void {
         bodies -> for_each' fn c: collision.Body {
             c.pos += c.vel * step * delta
         }
+        arena.update' step * delta
 
         true <=> :collision.Body is :Player
 
@@ -509,10 +541,14 @@ update :: fn delta: float -> void {
             tot_mass :: (a.mass + b.mass)
 
             skin :: 0.001
-            a.pos += n * skin
-            a.vel += n * -relative_v * a.mass / tot_mass
-            b.pos -= n * skin
-            b.vel += n * relative_v * b.mass / tot_mass
+            if a.mass != 0. {
+                a.pos += n * skin
+                a.vel += n * -relative_v * a.mass / tot_mass
+            }
+            if b.mass != 0. {
+                b.pos -= n * skin
+                b.vel += n * relative_v * b.mass / tot_mass
+            }
         }
         t -= step
     }

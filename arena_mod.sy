@@ -17,35 +17,37 @@ Goal :: blob {
 goal_new :: fn pos: (float, float), dir: float, arena_scale: float -> Goal {
 
     scale :: 13. / 100. * arena_scale
-    width :: 8. / 13.* scale
-    height :: 13. / 13. * scale
+    px :: 1. / 13. * scale
+    width :: 8. * px
+    height :: 13. * px
     offset :: (arena_scale * .89 - width / 2., 0.) * dir
+    pole_rad :: px / 2.
 
     self: !Goal = nil
     self = Goal{
-        rad: width / 2. * .99,
-        pos: pos + offset,
+        rad: width / 2. * .75,
+        pos: pos + offset + (px, 0.) * dir,
         vel: (0.0, 0.5),
         cage: collision.CircleBody{
-            mass: 100.,
-            rad: height / 2.,
-            pos: pos - (offset + (width / 2., 0.) * dir),
+            mass: 0.,
+            rad: width - px,
+            pos: pos - (offset + (width / 2. - px, 0.) * dir),
             vel: (0.0, 0.5),
         },
         draw: fn {
             l_gfx_sprite' assets.goal, (0, 0), self.pos, (width * dir, height)
 
             // Goal hitbox(es)
-            l_gfx_rect(self.pos, (self.rad, self.rad) * sqrt(2.), game.pi / 4., (0., 0., 0.))
-            l_gfx_rect(self.cage.pos, (self.cage.rad, self.cage.rad) * sqrt(2.), game.pi / 4., (0., 0., 0., .5))
+            // l_gfx_rect(self.pos, (self.rad, self.rad) * sqrt(2.), game.pi / 4., (0., 0., 0.))
+            // l_gfx_rect(self.cage.pos, (self.cage.rad, self.cage.rad) * sqrt(2.), game.pi / 4., (0., 0., 0., .5))
         },
         update: fn delta: float {
-            if abs(self.pos[1]) > arena_scale * .8 / 2. {
+            self.pos += self.vel * delta
+            self.cage.pos += self.cage.vel * delta
+            if abs(self.pos[1]) > arena_scale * .7 / 2. {
                 self.vel = (self.vel[0], -sign(self.pos[1]) * abs(self.vel[1]))
                 self.cage.vel = self.vel
             }
-            self.pos += self.vel * delta
-            self.cage.pos = (self.cage.pos[0], self.pos[1])
         }
     }
 
