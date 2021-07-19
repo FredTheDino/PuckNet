@@ -605,9 +605,10 @@ update :: fn delta: float -> void {
     particles.update' delta
 }
 
-set_entities :: fn incoming_entities: [Entity], incoming_players: [Player] {
+set_entities :: fn incoming_entities: [Entity], incoming_players: [Player], incomming_arena: Arena {
     entities = incoming_entities
     players = incoming_players
+    arena = incomming_arena
 }
 
 draw :: fn {
