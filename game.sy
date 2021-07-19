@@ -57,8 +57,9 @@ Player :: blob {
 }
 
 player_new :: fn pos: (float, float), team: int -> Player {
-
     sprites :: assets.player1 if team == 0 else assets.player2
+    charge_osc := 2.0
+    charge_osc_offset := 0.15
 
     self: !Player = nil
     self = Player {
@@ -116,6 +117,13 @@ player_new :: fn pos: (float, float), team: int -> Player {
                 p.draw'
                 p.pos -= puck_offsets[segment] * self.rad
             }
+
+            // Arrow
+            // How much the shot charge moves the arrow out (linearly)
+            charge_offset := (sin(charge_osc * self.charge + charge_osc_offset) * 0.08) + 0.08
+            // The sum arrow offset (relative to the player sprite)
+            arrow_offset := (cos(self.rot), sin(self.rot)) * (0.15 + charge_offset)
+            l_gfx_sprite' assets.arrow, (0, 0), self.pos + offset + arrow_offset, (0.3, 0.3) * self.rad * scale, self.rot + pi, (1., 0., 0., 1.)
         },
         process_input: fn delta: float -> void {
             if self.input is nil {
@@ -124,9 +132,8 @@ player_new :: fn pos: (float, float), team: int -> Player {
             input: !Input = self.input
 
             if self.puck is :Puck {
-                if input.shoot && self.puck is :Puck {
-                    shoot_speed :: max(sin(0.15 + self.charge * 2.0) * 1.2, -1.0) + 1.5
-
+                if input.shoot {
+                    shoot_speed :: max(sin(charge_osc * self.charge + charge_osc_offset) * 1.2, -1.0) + 1.5
                     puck: !Puck = self.puck
                     puck.vel = dir(self.rot) * shoot_speed
                     puck.hold_cooldown = 0.1
@@ -584,6 +591,7 @@ start :: fn {
 
     l_set_window_size' (800, 800)
 
+    init'
     [0, 1] -> for_each' fn _:int {
         player := player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5)), _
         push' players, player
@@ -594,7 +602,6 @@ start :: fn {
     player_id = 0
 
     bind_keys'
-    init'
     loop !l_input_down("quit") {
         l_update'
         l_render'
