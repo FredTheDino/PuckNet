@@ -1,9 +1,9 @@
 use arena_mod
 use assets
 use collision
+use mupps
 use particles
 use tick
-use mupps
 
 pi :: 3.14159265358979
 
