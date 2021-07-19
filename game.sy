@@ -123,7 +123,7 @@ player_new :: fn pos: (float, float), team: int -> Player {
             charge_offset := (sin(charge_osc * self.charge + charge_start_osc_offset) * 0.08) + 0.08
             // The sum arrow offset (relative to the player sprite)
             arrow_offset := (cos(self.rot), sin(self.rot)) * (0.15 + charge_offset)
-            l_gfx_sprite' assets.arrow, (0, 0), self.pos + offset + arrow_offset, (0.3, 0.3) * self.rad * scale, self.rot + pi, (1., 0., 0., 1.)
+            l_gfx_sprite' assets.arrow, (0, 0), self.pos + offset + arrow_offset, (1., 7./5.) * 0.3 * self.rad * scale, self.rot + pi, (1., 0., 0., 1.)
         },
         process_input: fn delta: float -> void {
             if self.input is nil {
