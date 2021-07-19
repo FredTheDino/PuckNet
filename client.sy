@@ -15,7 +15,7 @@ start :: fn {
 
     game.init'
     update_ticker := game.tick.ticker_new' 60.0
-    input: game.Input? = nil
+    input: entity.Input? = nil
     loop !l_input_down("quit") {
         n_rpc_resolve'
 
@@ -25,7 +25,7 @@ start :: fn {
         if input is nil {
             input = new_input
         } else {
-            input_: !game.Input = input
+            input_: !entity.Input = input
             input = game.merge_inputs(input_, new_input)
         }
         if update_ticker.next(l_delta()) {
