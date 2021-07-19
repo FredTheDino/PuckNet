@@ -19,32 +19,9 @@ Mupp :: blob {
 
 :Arena is :game.Entity
 
-
 arena_new :: fn pos: (float, float) -> Arena {
     pos :: (0.0, 0.0)
     scale :: 2.0
-
-    muppets:[Mupp]: []
-    place_mupps :: fn lo_x: float, hi_x: float, lo_y: float, hi_y: float {
-        y := hi_y
-        loop y > lo_y {
-            x := lo_x
-            loop x < hi_x {
-                muppets -> push' Mupp {
-                    pos: (x + 0.5 * rem(y, 2.0), y) + (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5)),
-                    bobbiness: l_random_range(0.1, 0.5),
-                    rgb: (l_random_range(0.2, 0.4), l_random_range(0.2, 0.4), l_random_range(0.2, 0.4)),
-                    sprite: l_random_range(0, 3),
-                }
-                x += 1.0
-            }
-            y -= 1.0
-        }
-    }
-
-    place_mupps(-45.5, -26.0, -20.0, 20.0)
-    place_mupps( 26.0, 45.5, -20.0, 20.0)
-    place_mupps( -26.0, 26.0, -20.0, -13.0)
 
     r :: scale / 5.0
     x :: 0.80 * scale
@@ -70,14 +47,6 @@ arena_new :: fn pos: (float, float) -> Arena {
             l_gfx_sprite(assets.border, (0, 0), pos + (0.0, scale / 2.0), (2.0, 2.0 * 40.0 / 200.0) * scale)
             // TODO(ed): Move this to a custom file - it needs to be
             // rendered on top of the player
-            t :: l_time()
-            exitement :: sin(t)
-            muppets -> for_each(fn m: Mupp {
-                mupp :: assets.mupps[m.sprite]
-                scale :: as_float(mupp[1][1]) / as_float(mupp[1][0])
-                uni_scale :: 0.1
-                l_gfx_sprite(mupp[0], (0, 0), 0.08 * m.pos + 0.1 * (0.0, sin((t + 100.0) * exitement * exitement * m.bobbiness)) * m.bobbiness, (uni_scale) * (1.0, scale), m.rgb)
-            })
         },
         update: fn delta: float {
         },
