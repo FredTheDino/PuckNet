@@ -1,0 +1,20 @@
+clamp :: fn v: float, lo: float, hi: float -> float {
+    min' hi, max' lo, v
+}
+
+dir :: fn rot: float -> (float, float) {
+    (cos(rot), sin(rot))
+}
+
+angle_distance :: fn a: float, b: float -> float {
+    angle' dir' b - a
+}
+
+friction :: fn v: (float, float), f: float -> (float, float) {
+    if magnitude(v) <= f {
+        ret (0.0, 0.0)
+    } else {
+        ret v - normalize(v) * f
+    }
+}
+
