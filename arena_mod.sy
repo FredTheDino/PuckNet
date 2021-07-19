@@ -12,7 +12,7 @@ Goal :: blob {
 }
 
 :Goal is :game.Entity
-:Goal is :collision.Body
+:Goal is :collision.Circle
 
 goal_new :: fn pos: (float, float), dir: float, arena_scale: float -> Goal {
 
@@ -21,7 +21,6 @@ goal_new :: fn pos: (float, float), dir: float, arena_scale: float -> Goal {
     width :: 8. * px
     height :: 13. * px
     offset :: (arena_scale * .89 - width / 2., 0.) * dir
-    pole_rad :: px / 2.
 
     self: !Goal = nil
     self = Goal{
@@ -36,10 +35,6 @@ goal_new :: fn pos: (float, float), dir: float, arena_scale: float -> Goal {
         },
         draw: fn {
             l_gfx_sprite' assets.goal, (0, 0), self.pos, (width * dir, height)
-
-            // Goal hitbox(es)
-            // l_gfx_rect(self.pos, (self.rad, self.rad) * sqrt(2.), game.pi / 4., (0., 0., 0.))
-            // l_gfx_rect(self.cage.pos, (self.cage.rad, self.cage.rad) * sqrt(2.), game.pi / 4., (0., 0., 0., .5))
         },
         update: fn delta: float {
             self.pos += self.vel * delta

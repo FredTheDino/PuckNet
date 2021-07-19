@@ -487,6 +487,7 @@ update :: fn delta: float -> void {
             }
             // Goal inside collision
             arena.goals -> for_each' fn g: arena_mod.Goal {
+                // :(
                 a.rad = -a.rad
                 col :: collision.circle_vs_circle' a, g.cage, delta * t * (a.vel - g.cage.vel)
                 a.rad = -a.rad
