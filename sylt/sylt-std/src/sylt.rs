@@ -1,6 +1,7 @@
 use crate as sylt_std;
 
 use owo_colors::OwoColorize;
+use std::cell::RefCell;
 use std::rc::Rc;
 use sylt_common::error::RuntimeError;
 use sylt_common::{Blob, RuntimeContext, Type, Value};
@@ -39,7 +40,8 @@ pub fn for_each(ctx: RuntimeContext<'_>) -> Result<Value, RuntimeError> {
     ));
 }
 
-#[sylt_macro::sylt_doc(push, "Appends an element to the end of a list", [One(List(ls)), One(Value(val))] Type::Void)]
+#[sylt_macro::sylt_doc(push, "Appends an element to the end of a list",
+  [One(List(ls)), One(Value(val))] Type::Void)]
 #[sylt_macro::sylt_link(push, "sylt_std::sylt")]
 pub fn push<'t>(ctx: RuntimeContext<'t>) -> Result<Value, RuntimeError> {
     let values = ctx.machine.stack_from_base(ctx.stack_base);
@@ -62,6 +64,38 @@ pub fn push<'t>(ctx: RuntimeContext<'t>) -> Result<Value, RuntimeError> {
         }
         (values, _) => Err(RuntimeError::ExternTypeMismatch(
             "push".to_string(),
+            values.iter().map(Type::from).collect(),
+        )),
+    }
+}
+
+#[sylt_macro::sylt_doc(add, "Inserts a value into a set",
+  [One(Set(ls)), One(Value(val))] Type::Void)]
+#[sylt_macro::sylt_link(add, "sylt_std::sylt")]
+pub fn add<'t>(ctx: RuntimeContext<'t>) -> Result<Value, RuntimeError> {
+    let values = ctx.machine.stack_from_base(ctx.stack_base);
+    match (values.as_ref(), ctx.typecheck) {
+        ([Value::Set(ls), v], true) => {
+            let ls = Type::from(Value::Set(ls.clone()));
+            let ty = if let Type::Set(ty) = &ls {
+                ty
+            } else {
+                unreachable!()
+            };
+            let v = Type::from(&*v);
+            if ty.fits(&v, &ctx.machine.blobs()).is_ok() || matches!(ls, Type::Unknown) {
+                Ok(Value::Nil)
+            } else {
+                Err(RuntimeError::TypeMismatch(ls, v))
+            }
+        }
+        ([Value::Set(ls), v], false) => {
+            // NOTE(ed): Deliberately no type checking.
+            ls.borrow_mut().insert(v.clone());
+            Ok(Value::Nil)
+        }
+        (values, _) => Err(RuntimeError::ExternTypeMismatch(
+            "add".to_string(),
             values.iter().map(Type::from).collect(),
         )),
     }
@@ -171,6 +205,21 @@ sylt_macro::extern_function!(
     "Converts the int to a float"
     [One(Float(t))] -> Type::Int => {
         Ok(Int(*t as i64))
+    },
+);
+
+sylt_macro::extern_function!(
+    "sylt_std::sylt"
+    as_chars
+    "Converts an ASCII string into a list of chars. Non-ASCII is converted to '?'."
+    [One(String(s))] -> Type::List(Box::new(Type::Int)) => {
+        let chars = s
+            .chars()
+            .map(|c| if c.is_ascii() { c } else { '?' } as i64)
+            .map(Value::Int)
+            .collect();
+
+        Ok(Value::List(Rc::new(RefCell::new(chars))))
     },
 );
 
@@ -350,6 +399,15 @@ sylt_macro::extern_function!(
     },
     [Three(Float(ax), Float(ay), Float(az)), Three(Float(bx), Float(by), Float(bz))] -> Type::Float => {
         Ok(Float(ax * bx + ay * by + az * bz))
+    },
+);
+
+sylt_macro::extern_function!(
+    "sylt_std::sylt"
+    debug_assertions
+    "Whether the sylt runtime was compiled with debug assertions or not."
+    [] -> Type::Bool => {
+        Ok(Bool(cfg!(debug_assertions)))
     },
 );
 

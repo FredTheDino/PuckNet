@@ -1,23 +1,51 @@
-arena :: l_load_image' "res/rink.png", (200, 100)
-goal :: l_load_image' "res/goal.png", (8, 13)
-player1_back :: l_load_image' "res/player1_back.png", (13, 15)
-player1_front :: l_load_image' "res/player1_front.png", (13, 15)
-player1_side :: l_load_image' "res/player1_side.png", (12, 15)
-player2_back :: l_load_image' "res/player2_back.png", (13, 15)
-player2_front :: l_load_image' "res/player2_front.png", (13, 15)
-player2_side :: l_load_image' "res/player2_side.png", (12, 15)
-puck :: l_load_image' "res/puck.png", (7, 6)
+empty_asset :: ("", 0)
 
-player1 :: [
-    player1_side,
-    player1_back,
-    player1_side,
-    player1_front,
-]
+ads := empty_asset
+arena := empty_asset
+arrow := empty_asset
+border := empty_asset
+font := empty_asset
+goal := empty_asset
+puck := empty_asset
 
-player2 :: [
-    player2_side,
-    player2_back,
-    player2_side,
-    player2_front,
-]
+player1 : [(str, int)] = []
+player2 : [(str, int)] = []
+mupps : [((str, int), (int, int))] = []
+
+load_assets :: fn {
+    ads = l_load_image' "res/ads.png", (401, 20)
+    arena = l_load_image' "res/rink.png", (200, 100)
+    arrow = l_load_image' "res/arrow.png", (5, 7)
+    border = l_load_image' "res/border.png", (200, 40)
+    font = l_load_image' "res/font.png", (14, 18)
+    goal = l_load_image' "res/goal.png", (8, 13)
+    puck = l_load_image' "res/puck.png", (7, 6)
+
+    player1_back :: l_load_image' "res/player1_back.png", (13, 15)
+    player1_front :: l_load_image' "res/player1_front.png", (13, 15)
+    player1_side :: l_load_image' "res/player1_side.png", (12, 15)
+    player2_back :: l_load_image' "res/player2_back.png", (13, 15)
+    player2_front :: l_load_image' "res/player2_front.png", (13, 15)
+    player2_side :: l_load_image' "res/player2_side.png", (12, 15)
+
+    player1 = [
+        player1_side,
+        player1_back,
+        player1_side,
+        player1_front,
+    ]
+
+    player2 = [
+        player2_side,
+        player2_back,
+        player2_side,
+        player2_front,
+    ]
+
+    mupps = [
+        (l_load_image("res/crowd1.png", (9, 21)), (9, 21)),
+        (l_load_image("res/crowd2.png", (8, 13)), (8, 13)),
+        (l_load_image("res/crowd3.png", (10, 19)), (10, 19))
+        (l_load_image("res/crowd3.png", (8, 13)), (8, 13)),
+    ]
+}

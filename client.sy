@@ -3,7 +3,7 @@ use game
 start :: fn {
     game.bind_keys'
 
-    n_rpc_connect' "mattfolk.xyz"
+    n_rpc_connect' "127.0.0.1"
     n_rpc_server' game.player_join
 
     loop (len(game.players) <= 2 * game.player_id || game.player_id == -1) && !l_input_down("quit") {
@@ -14,15 +14,13 @@ start :: fn {
     }
 
     game.init'
-    tick :: 1.0 / 60.0
-    time :: 0.0
+    update_ticker := game.tick.ticker_new' 60.0
     input: game.Input? = nil
     loop !l_input_down("quit") {
         n_rpc_resolve'
 
         l_update'
         l_render'
-        time += l_delta'
         new_input := game.poll_input'
         if input is nil {
             input = new_input
@@ -30,10 +28,7 @@ start :: fn {
             input_: !game.Input = input
             input = game.merge_inputs(input_, new_input)
         }
-        if time >= tick {
-            // print "tick"
-            // print time
-            time -= tick
+        if update_ticker.next(l_delta()) {
             n_rpc_server' game.set_input, input
             input = nil
         }
