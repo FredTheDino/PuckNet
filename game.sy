@@ -21,6 +21,7 @@ main_menu_lines := [
     "Connect",
     "Practice",
     "Start server",
+    "Settings",
     "Credits",
     "Quit",
 ]
