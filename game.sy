@@ -207,7 +207,7 @@ collision_check :: fn delta:float {
                 }
                 if :entity.Puck is a {
                     particles.goal' a.pos
-                    n_rpc_clients' particles.goal, g.pos
+                    n_rpc_clients' particles.goal, a.pos
                     puck.vel *= 0.0
                     puck.pos *= 0.0
                     if :entity.Player is puck.holder {
