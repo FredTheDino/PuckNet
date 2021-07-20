@@ -379,6 +379,13 @@ update :: fn delta: float -> void {
             } else if main_menu_lines[main_menu.line_index] == "Practice" {
                 reset_state'
                 show_main_menu = false
+                [0, 1] -> for_each' fn id:int {
+                    player := entity.player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5)), id, id, 0
+                    push' players, player
+                    push' entities, player
+                    push' bodies, player
+                }
+                player_id = 0
             } else if main_menu_lines[main_menu.line_index] == "Quit" {
                 exit = true
             } else {
@@ -460,15 +467,6 @@ start :: fn {
     l_update'
 
     l_set_window_size' (800, 800) //TODO(gu): set on startup so the window doesn't change size during start
-
-    [0, 1] -> for_each' fn id:int {
-        player := entity.player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5)), id, id, 0
-        push' players, player
-        push' entities, player
-        push' bodies, player
-    }
-    num_players += 1
-    player_id = 0
 
     bind_keys'
     loop !l_input_down("quit") && !exit {
