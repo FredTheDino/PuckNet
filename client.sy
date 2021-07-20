@@ -18,7 +18,7 @@ connect :: fn ip: str -> bool {
 main_loop :: fn {
     update_ticker := game.tick.ticker_new' 60.0
     input: game.entity.Input? = nil
-    loop !l_input_down("quit") {
+    loop !game.exit {
         n_rpc_resolve'
 
         l_update'

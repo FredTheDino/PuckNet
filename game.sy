@@ -333,7 +333,6 @@ collision_check :: fn delta:float {
                     b.puck = a.puck
                     puck: !entity.Puck = b.puck
                     puck.holder = b
-                    a.puck = nil
                 }
                 if :entity.Puck is b.puck && magnitude_squared(a.vel) > magnitude_squared(b.vel) {
                     a.puck = b.puck
@@ -420,6 +419,7 @@ update :: fn delta: float -> void {
     } else {
         update_game' delta
     }
+    exit = exit || l_input_down("quit")
 }
 
 set_entities :: fn incoming_entities: [entity.Entity], incoming_players: [entity.Player], incomming_arena: arena_mod.Arena {
@@ -444,32 +444,36 @@ move_camera :: fn {
     }
 }
 
+draw_game :: fn {
+    move_camera'
+
+    arena.draw'
+    particles.render'
+
+    entities -> for_each' fn e: entity.Entity {
+        if !(e is :entity.Puck) {
+            e.draw'
+        }
+    }
+
+    entities -> for_each' fn e: entity.Entity {
+        if e is :entity.Puck {
+            p: !entity.Puck = e
+            // The holder will draw the puck in the right place if there is one
+            if p.holder is :void {
+                e.draw'
+            }
+        }
+    }
+
+    mupps.draw'
+}
+
 draw :: fn {
     if show_main_menu {
         main_menu.draw'
     } else {
-        move_camera'
-
-        arena.draw'
-        particles.render'
-
-        entities -> for_each' fn e: entity.Entity {
-            if !(e is :entity.Puck) {
-                e.draw'
-            }
-        }
-
-        entities -> for_each' fn e: entity.Entity {
-            if e is :entity.Puck {
-                p: !entity.Puck = e
-                // The holder will draw the puck in the right place if there is one
-                if p.holder is :void {
-                    e.draw'
-                }
-            }
-        }
-
-        mupps.draw'
+        draw_game'
     }
 }
 
@@ -482,7 +486,7 @@ start :: fn {
     l_set_window_size' (800, 800) //TODO(gu): set on startup so the window doesn't change size during start
 
     bind_keys'
-    loop !l_input_down("quit") && !exit {
+    loop !exit {
         l_update'
         l_render'
 
