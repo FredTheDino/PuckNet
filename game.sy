@@ -23,6 +23,8 @@ main_menu_lines := [
 main_menu : menu.Menu = menu.menu_new' main_menu_lines
 show_menu := true
 
+exit := false
+
 bind_keys :: fn {
     l_bind_key("w", "up")
     l_bind_key("a", "left")
@@ -339,6 +341,17 @@ collision_check :: fn delta:float {
 update :: fn delta: float -> void {
     if show_menu {
         main_menu.update' delta
+        if main_menu.line_selected {
+            if main_menu_lines[main_menu.line_index] == "Start" {
+                show_menu = false
+            } else if main_menu_lines[main_menu.line_index] == "Quit" {
+                exit = true
+            } else {
+                print "Unhandled main menu item:"
+                print main_menu_lines[main_menu.line_index]
+                exit = true
+            }
+        }
     } else {
         players -> for_each' fn p: entity.Player {
             p.try_grab' puck
@@ -382,7 +395,8 @@ draw :: fn {
     } else {
         move_camera'
 
-        arena.draw' particles.render'
+        arena.draw'
+        particles.render'
 
         entities -> for_each' fn e: entity.Entity {
             if !(e is :entity.Puck) {
@@ -421,7 +435,7 @@ start :: fn {
     player_id = 0
 
     bind_keys'
-    loop !l_input_down("quit") {
+    loop !l_input_down("quit") && !exit {
         l_update'
         l_render'
 
