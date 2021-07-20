@@ -48,11 +48,18 @@ bind_keys :: fn {
 }
 
 init :: fn {
-    push' entities, puck
-    push' bodies, puck
     mupps.init'
     particles.init'
     assets.load_assets'
+}
+
+reset_state :: fn {
+    puck.pos = (0.0, 0.0)
+    players = []
+    entities = [puck]
+    bodies = [puck]
+    num_players = 0
+    player_id = -1
 }
 
 num_players := 0
@@ -350,11 +357,13 @@ update :: fn delta: float -> void {
             if main_menu_lines[main_menu.line_index] == "Connect" {
                 // When we break out of the client loop, return here.
                 reset_state'
-                client.connect' "127.0.0.1"
-                show_main_menu = false
-                client.main_loop'
-                show_main_menu = true
-                main_menu.line_index = 0
+                if client.connect("127.0.0.1") {
+                    show_main_menu = false
+                    client.main_loop'
+                    show_main_menu = true
+                    main_menu.line_index = 0
+                }
+                //TODO(gu): else show connection error in ui in some way
             } else if main_menu_lines[main_menu.line_index] == "Start server" {
                 reset_state'
                 show_main_menu = false
@@ -362,6 +371,7 @@ update :: fn delta: float -> void {
                 show_main_menu = true
                 main_menu.line_index = 0
             } else if main_menu_lines[main_menu.line_index] == "Practice" {
+                reset_state'
                 show_main_menu = false
             } else if main_menu_lines[main_menu.line_index] == "Quit" {
                 exit = true
@@ -437,21 +447,13 @@ draw :: fn {
     }
 }
 
-reset_state :: fn {
-    puck.pos = (0.0, 0.0)
-    players = []
-    entities = [puck]
-    num_players = 0
-    player_id = -1
-}
-
 start :: fn {
     init'
 
     // Added for safety - to avoid delta=0
     l_update'
 
-    l_set_window_size' (800, 800)
+    l_set_window_size' (800, 800) //TODO(gu): set on startup so the window doesn't change size during start
 
     [0, 1] -> for_each' fn id:int {
         player := entity.player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5)), id, id, 0

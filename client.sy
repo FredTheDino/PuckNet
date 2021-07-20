@@ -1,6 +1,7 @@
 use game
 
-connect :: fn ip: str {
+connect :: fn ip: str -> bool {
+    //TODO(gu): return false if connection failed
     n_rpc_connect' ip
     n_rpc_server' game.player_join
 
@@ -10,6 +11,8 @@ connect :: fn ip: str {
         l_update'
         l_render'
     }
+
+    true
 }
 
 main_loop :: fn {

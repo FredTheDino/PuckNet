@@ -1,5 +1,4 @@
 empty_asset :: ("", 0)
-loaded := false
 
 ads := empty_asset
 arena := empty_asset
@@ -14,10 +13,6 @@ player2 : [(str, int)] = []
 mupps : [((str, int), (int, int))] = []
 
 load_assets :: fn {
-    if loaded {
-        ret
-    }
-    loaded = true
     ads = l_load_image' "res/ads.png", (401, 20)
     arena = l_load_image' "res/rink.png", (200, 100)
     arrow = l_load_image' "res/arrow.png", (5, 7)
