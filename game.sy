@@ -11,12 +11,14 @@ use tick
 use util
 
 GameState :: blob {
+    name: str,
     update: fn float -> void,
     draw: fn -> void,
     process_input: fn -> void,
 }
 
 current_game_state : GameState = GameState{
+    name: "",
     update: fn delta: float {},
     draw: fn {},
     process_input: fn{},
@@ -40,6 +42,7 @@ main_menu_lines := [
 main_menu : menu.Menu = menu.menu_new' main_menu_lines
 
 exit := false
+client_exit := false
 
 bind_keys :: fn {
     l_bind_key("w", "up")
@@ -269,16 +272,18 @@ collision_check :: fn delta:float {
 }
 
 menu_state :: GameState{
+    name: "menu",
     update: fn delta: float -> void {
         main_menu.update' delta
         if main_menu.line_selected {
             if main_menu_lines[main_menu.line_index] == "Connect" {
                 // When we break out of the client loop, return here.
                 reset_state'
+                client_exit = false
                 if client.connect("127.0.0.1") {
                     current_game_state = hockey_state
                     client.main_loop'
-                    current_game_state = menu_state
+                    n_rpc_disconnect'
                     main_menu.line_index = 0
                 }
                 //TODO(gu): else show connection error in ui in some way
@@ -314,6 +319,7 @@ menu_state :: GameState{
 }
 
 hockey_state :: GameState{
+    name: "hockey",
     update: fn delta: float -> void {
         players -> for_each' fn p: entity.Player {
             p.try_grab' puck
@@ -336,7 +342,16 @@ hockey_state :: GameState{
 
 update :: fn delta: float -> void {
     current_game_state.update' delta
-    exit = exit || l_input_down("quit")
+    if l_input_pressed("quit") {
+        reset_camera'
+        if current_game_state.name == hockey_state.name {
+            l_update'
+            client_exit = true
+            current_game_state = menu_state
+        } else {
+            exit = true
+        }
+    }
 }
 
 set_entities :: fn incoming_entities: [entity.Entity], incoming_players: [entity.Player], incomming_arena: arena_mod.Arena {
@@ -359,6 +374,11 @@ move_camera :: fn {
         l_gfx_camera_place' x, 0.0
         l_gfx_camera_set_zoom' 0.7
     }
+}
+
+reset_camera :: fn {
+    l_gfx_camera_place' 0.0, 0.0
+    l_gfx_camera_set_zoom' 1.0
 }
 
 draw_game :: fn {
