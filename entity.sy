@@ -17,6 +17,7 @@ Input :: blob {
     shoot: bool,
     charge: bool,
     player: int,
+    select: bool,
 }
 
 Player :: blob {
