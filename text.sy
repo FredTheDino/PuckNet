@@ -9,17 +9,17 @@ x_inc :: 0.42
 x_scale_global :: 0.08
 y_scale_global :: 0.1
 
-draw_text :: fn x: float, y: float, scale: float, s: str {
+draw_text :: fn x: float, y: float, scale: float, s: str, color: (float, float, float, float) {
     x := x
     as_chars(s) -> for_each' fn c: int -> {
-        draw_char' x, y, scale, c
+        draw_char' x, y, scale, c, color
         x += x_scale_global * scale * 0.85
     }
 }
 
-draw_char :: fn x: float, y: float, scale: float, c: int {
+draw_char :: fn x: float, y: float, scale: float, c: int, color: (float, float, float, float) {
     c >= 32 <=> true  // unprintable
     c <= 126 <=> true // upper bound
     scale := (x_scale_global, y_scale_global) * scale
-    l_gfx_sprite' assets.font, glyph_tile(c - 32), (x, y), scale, (1., 0., 0., 1.)
+    l_gfx_sprite' assets.font, glyph_tile(c - 32), (x, y), scale, color
 }

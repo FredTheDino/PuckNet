@@ -17,6 +17,7 @@ arena: arena_mod.Arena = arena_mod.arena_new' (0.0, 0.0)
 
 main_menu_lines := [
     "Start",
+    "Credits",
     "Quit",
 ]
 main_menu : menu.Menu = menu.menu_new' main_menu_lines
