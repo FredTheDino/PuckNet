@@ -1,9 +1,6 @@
-use entity
 use game
 
-start :: fn {
-    game.bind_keys'
-
+connect :: fn ip: str {
     n_rpc_connect' "127.0.0.1"
     n_rpc_server' game.player_join
 
@@ -13,10 +10,11 @@ start :: fn {
         l_update'
         l_render'
     }
+}
 
-    game.init'
+main_loop :: fn {
     update_ticker := game.tick.ticker_new' 60.0
-    input: entity.Input? = nil
+    input: game.entity.Input? = nil
     loop !l_input_down("quit") {
         n_rpc_resolve'
 
@@ -26,7 +24,7 @@ start :: fn {
         if input is nil {
             input = new_input
         } else {
-            input_: !entity.Input = input
+            input_: !game.entity.Input = input
             input = game.merge_inputs(input_, new_input)
         }
         if update_ticker.next(l_delta()) {

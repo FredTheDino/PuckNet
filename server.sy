@@ -1,8 +1,6 @@
 use game
 
-start :: fn {
-    game.init'
-    l_bind_quit("quit")
+main_loop :: fn {
     n_rpc_start_server'
 
     n_rpc_connect' "127.0.0.1", 8388
