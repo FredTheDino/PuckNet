@@ -1,7 +1,7 @@
 use entity
 use text
 
-MOVE_REPEAT := 5.       // per second
+MOVE_REPEAT := 5.        // per second
 MOVE_REPEAT_DELAY := 0.4 // seconds
 
 MenuInput :: blob {
