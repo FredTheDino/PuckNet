@@ -1,0 +1,11 @@
+start :: fn {
+    l_bind_quit("quit")
+    s := ""
+    l_set_text_input_enabled' true
+    loop {
+        l_update'
+        l_render'
+        s = l_text_input_update' s
+        print s
+    }
+}
