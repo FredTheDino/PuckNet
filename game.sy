@@ -38,6 +38,12 @@ bind_keys :: fn {
     l_bind_key("q", "swap_player")
     l_bind_key("SPACE", "shoot")
 
+    l_bind_key("Up", "up")
+    l_bind_key("Left", "left")
+    l_bind_key("Down", "down")
+    l_bind_key("Right", "right")
+    l_bind_key("Return", "shoot")
+
     l_bind_axis(0, "LEFTX", "right")
     l_bind_axis(0, "LEFTY", "down")
     l_bind_button(0, "Y", "swap_player")
