@@ -70,7 +70,8 @@ player_new :: fn pos: (float, float), team: int, num: int, owner: int -> Player 
                         (1 if self.rot > 3./4. * pi else 0) +
                         (1 if self.rot > 5./4. * pi else 0) -
                         (3 if self.rot > 7./4. * pi else 0))
-            sprite :: sprites[segment]
+            charge_sin :: sin(charge_osc * self.charge + charge_start_osc_offset)
+            sprite :: sprites[as_int(1.499 * (charge_sin + 1.))][segment]
             widths :: [-12.0, 13.0, 12.0, 13.0]
             width :: widths[segment]
             height :: 15.
@@ -92,6 +93,7 @@ player_new :: fn pos: (float, float), team: int, num: int, owner: int -> Player 
                 p.pos -= puck_offsets[segment] * self.rad
             }
 
+            // Player
             l_gfx_sprite' sprite, (0, 0), self.pos + offset, (width, height) / height * self.rad * scale
 
             // Puck (if held)
@@ -107,9 +109,9 @@ player_new :: fn pos: (float, float), team: int, num: int, owner: int -> Player 
                 // Red/green matches player colors.
                 color := (1., 0., 0., 1.) if team == 0 else (0.1176, 0.7608, 0.2275, 1.)
                 // How much the shot charge moves the arrow out (linearly).
-                charge_offset := (sin(charge_osc * self.charge + charge_start_osc_offset) * 0.08) + 0.08
+                charge_offset := (1. + charge_sin) * 0.08
                 // The sum arrow offset (relative to the player sprite).
-                arrow_offset := (cos(self.rot), sin(self.rot)) * (0.10 + charge_offset)
+                arrow_offset := (cos(self.rot), sin(self.rot)) * (0.1 + charge_offset)
                 l_gfx_sprite' assets.arrow, (0, 0), self.pos + offset + arrow_offset, (5., 7.) / height * self.rad * scale, self.rot + pi, color
             }
         },
@@ -118,11 +120,12 @@ player_new :: fn pos: (float, float), team: int, num: int, owner: int -> Player 
                 ret
             }
             input: !Input = self.input
+            charge_sin :: sin(charge_osc * self.charge + charge_start_osc_offset)
 
             // Shooting
             if self.puck is :Puck && (((input.charge || input.shoot) && self.charge != 0.0) || (input.tackle && self.charge == 0.0)) {
                 if input.shoot {
-                    shoot_speed :: max(sin(charge_osc * self.charge + charge_start_osc_offset) * 1.2, -1.0) + 1.8
+                    shoot_speed :: max(charge_sin * 1.2, -1.0) + 1.8
                     puck: !Puck = self.puck
                     puck.vel = util.dir(self.rot) * shoot_speed
                     puck.hold_cooldown = 0.1
