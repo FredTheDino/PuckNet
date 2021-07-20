@@ -361,56 +361,64 @@ collision_check :: fn delta:float {
     if iter == 0 { <!> }
 }
 
-update :: fn delta: float -> void {
-    if show_main_menu {
-        main_menu.update' delta
-        if main_menu.line_selected {
-            if main_menu_lines[main_menu.line_index] == "Connect" {
-                // When we break out of the client loop, return here.
-                reset_state'
-                if client.connect("127.0.0.1") {
-                    show_main_menu = false
-                    client.main_loop'
-                    show_main_menu = true
-                    main_menu.line_index = 0
-                }
-                //TODO(gu): else show connection error in ui in some way
-            } else if main_menu_lines[main_menu.line_index] == "Start server" {
-                reset_state'
+update_menu :: fn delta: float -> void {
+    main_menu.update' delta
+    if main_menu.line_selected {
+        if main_menu_lines[main_menu.line_index] == "Connect" {
+            // When we break out of the client loop, return here.
+            reset_state'
+            if client.connect("127.0.0.1") {
                 show_main_menu = false
-                server.main_loop'
+                client.main_loop'
                 show_main_menu = true
                 main_menu.line_index = 0
-            } else if main_menu_lines[main_menu.line_index] == "Practice" {
-                reset_state'
-                show_main_menu = false
-                [0, 1] -> for_each' fn id:int {
-                    player := entity.player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5)), id, id, 0
-                    push' players, player
-                    push' entities, player
-                    push' bodies, player
-                }
-                player_id = 0
-            } else if main_menu_lines[main_menu.line_index] == "Quit" {
-                exit = true
-            } else {
-                print "Unhandled main menu item:"
-                print main_menu_lines[main_menu.line_index]
-                exit = true
             }
+            //TODO(gu): else show connection error in ui in some way
+        } else if main_menu_lines[main_menu.line_index] == "Start server" {
+            reset_state'
+            show_main_menu = false
+            server.main_loop'
+            show_main_menu = true
+            main_menu.line_index = 0
+        } else if main_menu_lines[main_menu.line_index] == "Practice" {
+            reset_state'
+            show_main_menu = false
+            [0, 1] -> for_each' fn id:int {
+                player := entity.player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5)), id, id, 0
+                push' players, player
+                push' entities, player
+                push' bodies, player
+            }
+            player_id = 0
+        } else if main_menu_lines[main_menu.line_index] == "Quit" {
+            exit = true
+        } else {
+            print "Unhandled main menu item:"
+            print main_menu_lines[main_menu.line_index]
+            exit = true
         }
+    }
+}
+
+update_game :: fn delta: float -> void {
+    players -> for_each' fn p: entity.Player {
+        p.try_grab' puck
+    }
+
+    collision_check' delta
+
+    entities -> for_each' fn e: entity.Entity {
+        e.update' delta
+    }
+
+    particles.update' delta
+}
+
+update :: fn delta: float -> void {
+    if show_main_menu {
+        update_menu' delta
     } else {
-        players -> for_each' fn p: entity.Player {
-            p.try_grab' puck
-        }
-
-        collision_check' delta
-
-        entities -> for_each' fn e: entity.Entity {
-            e.update' delta
-        }
-
-        particles.update' delta
+        update_game' delta
     }
 }
 
