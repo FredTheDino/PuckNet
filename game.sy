@@ -1,9 +1,12 @@
 use arena_mod
 use assets
+use client
 use collision
 use entity
+use menu
 use mupps
 use particles
+use server
 use tick
 use util
 
@@ -14,6 +17,19 @@ puck : entity.Puck = entity.puck_new' (0.0, 0.0)
 bodies : [collision.CircleBody] = []
 arena: arena_mod.Arena = arena_mod.arena_new' (0.0, 0.0)
 
+main_menu_lines := [
+    "Connect",
+    "Practice",
+    "Start server",
+    "Settings",
+    "Credits",
+    "Quit",
+]
+main_menu : menu.Menu = menu.menu_new' main_menu_lines
+show_main_menu := true
+
+exit := false
+
 bind_keys :: fn {
     l_bind_key("w", "up")
     l_bind_key("a", "left")
@@ -22,21 +38,39 @@ bind_keys :: fn {
     l_bind_key("q", "swap_player")
     l_bind_key("SPACE", "shoot")
 
+    l_bind_key("Up", "up")
+    l_bind_key("Left", "left")
+    l_bind_key("Down", "down")
+    l_bind_key("Right", "right")
+    l_bind_key("Return", "shoot")
+
     l_bind_axis(0, "LEFTX", "right")
     l_bind_axis(0, "LEFTY", "down")
     l_bind_button(0, "Y", "swap_player")
     l_bind_button(0, "A", "shoot")
+
+    l_bind_button(0, "dpup", "up")
+    l_bind_button(0, "dpdown", "down")
+    l_bind_button(0, "dpleft", "left")
+    l_bind_button(0, "dpright", "right")
 
     l_bind_quit("quit")
     l_bind_key("ESCAPE", "quit")
 }
 
 init :: fn {
-    push' entities, puck
-    push' bodies, puck
     mupps.init'
     particles.init'
     assets.load_assets'
+}
+
+reset_state :: fn {
+    puck.pos = (0.0, 0.0)
+    players = []
+    entities = [puck]
+    bodies = [puck]
+    num_players = 0
+    player_id = -1
 }
 
 num_players := 0
@@ -80,20 +114,6 @@ poll_input :: fn -> entity.Input {
         current_player = rem' current_player, 2
     }
 
-    if player_id != -1 {
-        a :: 2 * player_id + current_player
-        b :: 2 * player_id + rem' current_player + 1, 2
-        delta_x :: abs' players[a].pos[0] - players[b].pos[0]
-        weight :: min' 1.0, 0.4 + delta_x * 0.5
-        x :: -(players[a].pos[0] * weight + players[b].pos[0] * (1.0 - weight))
-        curr_x :: l_gfx_camera_at()[0]
-
-        speed :: min' 1.0, 4.0 * l_delta'
-        x :: x * speed + curr_x * (1.0 - speed)
-        l_gfx_camera_place' x, 0.0
-        l_gfx_camera_set_zoom' 0.7
-    }
-
     entity.Input {
         dir: normalize((l_input_value("right") - l_input_value("left"),
                         l_input_value("up")    - l_input_value("down"))),
@@ -103,6 +123,7 @@ poll_input :: fn -> entity.Input {
         shoot: l_input_released("shoot"),
 
         player: 2 * player_id + current_player,
+        select: l_input_pressed("shoot")
     }
 }
 
@@ -125,6 +146,7 @@ merge_inputs :: fn current: entity.Input, new: entity.Input -> entity.Input {
             tackle: current.tackle || new.tackle,
             shoot: current.shoot || new.shoot,
             player: new.player,
+            select: current.select || new.select,
         }
     }
 }
@@ -136,10 +158,11 @@ clear_input :: fn input: entity.Input -> entity.Input {
         tackle: false,
         shoot: false,
         player: input.player,
+        select: false,
     }
 }
 
-process_input :: fn delta: float {
+process_player_input :: fn delta: float {
     players -> for_each' fn p: entity.Player {
         p.process_input' delta
         if p.input is :entity.Input {
@@ -233,7 +256,46 @@ collision_check :: fn delta:float {
     arena.update' delta
 }
 
-update :: fn delta: float -> void {
+update_menu :: fn delta: float -> void {
+    main_menu.update' delta
+    if main_menu.line_selected {
+        if main_menu_lines[main_menu.line_index] == "Connect" {
+            // When we break out of the client loop, return here.
+            reset_state'
+            if client.connect("127.0.0.1") {
+                show_main_menu = false
+                client.main_loop'
+                show_main_menu = true
+                main_menu.line_index = 0
+            }
+            //TODO(gu): else show connection error in ui in some way
+        } else if main_menu_lines[main_menu.line_index] == "Start server" {
+            reset_state'
+            show_main_menu = false
+            server.main_loop'
+            show_main_menu = true
+            main_menu.line_index = 0
+        } else if main_menu_lines[main_menu.line_index] == "Practice" {
+            reset_state'
+            show_main_menu = false
+            [0, 1] -> for_each' fn id:int {
+                player := entity.player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5)), id, id, 0
+                push' players, player
+                push' entities, player
+                push' bodies, player
+            }
+            player_id = 0
+        } else if main_menu_lines[main_menu.line_index] == "Quit" {
+            exit = true
+        } else {
+            print "Unhandled main menu item:"
+            print main_menu_lines[main_menu.line_index]
+            exit = true
+        }
+    }
+}
+
+update_game :: fn delta: float -> void {
     players -> for_each' fn p: entity.Player {
         p.try_grab' puck
     }
@@ -247,13 +309,40 @@ update :: fn delta: float -> void {
     particles.update' delta
 }
 
+update :: fn delta: float -> void {
+    if show_main_menu {
+        update_menu' delta
+    } else {
+        update_game' delta
+    }
+    exit = exit || l_input_down("quit")
+}
+
 set_entities :: fn incoming_entities: [entity.Entity], incoming_players: [entity.Player], incomming_arena: arena_mod.Arena {
     entities = incoming_entities
     players = incoming_players
     arena = incomming_arena
 }
 
-draw :: fn {
+move_camera :: fn {
+    if player_id != -1 {
+        a :: 2 * player_id + current_player
+        b :: 2 * player_id + rem' current_player + 1, 2
+        delta_x :: abs' players[a].pos[0] - players[b].pos[0]
+        weight :: min' 1.0, 0.4 + delta_x * 0.5
+        x :: -(players[a].pos[0] * weight + players[b].pos[0] * (1.0 - weight))
+        curr_x :: l_gfx_camera_at()[0]
+
+        speed :: min' 1.0, 4.0 * l_delta'
+        x :: x * speed + curr_x * (1.0 - speed)
+        l_gfx_camera_place' x, 0.0
+        l_gfx_camera_set_zoom' 0.7
+    }
+}
+
+draw_game :: fn {
+    move_camera'
+
     arena.draw'
     particles.render'
 
@@ -276,29 +365,33 @@ draw :: fn {
     mupps.draw'
 }
 
+draw :: fn {
+    if show_main_menu {
+        main_menu.draw'
+    } else {
+        draw_game'
+    }
+}
+
 start :: fn {
+    init'
+
     // Added for safety - to avoid delta=0
     l_update'
 
-    l_set_window_size' (800, 800)
-
-    init'
-    [0, 1] -> for_each' fn id:int {
-        player := entity.player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5)), id, id, 0
-        push' players, player
-        push' entities, player
-        push' bodies, player
-    }
-    num_players += 1
-    player_id = 0
+    l_set_window_size' (800, 800) //TODO(gu): set on startup so the window doesn't change size during start
 
     bind_keys'
-    loop !l_input_down("quit") {
+    loop !exit {
         l_update'
         l_render'
 
-        set_input' poll_input'
-        process_input' l_delta'
+        if show_main_menu {
+            main_menu.process_input' menu.from_input' poll_input'
+        } else {
+            set_input' poll_input'
+            process_player_input' l_delta'
+        }
 
         update' l_delta'
         draw'

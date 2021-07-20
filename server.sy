@@ -1,20 +1,18 @@
 use game
 
-start :: fn {
-    game.init'
-    l_bind_quit("quit")
+main_loop :: fn {
     n_rpc_start_server'
 
     n_rpc_connect' "127.0.0.1", 8388
     n_rpc_server' game.broadcast_server, "hello!"
 
-    loop !l_input_down("quit") {
+    loop !game.exit {
         n_rpc_resolve'
 
         l_update'
         l_render'
 
-        game.process_input' l_delta'
+        game.process_player_input' l_delta'
         game.update' l_delta'
         game.draw'
 
