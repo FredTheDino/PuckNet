@@ -26,7 +26,7 @@ main_menu_lines := [
     "Quit",
 ]
 main_menu : menu.Menu = menu.menu_new' main_menu_lines
-show_menu := true
+show_main_menu := true
 
 exit := false
 
@@ -344,25 +344,25 @@ collision_check :: fn delta:float {
 }
 
 update :: fn delta: float -> void {
-    if show_menu {
+    if show_main_menu {
         main_menu.update' delta
         if main_menu.line_selected {
             if main_menu_lines[main_menu.line_index] == "Connect" {
                 // When we break out of the client loop, return here.
                 reset_state'
                 client.connect' "127.0.0.1"
-                show_menu = false
+                show_main_menu = false
                 client.main_loop'
-                show_menu = true
+                show_main_menu = true
                 main_menu.line_index = 0
             } else if main_menu_lines[main_menu.line_index] == "Start server" {
                 reset_state'
-                show_menu = false
+                show_main_menu = false
                 server.main_loop'
-                show_menu = true
+                show_main_menu = true
                 main_menu.line_index = 0
             } else if main_menu_lines[main_menu.line_index] == "Practice" {
-                show_menu = false
+                show_main_menu = false
             } else if main_menu_lines[main_menu.line_index] == "Quit" {
                 exit = true
             } else {
@@ -409,7 +409,7 @@ move_camera :: fn {
 }
 
 draw :: fn {
-    if show_menu {
+    if show_main_menu {
         main_menu.draw'
     } else {
         move_camera'
@@ -467,7 +467,7 @@ start :: fn {
         l_update'
         l_render'
 
-        if show_menu {
+        if show_main_menu {
             main_menu.process_input' menu.from_input' poll_input'
         } else {
             set_input' poll_input'
