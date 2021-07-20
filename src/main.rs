@@ -22,13 +22,13 @@ struct Args {
 fn main() {
     let args = Args::parse_args_default_or_exit();
 
+    if args.is_client || args.is_server {
+        panic!("Unsupported! Run normally and use the main menu");
+    }
+
     let args = sylt::Args {
         file: if let Some(file) = args.file {
             file
-        } else if args.is_client {
-            PathBuf::from("client.sy")
-        } else if args.is_server {
-            PathBuf::from("server.sy")
         } else if args.is_browser {
             PathBuf::from("browser.sy")
         } else {
