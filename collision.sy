@@ -1,8 +1,10 @@
+use entity
+
 Manifold :: blob {
-    t: float,
     normal: (float, float),
-    a: Circle | Wall,
-    b: Circle | Wall,
+    depth: float,
+    a: CircleBody | Circle | Wall,
+    b: CircleBody | Circle | Wall,
 }
 
 Circle :: blob {
@@ -27,85 +29,92 @@ CircleBody :: blob {
     vel: (float, float),
 }
 
-// a  - a point on the first line
-// b  - a point on the second line
-// av - the direction the a-line is pointed
-// Returns the time until it occurs - on no overlap the time is negative
-line_vs_line :: fn a: (float, float), av: (float, float), b: (float, float), bv: (float, float) -> float {
-    // TODO(ed): Normalize `av`
-    top :: (b[0] - a[0]) * bv[1] - (b[1] - a[1]) * bv[0]
-    bot :: av[0] * bv[1] - av[1] * bv[0]
-    // NOTE(ed): This minus sign is here - I don't like it
-    ret -1.0 if bot == 0.0 else top / bot
-}
-
-// Checks the collision - movement is the relative
-// movement of the two objects seen from `a`.
-circle_vs_wall :: fn c: Circle, w: Wall, movement: (float, float) -> Manifold {
-    n :: w.normal if dot(w.normal, movement) < 0.0 else -w.normal
-
-    a :: c.pos
-    tan :: (w.normal[1], w.normal[0])
-
-    b :: w.pos + c.rad * n
-    t1 :: line_vs_line' a, movement, b, tan
-
-    b :: w.pos - c.rad * n
-    t2 :: line_vs_line' a, movement, b, tan
-
-    t :: min(t1, t2) if > 0.0 else max(t1, t2)
+circle_vs_wall :: fn c: Circle, w: Wall -> Manifold {
+    n :: w.normal
 
     Manifold {
-        t: t,
+        depth: dot(w.pos - c.pos, n) + c.rad,
         normal: n,
         a: c,
         b: w,
     }
 }
 
-// Checks the collision - movement is the relative
-// movement of the two objects seen from `a`.
-circle_vs_circle :: fn a: Circle, b: Circle, movement: (float, float) -> Manifold {
-    error :: Manifold{
-        t: -1.0,
-        normal: (0.0 , 0.0),
+circle_vs_circle :: fn a: Circle, b: Circle -> Manifold {
+    distance :: a.pos - b.pos
+    normal :: normalize' distance
+
+    Manifold {
+        normal: normal,
+        depth: a.rad + b.rad - dot(distance, normal),
         a: a,
         b: b,
     }
+}
 
-    speed :: magnitude' movement
-    if speed == 0.0 {
-        ret error
-    }
-
-    movement_dir :: movement / speed
+circle_vs_in_circle :: fn a: Circle, b: Circle -> Manifold {
     distance :: b.pos - a.pos
-    t_to_center :: dot' distance, movement_dir
-    closest :: a.pos + t_to_center * movement_dir
-    p_to_c_squared :: magnitude_squared' closest - b.pos
-    discriminant :: pow(a.rad + b.rad, 2.0) - p_to_c_squared
+    normal :: normalize' distance
 
-    if discriminant < 0.0 {
-        ret error
+    Manifold {
+        normal: normal,
+        depth: dot(distance, normal) + a.rad + b.rad,
+        a: a,
+        b: b,
     }
+}
 
-    delta :: sqrt(discriminant)
+solve :: fn col: Manifold {
+    // Elastic collision
+    n :: col.normal
 
-    t := (t_to_center - delta) / speed
-    if t < 0.0 || 1.0 < t {
-        t = (t_to_center + delta) / speed
-        if t < 0.0 || 1.0 < t {
-            ret error
+    a :!CircleBody = col.a
+    if !:CircleBody is a {
+        a = CircleBody{
+            mass: 0.0,
+            rad: 0.0,
+            pos: a.pos,
+            vel: (0.0, 0.0),
+        }
+    }
+    b :!CircleBody = col.b
+    if !:CircleBody is b {
+        b = CircleBody{
+            mass: 0.0,
+            rad: 0.0,
+            pos: b.pos,
+            vel: (0.0, 0.0),
         }
     }
 
-    n :: normalize' a.pos + t * movement - b.pos
-    n :: n if dot(n, movement) < 0.0 else -n
+    // Should the puck action be handled here?
+    if :entity.Player is a && :entity.Player is b {
+        a :!entity.Player : a
+        b :!entity.Player : b
+        if :entity.Puck is a.puck && magnitude_squared(a.vel) < magnitude_squared(b.vel) {
+            b.puck = a.puck
+            puck: !entity.Puck = b.puck
+            puck.holder = b
+            a.puck = nil
+        }
+        if :entity.Puck is b.puck && magnitude_squared(a.vel) > magnitude_squared(b.vel) {
+            a.puck = b.puck
+            puck: !entity.Puck = a.puck
+            puck.holder = a
+            b.puck = nil
+        }
+    }
 
-    Manifold {
-        t: t,
-        normal : n,
-        a: a,
-        b: b,
+    energy_kept :: 0.9
+    relative_v :: (1.0 + energy_kept) * (dot(a.vel, n) - dot(b.vel, n))
+    tot_mass :: (a.mass + b.mass)
+
+    if a.mass != 0. {
+        a.pos += n * col.depth * a.mass / tot_mass
+        a.vel += n * -relative_v * a.mass / tot_mass
+    }
+    if b.mass != 0. {
+        b.pos -= n * col.depth * b.mass / tot_mass
+        b.vel += n * relative_v * b.mass / tot_mass
     }
 }

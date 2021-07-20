@@ -173,191 +173,87 @@ process_player_input :: fn delta: float {
 }
 
 collision_check :: fn delta:float {
-    iter := 1000
-    t := 1.0
-    loop t > 0.0 && iter > 0 {
-        iter -= 1
-        is_collision := false
-        next_col := collision.Manifold {
-            t: 2.0,
-            normal: (0.0, 0.0),
-            a: collision.Wall {
-                pos: (0.0, 0.0),
-                normal: (0.0, 0.0),
-            },
-            b: collision.Wall {
-                pos: (0.0, 0.0),
-                normal: (0.0, 0.0),
-            },
+    // Find next collision
+    a_i := 0
+    // TODO(ed): Write this with for_each, when the upvalue bug is fixed.
+    loop a_i < len(bodies) {
+        a := bodies[a_i]
+        b_i := -1
+        bodies -> for_each' fn b: collision.CircleBody {
+            b_i += 1
+            // Skip the ones we've seen
+            if a_i >= b_i {
+                ret
+            }
+            if :entity.Puck is a || :entity.Puck is b {
+                ret
+            }
+            col :: collision.circle_vs_circle' a, b
+            if col.depth <= 0.0 {
+                ret
+            }
+            collision.solve' col
         }
-
-        // Find next collision
-        a_i := 0
-        // TODO(ed): Write this with for_each, when the upvalue bug is fixed.
-        loop a_i < len(bodies) {
-            a := bodies[a_i]
-            b_i := -1
-            bodies -> for_each' fn b: collision.CircleBody {
-                b_i += 1
-                // Skip the ones we've seen
-                if a_i >= b_i {
-                    ret
-                }
-                if :entity.Puck is a || :entity.Puck is b {
-                    ret
-                }
-                col :: collision.circle_vs_circle' a, b, delta * t * (a.vel - b.vel)
-                // TODO(ed): Don't capture other bodies.
-                if col.t <= 0.0 || next_col.t < col.t {
-                    ret
-                }
-                next_col = col
-                is_collision = true
+        arena.walls -> for_each' fn w: collision.Wall {
+            col :: collision.circle_vs_wall' a, w
+            if col.depth <= 0.0 {
+                ret
             }
-            arena.walls -> for_each' fn w: collision.Wall {
-                col :: collision.circle_vs_wall' a, w, delta * t * a.vel
-                if col.t <= 0.0 || next_col.t < col.t {
-                    ret
-                }
-                next_col = col
-                is_collision = true
-            }
-            arena.corners -> for_each' fn c: collision.Circle {
-                col :: collision.circle_vs_circle' a, c, delta * t * a.vel
-                if col.t <= 0.0 || next_col.t < col.t {
-                    ret
-                }
-                if (sign(col.normal[1]) == sign(c.pos[1])
-                    || sign(col.normal[0]) == sign(c.pos[0])
-                    || magnitude_squared(a.pos) < magnitude_squared(c.pos)) {
-                    ret
-                }
-                next_col = col
-                is_collision = true
-            }
-            // Goal outside collision
-            arena.goals -> for_each' fn g: arena_mod.Goal {
-                col :: collision.circle_vs_circle' a, g.cage, delta * t * (a.vel - g.cage.vel)
-                if col.t <= 0.0 || next_col.t < col.t {
-                    ret
-                }
-                if abs(a.pos[0]) > abs(g.cage.pos[0]) || sign(col.normal[0]) == sign(g.cage.pos[0]) {
-                    ret
-                }
-                next_col = col
-                is_collision = true
-            }
-            // Goal inside collision
-            arena.goals -> for_each' fn g: arena_mod.Goal {
-                // :(
-                a.rad = -a.rad
-                col :: collision.circle_vs_circle' a, g.cage, delta * t * (a.vel - g.cage.vel)
-                a.rad = -a.rad
-                if col.t <= 0.0 || next_col.t < col.t {
-                    ret
-                }
-                if abs(a.pos[0]) > abs(g.cage.pos[0]) || sign(col.normal[0]) != sign(g.cage.pos[0]) {
-                    ret
-                }
-                next_col = col
-                is_collision = true
-            }
-            a_i += 1
+            collision.solve' col
         }
-        // Find next collision
-        a_i := 0
-        // TODO(ed): Write this with for_each, when the upvalue bug is fixed.
-        loop a_i < len(bodies) {
-            a := bodies[a_i]
-            b_i := -1
-            // TODO(ed): For 100% accuracy - this needs to move out
-            // of the loop, and be checked afterwards.
-            if :entity.Puck is a {
-                arena.goals -> for_each' fn g: collision.Circle {
-                    col :: collision.circle_vs_circle' a, g, delta * t * a.vel
-                    if 0.0 <= col.t && col.t < t {
-
-                        particles.goal' g.pos
-                        n_rpc_clients' particles.goal, g.pos
-                        puck.vel *= 0.0
-                        puck.pos *= 0.0
-                        if :entity.Player is puck.holder {
-                            holder: !entity.Player = puck.holder
-                            holder.puck = nil
-                        }
-                        puck.holder = nil
+        arena.corners -> for_each' fn c: collision.Circle {
+            col := collision.circle_vs_in_circle' a, c
+            if col.depth <= 0.0 {
+                ret
+            }
+            if (sign(col.normal[1]) == sign(c.pos[1])
+                || sign(col.normal[0]) == sign(c.pos[0])
+                || magnitude_squared(a.pos) < magnitude_squared(c.pos)) {
+                ret
+            }
+            collision.solve' col
+        }
+        // Goal outside collision
+        arena.goals -> for_each' fn g: arena_mod.Goal {
+            col := collision.circle_vs_circle' a, g.cage
+            if col.depth <= 0.0 {
+                ret
+            }
+            if abs(a.pos[0]) > abs(g.cage.pos[0]) || sign(col.normal[0]) == sign(g.cage.pos[0]) {
+                w :: collision.Wall {
+                    normal: (sign(g.cage.pos[0]), 0.0),
+                    pos: g.cage.pos,
+                }
+                col = collision.circle_vs_wall' a, w
+                if col.depth <= 0.0 {
+                    ret
+                }
+                if :entity.Puck is a {
+                    particles.goal' a.pos
+                    n_rpc_clients' particles.goal, a.pos
+                    puck.vel *= 0.0
+                    puck.pos *= 0.0
+                    if :entity.Player is puck.holder {
+                        holder: !entity.Player = puck.holder
+                        holder.puck = nil
                     }
+                    puck.holder = nil
                 }
-            }
-            a_i += 1
-        }
-
-        // Step up to the next collision
-        step := min' t, next_col.t
-        bodies -> for_each' fn c: collision.Body {
-            c.pos += c.vel * step * delta
-        }
-        arena.update' step * delta
-
-        true <=> :collision.Body is :entity.Player
-
-        // Solve the collision
-        if is_collision {
-            // Elastic collision
-            energy_kept :: 0.9
-            n :: next_col.normal
-
-            a :!collision.CircleBody = next_col.a
-            if !:collision.CircleBody is a {
-                a = collision.CircleBody{
-                    mass: 0.0,
-                    rad: 0.0,
-                    pos: a.pos,
-                    vel: (0.0, 0.0),
+                collision.solve' col
+            } else {
+                if col.depth <= 0.0 {
+                    ret
                 }
-            }
-            b :!collision.CircleBody = next_col.b
-            if !:collision.CircleBody is b {
-                b = collision.CircleBody{
-                    mass: 0.0,
-                    rad: 0.0,
-                    pos: b.pos,
-                    vel: (0.0, 0.0),
-                }
-            }
-
-            if :entity.Player is a && :entity.Player is b {
-                a :!entity.Player : a
-                b :!entity.Player : b
-                if :entity.Puck is a.puck && magnitude_squared(a.vel) < magnitude_squared(b.vel) {
-                    b.puck = a.puck
-                    puck: !entity.Puck = b.puck
-                    puck.holder = b
-                }
-                if :entity.Puck is b.puck && magnitude_squared(a.vel) > magnitude_squared(b.vel) {
-                    a.puck = b.puck
-                    puck: !entity.Puck = a.puck
-                    puck.holder = a
-                    b.puck = nil
-                }
-            }
-
-            relative_v :: (1.0 + energy_kept) * (dot(a.vel, n) - dot(b.vel, n))
-            tot_mass :: (a.mass + b.mass)
-
-            skin :: 0.001
-            if a.mass != 0. {
-                a.pos += n * skin
-                a.vel += n * -relative_v * a.mass / tot_mass
-            }
-            if b.mass != 0. {
-                b.pos -= n * skin
-                b.vel += n * relative_v * b.mass / tot_mass
+                collision.solve' col
             }
         }
-        t -= step
+        a_i += 1
     }
-    if iter == 0 { <!> }
+
+    bodies -> for_each' fn c: collision.Body {
+        c.pos += c.vel * delta
+    }
+    arena.update' delta
 }
 
 update_menu :: fn delta: float -> void {
