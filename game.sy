@@ -89,20 +89,6 @@ poll_input :: fn -> entity.Input {
         current_player = rem' current_player, 2
     }
 
-    if player_id != -1 {
-        a :: 2 * player_id + current_player
-        b :: 2 * player_id + rem' current_player + 1, 2
-        delta_x :: abs' players[a].pos[0] - players[b].pos[0]
-        weight :: min' 1.0, 0.4 + delta_x * 0.5
-        x :: -(players[a].pos[0] * weight + players[b].pos[0] * (1.0 - weight))
-        curr_x :: l_gfx_camera_at()[0]
-
-        speed :: min' 1.0, 4.0 * l_delta'
-        x :: x * speed + curr_x * (1.0 - speed)
-        l_gfx_camera_place' x, 0.0
-        l_gfx_camera_set_zoom' 0.7
-    }
-
     entity.Input {
         dir: normalize((l_input_value("right") - l_input_value("left"),
                         l_input_value("up")    - l_input_value("down"))),
@@ -374,10 +360,28 @@ set_entities :: fn incoming_entities: [entity.Entity], incoming_players: [entity
     arena = incomming_arena
 }
 
+move_camera :: fn {
+    if player_id != -1 {
+        a :: 2 * player_id + current_player
+        b :: 2 * player_id + rem' current_player + 1, 2
+        delta_x :: abs' players[a].pos[0] - players[b].pos[0]
+        weight :: min' 1.0, 0.4 + delta_x * 0.5
+        x :: -(players[a].pos[0] * weight + players[b].pos[0] * (1.0 - weight))
+        curr_x :: l_gfx_camera_at()[0]
+
+        speed :: min' 1.0, 4.0 * l_delta'
+        x :: x * speed + curr_x * (1.0 - speed)
+        l_gfx_camera_place' x, 0.0
+        l_gfx_camera_set_zoom' 0.7
+    }
+}
+
 draw :: fn {
     if show_menu {
         main_menu.draw'
     } else {
+        move_camera'
+
         arena.draw' particles.render'
 
         entities -> for_each' fn e: entity.Entity {
@@ -404,7 +408,7 @@ start :: fn {
     // Added for safety - to avoid delta=0
     l_update'
 
-    l_set_window_size' (800, 800)
+    // l_set_window_size' (800, 800)
 
     init'
     [0, 1] -> for_each' fn id:int {
