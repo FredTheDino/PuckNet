@@ -49,6 +49,11 @@ bind_keys :: fn {
     l_bind_button(0, "Y", "swap_player")
     l_bind_button(0, "A", "shoot")
 
+    l_bind_button(0, "dpup", "up")
+    l_bind_button(0, "dpdown", "down")
+    l_bind_button(0, "dpleft", "left")
+    l_bind_button(0, "dpright", "right")
+
     l_bind_quit("quit")
     l_bind_key("ESCAPE", "quit")
 }
