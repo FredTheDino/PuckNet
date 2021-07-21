@@ -245,7 +245,7 @@ collision_check :: fn delta:float {
                 if col.depth <= 0.0 {
                     ret
                 }
-                if :entity.Puck is a {
+                if :entity.Puck is a && dot(a.vel, col.normal) < 0.0 {
                     particles.goal' a.pos
                     n_rpc_clients' particles.goal, a.pos
                     score += (0 if puck.pos[0] < 0. else 1, 1 if puck.pos[0] < 0. else 0)
@@ -323,7 +323,13 @@ hockey_state :: GameState {
             p.try_grab' puck
         }
 
-        collision_check' delta
+        physics_steps :: 6.0
+        step_size :: 1.0 / physics_steps
+        t := 0.0
+        loop t < 1.0 {
+            t += step_size
+            collision_check' delta * step_size
+        }
 
         entities -> for_each' fn e: entity.Entity {
             e.update' delta
