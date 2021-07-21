@@ -1,18 +1,9 @@
 use gumdrop::Options;
-use std::path::PathBuf;
 
 #[derive(Default, Debug, Options)]
 struct Args {
     #[options(free)]
-    file: Option<PathBuf>,
-    #[options(short = "s", long = "server", help = "Start as a server")]
-    is_server: bool,
-    #[options(short = "c", long = "client", help = "Start as a client")]
-    is_client: bool,
-    #[options(short = "b", long = "browser", help = "Starts the server browser")]
-    is_browser: bool,
-    #[options(short = "p", long = "port", help = "The port to use when starting/connecting to a server")]
-    port: u16,
+    args: Vec<String>,
     #[options(short = "v", no_long, count, help = "Increase verbosity, up to max 2")]
     verbosity: u32,
     #[options(help = "Print this help")]
@@ -20,21 +11,12 @@ struct Args {
 }
 
 fn main() {
-    let args = Args::parse_args_default_or_exit();
-
-    if args.is_client || args.is_server {
-        panic!("Unsupported! Run normally and use the main menu");
-    }
+    let mut args = Args::parse_args_default_or_exit();
+    args.args.insert(0, "game.sy".to_string());
 
     let args = sylt::Args {
-        file: if let Some(file) = args.file {
-            file
-        } else if args.is_browser {
-            PathBuf::from("browser.sy")
-        } else {
-            PathBuf::from("game.sy")
-        },
         verbosity: args.verbosity,
+        args: args.args,
 
         ..sylt::Args::default()
     };
