@@ -11,11 +11,8 @@ struct Args {
 }
 
 fn main() {
-    let args = Args::parse_args_default_or_exit();
-
-    if args.is_client || args.is_server {
-        panic!("Unsupported! Run normally and use the main menu");
-    }
+    let mut args = Args::parse_args_default_or_exit();
+    args.args.insert(0, "game.sy".to_string());
 
     let args = sylt::Args {
         verbosity: args.verbosity,
