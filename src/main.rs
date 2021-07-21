@@ -13,6 +13,10 @@ struct Args {
 fn main() {
     let args = Args::parse_args_default_or_exit();
 
+    if args.is_client || args.is_server {
+        panic!("Unsupported! Run normally and use the main menu");
+    }
+
     let args = sylt::Args {
         verbosity: args.verbosity,
         args: args.args,

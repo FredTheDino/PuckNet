@@ -16,7 +16,6 @@ Goal :: blob {
 :Goal is :collision.Circle
 
 goal_new :: fn pos: (float, float), dir: float, arena_scale: float -> Goal {
-
     scale :: 13. / 100. * arena_scale
     px :: 1. / 13. * scale
     width :: 8. * px

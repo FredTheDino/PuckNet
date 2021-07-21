@@ -17,6 +17,7 @@ Input :: blob {
     shoot: bool,
     charge: bool,
     player: int,
+    select: bool,
 }
 
 Player :: blob {
@@ -71,7 +72,7 @@ player_new :: fn pos: (float, float), team: int, num: int, owner: int -> Player 
                         (1 if self.rot > 5./4. * pi else 0) -
                         (3 if self.rot > 7./4. * pi else 0))
             charge_sin :: sin(charge_osc * self.charge + charge_start_osc_offset)
-            sprite :: sprites[as_int(1.499 * (charge_sin + 1.))][segment]
+            sprite :: sprites[as_int(1.499 * (charge_sin + 1.)) if self.charge < 0.5 else 2][segment]
             widths :: [-12.0, 13.0, 12.0, 13.0]
             width :: widths[segment]
             height :: 15.
