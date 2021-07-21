@@ -139,6 +139,7 @@ player_new :: fn pos: (float, float), team: int, num: int, owner: int -> Player 
                     self.charge += delta
                     break_fric :: 3.0
                     self.vel = util.friction' self.vel, break_fric * delta
+                    input.dir = (0.0, 0.0)
                 } else {
                     self.charge = 0.0
                 }
