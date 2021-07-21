@@ -6,7 +6,7 @@ main_loop :: fn {
     n_rpc_connect' "127.0.0.1", 8388
     n_rpc_server' game.broadcast_server, "hello!"
 
-    loop !game.exit {
+    loop !game.network_exit {
         n_rpc_resolve'
 
         l_update'

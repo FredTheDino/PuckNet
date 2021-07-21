@@ -10,6 +10,20 @@ use server
 use tick
 use util
 
+GameState :: blob {
+    name: str,
+    update: fn float -> void,
+    draw: fn -> void,
+    process_input: fn -> void,
+}
+
+current_game_state : GameState = GameState {
+    name: "",
+    update: fn delta: float {},
+    draw: fn {},
+    process_input: fn {},
+}
+
 players : [entity.Player] = []
 entities : [entity.Entity] = []
 
@@ -26,9 +40,9 @@ main_menu_lines := [
     "Quit",
 ]
 main_menu : menu.Menu = menu.menu_new' main_menu_lines
-show_main_menu := true
 
 exit := false
+network_exit := false
 
 bind_keys :: fn {
     l_bind_key("w", "up")
@@ -62,6 +76,7 @@ init :: fn {
     mupps.init'
     particles.init'
     assets.load_assets'
+    current_game_state = menu_state
 }
 
 reset_state :: fn {
@@ -256,66 +271,90 @@ collision_check :: fn delta:float {
     arena.update' delta
 }
 
-update_menu :: fn delta: float -> void {
-    main_menu.update' delta
-    if main_menu.line_selected {
-        if main_menu_lines[main_menu.line_index] == "Connect" {
-            // When we break out of the client loop, return here.
-            reset_state'
-            if client.connect("127.0.0.1") {
-                show_main_menu = false
-                client.main_loop'
-                show_main_menu = true
+menu_state :: GameState {
+    name: "menu",
+    update: fn delta: float -> void {
+        main_menu.update' delta
+        if main_menu.line_selected {
+            if main_menu_lines[main_menu.line_index] == "Connect" {
+                // When we break out of the client loop, return here.
+                reset_state'
+                network_exit = false
+                if client.connect("127.0.0.1") {
+                    current_game_state = hockey_state
+                    client.main_loop'
+                    n_rpc_disconnect'
+                    main_menu.line_index = 0
+                }
+                //TODO(gu): else show connection error in ui in some way
+            } else if main_menu_lines[main_menu.line_index] == "Start server" {
+                reset_state'
+                network_exit = false
+                current_game_state = hockey_state // ?
+                server.main_loop'
+                n_rpc_disconnect' // Or something that is not implemented
                 main_menu.line_index = 0
+            } else if main_menu_lines[main_menu.line_index] == "Practice" {
+                reset_state'
+                current_game_state = hockey_state
+                [0, 1] -> for_each' fn id:int {
+                    player := entity.player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5)), id, id, 0
+                    push' players, player
+                    push' entities, player
+                    push' bodies, player
+                }
+                player_id = 0
+            } else if main_menu_lines[main_menu.line_index] == "Quit" {
+                exit = true
+            } else {
+                print "Unhandled main menu item:"
+                print main_menu_lines[main_menu.line_index]
+                exit = true
             }
-            //TODO(gu): else show connection error in ui in some way
-        } else if main_menu_lines[main_menu.line_index] == "Start server" {
-            reset_state'
-            show_main_menu = false
-            server.main_loop'
-            show_main_menu = true
-            main_menu.line_index = 0
-        } else if main_menu_lines[main_menu.line_index] == "Practice" {
-            reset_state'
-            show_main_menu = false
-            [0, 1] -> for_each' fn id:int {
-                player := entity.player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5)), id, id, 0
-                push' players, player
-                push' entities, player
-                push' bodies, player
-            }
-            player_id = 0
-        } else if main_menu_lines[main_menu.line_index] == "Quit" {
-            exit = true
-        } else {
-            print "Unhandled main menu item:"
-            print main_menu_lines[main_menu.line_index]
-            exit = true
         }
+    },
+    draw: main_menu.draw,
+    process_input: fn {
+        main_menu.process_input' menu.from_input' poll_input'
     }
 }
 
-update_game :: fn delta: float -> void {
-    players -> for_each' fn p: entity.Player {
-        p.try_grab' puck
+hockey_state :: GameState {
+    name: "hockey",
+    update: fn delta: float -> void {
+        players -> for_each' fn p: entity.Player {
+            p.try_grab' puck
+        }
+
+        collision_check' delta
+
+        entities -> for_each' fn e: entity.Entity {
+            e.update' delta
+        }
+
+        particles.update' delta
+    },
+    draw: draw_game,
+    process_input: fn {
+        set_input' poll_input'
+        process_player_input' l_delta'
     }
-
-    collision_check' delta
-
-    entities -> for_each' fn e: entity.Entity {
-        e.update' delta
-    }
-
-    particles.update' delta
 }
 
 update :: fn delta: float -> void {
-    if show_main_menu {
-        update_menu' delta
-    } else {
-        update_game' delta
+    current_game_state.update' delta
+
+    // Logic for moving "out" of the program
+    if l_input_pressed("quit") {
+        reset_camera'
+        if current_game_state.name == hockey_state.name {
+            l_update'
+            network_exit = true
+            current_game_state = menu_state
+        } else {
+            exit = true
+        }
     }
-    exit = exit || l_input_down("quit")
 }
 
 set_entities :: fn incoming_entities: [entity.Entity], incoming_players: [entity.Player], incomming_arena: arena_mod.Arena {
@@ -338,6 +377,11 @@ move_camera :: fn {
         l_gfx_camera_place' x, 0.0
         l_gfx_camera_set_zoom' 0.7
     }
+}
+
+reset_camera :: fn {
+    l_gfx_camera_place' 0.0, 0.0
+    l_gfx_camera_set_zoom' 1.0
 }
 
 draw_game :: fn {
@@ -366,11 +410,7 @@ draw_game :: fn {
 }
 
 draw :: fn {
-    if show_main_menu {
-        main_menu.draw'
-    } else {
-        draw_game'
-    }
+    current_game_state.draw'
 }
 
 start :: fn {
@@ -386,12 +426,7 @@ start :: fn {
         l_update'
         l_render'
 
-        if show_main_menu {
-            main_menu.process_input' menu.from_input' poll_input'
-        } else {
-            set_input' poll_input'
-            process_player_input' l_delta'
-        }
+        current_game_state.process_input'
 
         update' l_delta'
         draw'

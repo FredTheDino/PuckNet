@@ -217,7 +217,7 @@ Puck :: blob {
 puck_new :: fn pos: (float, float) -> Puck {
     circle_rad :: 0.02
     self: !Puck = nil
-    self = Puck{
+    self = Puck {
         mass: 0.5,
         rad: sqrt(circle_rad * circle_rad * 2.0),
         pos: pos,
