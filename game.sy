@@ -279,19 +279,13 @@ menu_state :: GameState {
                 // When we break out of the client loop, return here.
                 reset_state'
                 network_exit = false
-                if client.connect("127.0.0.1") {
-                    current_game_state = hockey_state
-                    client.main_loop'
-                    n_rpc_disconnect'
-                    main_menu.line_index = 0
-                }
-                //TODO(gu): else show connection error in ui in some way
+                current_game_state = browser_state
             } else if main_menu_lines[main_menu.line_index] == "Start server" {
                 reset_state'
                 network_exit = false
                 current_game_state = hockey_state // ?
                 server.main_loop'
-                n_rpc_disconnect' // Or something that is not implemented
+                //TODO(gu): shutdown server
                 main_menu.line_index = 0
             } else if main_menu_lines[main_menu.line_index] == "Practice" {
                 reset_state'
@@ -337,6 +331,43 @@ hockey_state :: GameState {
     process_input: fn {
         set_input' poll_input'
         process_player_input' l_delta'
+    }
+}
+
+browser_menu := menu.menu_new' []
+
+browser_state :: GameState {
+    name: "Server browser",
+    update: fn delta: float -> void {
+        browser_menu.lines = browser.servers -> map' fn server: browser.Server -> str {
+            server.name
+        }
+    },
+    draw: fn -> void {
+        browser_menu.draw'
+    },
+    process_input: fn {
+        browser_menu.process_input' menu.from_input' poll_input'
+
+        if browser_menu.line_selected {
+            // Disconnect from the server browser
+            n_rpc_disconnect'
+
+            // Connect to the selected server
+            addr := split_ip' browser.servers[browser_menu.line_index].ip
+            ip := addr[0]
+
+            client.connect' ip //TODO(gu): Custom ports
+            //TODO(gu): show connection error in ui in some way
+
+            // Setup playing
+            current_game_state = hockey_state
+            client.main_loop'
+            // Blocks here until the client disconnects
+
+            n_rpc_disconnect' // Disconnect from the server
+            main_menu.line_index = 0
+        }
     }
 }
 
@@ -436,8 +467,6 @@ start :: fn {
 
             update' l_delta'
             draw'
-
-            print len(browser.servers)
         }
     }
 }
