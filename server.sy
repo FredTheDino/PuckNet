@@ -1,10 +1,27 @@
 use game
+use text
 
 main_loop :: fn {
     n_rpc_start_server'
 
+    // Ask for server name
+    server_name := "Puck.NET"
+    l_set_text_input_enabled' true
+    text_input := ("", false) // workaround for sylt#298
+    loop {
+        l_update'
+        l_render'
+        text_input = l_text_input_update' server_name
+        server_name = text_input[0]
+        if text_input[1] {
+            break
+        }
+        //TODO(gu): draw centered
+        text.draw_text' 0.0, 0.2, 1.0, server_name, (255., 255., 255., 255.) / 255.
+    }
+
     n_rpc_connect' "127.0.0.1", 8388
-    n_rpc_server' game.browser.add_server, "hello!"
+    n_rpc_server' game.browser.add_server, server_name
 
     loop !game.network_exit {
         n_rpc_resolve'
