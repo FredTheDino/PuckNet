@@ -409,8 +409,8 @@ draw_game :: fn {
     mupps.draw'
 
     zero :: as_chars("0")[0]
-    text.draw_char' -0.1, 0.9, 1., score[0] + zero, (0., 0., 0., 1.)
-    text.draw_char' 0.1,  0.9, 1., score[1] + zero, (0., 0., 0., 1.)
+    text.draw_char' -0.1, 0.9, 1., score[0] + zero, (255., 0., 0., 255.) / 255.
+    text.draw_char' 0.1,  0.9, 1., score[1] + zero, (30., 194., 58., 255.) / 255.
 }
 
 draw :: fn {
