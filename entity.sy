@@ -124,6 +124,7 @@ player_new :: fn pos: (float, float), team: int, num: int, owner: int -> Player 
             charge_sin :: sin(charge_osc * self.charge + charge_start_osc_offset)
 
             // Shooting
+            ignore_movement := false
             if self.puck is :Puck && (((input.charge || input.shoot) && self.charge != 0.0) || (input.tackle && self.charge == 0.0)) {
                 if input.shoot {
                     shoot_speed :: max(charge_sin * 1.2, -1.0) + 1.8
@@ -139,6 +140,7 @@ player_new :: fn pos: (float, float), team: int, num: int, owner: int -> Player 
                     self.charge += delta
                     break_fric :: 3.0
                     self.vel = util.friction' self.vel, break_fric * delta
+                    ignore_movement = true
                 } else {
                     self.charge = 0.0
                 }
@@ -155,7 +157,7 @@ player_new :: fn pos: (float, float), team: int, num: int, owner: int -> Player 
             }
 
             force :: 3.0
-            if self.charge == 0.0 {
+            if !ignore_movement {
                 self.acc += force * magnitude' input.dir
             }
 
