@@ -1,0 +1,18 @@
+start :: fn {
+    l_bind_quit("quit")
+    s := ""
+    l_set_text_input_enabled' true
+    i := 0
+    text_input := ("", false)
+    loop {
+        i += 1
+        l_update'
+        l_render'
+        text_input = l_text_input_update' s
+        print text_input
+        s = text_input[0]
+        if text_input[1] {
+            break
+        }
+    }
+}
