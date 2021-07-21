@@ -323,7 +323,7 @@ hockey_state :: GameState {
             p.try_grab' puck
         }
 
-        physics_steps :: 3.0
+        physics_steps :: 2.0
         step_size :: 1.0 / physics_steps
         t := 0.0
         loop t < 1.0 {
