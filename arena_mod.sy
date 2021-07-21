@@ -25,7 +25,7 @@ goal_new :: fn pos: (float, float), dir: float, arena_scale: float -> Goal {
     self: !Goal = nil
     self = Goal {
         rad: width / 2. * .75,
-        pos: pos + offset + (px, 0.) * dir,
+        pos: pos + offset,
         vel: (0.0, 0.5),
         cage: collision.CircleBody {
             mass: 0.,
