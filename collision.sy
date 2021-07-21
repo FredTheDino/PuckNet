@@ -70,7 +70,7 @@ solve :: fn col: Manifold {
 
     a :!CircleBody = col.a
     if !:CircleBody is a {
-        a = CircleBody{
+        a = CircleBody {
             mass: 0.0,
             rad: 0.0,
             pos: a.pos,
@@ -79,7 +79,7 @@ solve :: fn col: Manifold {
     }
     b :!CircleBody = col.b
     if !:CircleBody is b {
-        b = CircleBody{
+        b = CircleBody {
             mass: 0.0,
             rad: 0.0,
             pos: b.pos,

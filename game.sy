@@ -17,11 +17,11 @@ GameState :: blob {
     process_input: fn -> void,
 }
 
-current_game_state : GameState = GameState{
+current_game_state : GameState = GameState {
     name: "",
     update: fn delta: float {},
     draw: fn {},
-    process_input: fn{},
+    process_input: fn {},
 }
 
 players : [entity.Player] = []
@@ -271,7 +271,7 @@ collision_check :: fn delta:float {
     arena.update' delta
 }
 
-menu_state :: GameState{
+menu_state :: GameState {
     name: "menu",
     update: fn delta: float -> void {
         main_menu.update' delta
@@ -319,7 +319,7 @@ menu_state :: GameState{
     }
 }
 
-hockey_state :: GameState{
+hockey_state :: GameState {
     name: "hockey",
     update: fn delta: float -> void {
         players -> for_each' fn p: entity.Player {

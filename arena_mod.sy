@@ -23,11 +23,11 @@ goal_new :: fn pos: (float, float), dir: float, arena_scale: float -> Goal {
     offset :: (arena_scale * .89 - width / 2., 0.) * dir
 
     self: !Goal = nil
-    self = Goal{
+    self = Goal {
         rad: width / 2. * .75,
         pos: pos + offset + (px, 0.) * dir,
         vel: (0.0, 0.5),
-        cage: collision.CircleBody{
+        cage: collision.CircleBody {
             mass: 0.,
             rad: width - px,
             pos: pos - (offset + (width / 2. - px, 0.) * dir),
@@ -75,7 +75,7 @@ arena_new :: fn pos: (float, float) -> Arena {
     y :: 0.30 * scale
 
     self: !Arena = nil
-    self = Arena{
+    self = Arena {
         draw: fn -> void {
             gray :: (0.2, 0.2, 0.2)
             l_gfx_rect((0.0, 0.0), (20.0, 20.0), gray)
@@ -102,10 +102,10 @@ arena_new :: fn pos: (float, float) -> Arena {
             self.goals[1].update' delta
         },
         walls: [
-            collision.Wall{ normal: (0.0, -1.0), pos: (0.0,  scale / 2.0) },
-            collision.Wall{ normal: (0.0,  1.0), pos: (0.0, -scale / 2.0) },
-            collision.Wall{ normal: (-1.0, 0.0), pos: ( scale,       0.0) },
-            collision.Wall{ normal: ( 1.0, 0.0), pos: (-scale,       0.0) },
+            collision.Wall { normal: (0.0, -1.0), pos: (0.0,  scale / 2.0) },
+            collision.Wall { normal: (0.0,  1.0), pos: (0.0, -scale / 2.0) },
+            collision.Wall { normal: (-1.0, 0.0), pos: ( scale,       0.0) },
+            collision.Wall { normal: ( 1.0, 0.0), pos: (-scale,       0.0) },
         ],
         corners: [
             // Radius is negative because of collisions inside of the circle
