@@ -323,13 +323,8 @@ hockey_state :: GameState {
             p.try_grab' puck
         }
 
-        physics_steps :: 2.0
-        step_size :: 1.0 / physics_steps
-        t := 0.0
-        loop t < 1.0 {
-            t += step_size
-            collision_check' delta * step_size
-        }
+        // It's too slow to run more collision checks
+        collision_check' delta
 
         entities -> for_each' fn e: entity.Entity {
             e.update' delta
