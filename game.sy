@@ -7,6 +7,7 @@ use menu
 use mupps
 use particles
 use server
+use text
 use tick
 use util
 
@@ -29,7 +30,9 @@ entities : [entity.Entity] = []
 
 puck : entity.Puck = entity.puck_new' (0.0, 0.0)
 bodies : [collision.CircleBody] = []
-arena: arena_mod.Arena = arena_mod.arena_new' (0.0, 0.0)
+arena : arena_mod.Arena = arena_mod.arena_new' (0.0, 0.0)
+
+score : (int, int) = (0, 0)
 
 main_menu_lines := [
     "Connect",
@@ -84,6 +87,7 @@ reset_state :: fn {
     players = []
     entities = [puck]
     bodies = [puck]
+    score = (0, 0)
     num_players = 0
     player_id = -1
 }
@@ -246,6 +250,7 @@ collision_check :: fn delta:float {
                 if :entity.Puck is a {
                     particles.goal' a.pos
                     n_rpc_clients' particles.goal, a.pos
+                    score += (0 if puck.pos[0] < 0. else 1, 1 if puck.pos[0] < 0. else 0)
                     puck.vel *= 0.0
                     puck.pos *= 0.0
                     if :entity.Player is puck.holder {
@@ -357,10 +362,11 @@ update :: fn delta: float -> void {
     }
 }
 
-set_entities :: fn incoming_entities: [entity.Entity], incoming_players: [entity.Player], incomming_arena: arena_mod.Arena {
+set_entities :: fn incoming_entities: [entity.Entity], incoming_players: [entity.Player], incomming_arena: arena_mod.Arena, incoming_score: (int, int) {
     entities = incoming_entities
     players = incoming_players
     arena = incomming_arena
+    score = incoming_score
 }
 
 move_camera :: fn {
@@ -407,6 +413,10 @@ draw_game :: fn {
     }
 
     mupps.draw'
+
+    zero :: as_chars("0")[0]
+    text.draw_char' -0.1, 0.9, 1., score[0] + zero, (0., 0., 0., 1.)
+    text.draw_char' 0.1,  0.9, 1., score[1] + zero, (0., 0., 0., 1.)
 }
 
 draw :: fn {
