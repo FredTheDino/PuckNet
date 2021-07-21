@@ -374,12 +374,12 @@ draw :: fn {
 }
 
 start :: fn {
+    // We set window size before ANY call to the engine so we have the correct size from the beginning
+    l_set_window_size' (800, 800)
     init'
 
     // Added for safety - to avoid delta=0
     l_update'
-
-    l_set_window_size' (800, 800) //TODO(gu): set on startup so the window doesn't change size during start
 
     bind_keys'
     loop !exit {
