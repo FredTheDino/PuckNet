@@ -241,11 +241,11 @@ collision_check :: fn delta:float {
                     normal: (sign(g.cage.pos[0]), 0.0),
                     pos: g.cage.pos,
                 }
-                col = collision.circle_vs_wall' a, w
-                if col.depth <= 0.0 {
+                in_col := collision.circle_vs_wall' a, w
+                if in_col.depth <= 0.0 {
                     ret
                 }
-                if :entity.Puck is a && dot(a.vel, col.normal) < 0.0 {
+                if :entity.Puck is a && dot(a.vel, in_col.normal) < 0.0 && col.depth > 0.03 {
                     particles.goal' a.pos
                     n_rpc_clients' particles.goal, a.pos
                     score += (0 if puck.pos[0] < 0. else 1, 1 if puck.pos[0] < 0. else 0)
@@ -257,7 +257,7 @@ collision_check :: fn delta:float {
                     }
                     puck.holder = nil
                 }
-                collision.solve' col
+                collision.solve' in_col
             } else {
                 if col.depth <= 0.0 {
                     ret
