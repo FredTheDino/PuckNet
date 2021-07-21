@@ -3,6 +3,7 @@ use game
 connect :: fn ip: str -> bool {
     //TODO(gu): return false if connection failed
     n_rpc_connect' ip
+
     n_rpc_server' game.player_join
 
     loop (len(game.players) <= 2 * game.player_id || game.player_id == -1) && !l_input_down("quit") {

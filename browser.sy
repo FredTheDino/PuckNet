@@ -1,8 +1,29 @@
 use game
 
+Server :: blob {
+    name: str,
+    ip: str,
+}
+
+servers: [Server] = []
+
+add_server :: fn name: str {
+    servers -> push' Server {
+        name: name,
+        ip: n_rpc_current_request_ip(),
+    }
+}
+
+set_servers :: fn recv_servers: [Server] {
+    servers = recv_servers
+}
+
 start :: fn {
     n_rpc_start_server' 8388
     loop {
         n_rpc_resolve'
+        n_rpc_clients' set_servers, servers
+
+        thread_sleep' 1.0
     }
 }

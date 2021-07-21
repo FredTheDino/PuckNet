@@ -1,9 +1,13 @@
 use crate as sylt_std;
 
 use std::cell::RefCell;
+use std::collections::HashMap;
+use std::collections::hash_map::Entry;
 use std::io::Write;
-use std::net::{TcpListener, TcpStream};
+use std::net::{SocketAddr, TcpListener, TcpStream};
 use std::ops::DerefMut;
+use std::rc::Rc;
+use std::str::FromStr;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use sylt_common::flat_value::{FlatValue, FlatValuePack};
@@ -14,24 +18,24 @@ const DEFAULT_PORT: u16 = 8588;
 type RPC = Vec<FlatValuePack>;
 
 std::thread_local! {
-    static RPC_QUEUE: Arc<Mutex<Vec<RPC>>> = Arc::new(Mutex::new(Vec::new()));
+    static RPC_QUEUE: Arc<Mutex<Vec<(RPC, Option<SocketAddr>)>>> = Arc::new(Mutex::new(Vec::new()));
     static SERVER_HANDLE: RefCell<Option<TcpStream>> = RefCell::new(None);
-    static CLIENT_HANDLES: RefCell<Option<Arc<Mutex<Vec<(TcpStream, bool)>>>>> = RefCell::new(None);
+    static CLIENT_HANDLES: RefCell<Option<Arc<Mutex<HashMap<SocketAddr, (TcpStream, bool)>>>>> = RefCell::new(None);
+    static CURRENT_REQUEST_SOCKET_ADDR: RefCell<Option<SocketAddr>> = RefCell::new(None);
 }
 
 /// Listen for new connections and accept them.
 fn rpc_listen(
     listener: TcpListener,
-    queue: Arc<Mutex<Vec<RPC>>>,
-    handles: Arc<Mutex<Vec<(TcpStream, bool)>>>,
+    queue: Arc<Mutex<Vec<(RPC, Option<SocketAddr>)>>>,
+    handles: Arc<Mutex<HashMap<SocketAddr, (TcpStream, bool)>>>,
 ) {
-    for connection in listener.incoming() {
-        if let Ok(stream) = connection {
+    loop {
+        if let Ok((stream, addr)) = listener.accept() {
             match stream.try_clone() {
-                Ok(stream) => handles
-                    .lock()
-                    .unwrap()
-                    .push((stream, true)),
+                Ok(stream) => {
+                    handles.lock().unwrap().insert(addr, (stream, true));
+                }
                 Err(e) => {
                     eprintln!("Error accepting TCP connection: {:?}", e);
                     eprintln!("Ignoring");
@@ -39,7 +43,7 @@ fn rpc_listen(
                 }
             }
             let queue = Arc::clone(&queue);
-            thread::spawn(|| rpc_handle_stream(stream, queue));
+            thread::spawn(move || rpc_handle_stream(stream, Some(addr), queue));
         }
     }
 }
@@ -47,7 +51,8 @@ fn rpc_listen(
 /// Receive RPC values from a stream and queue them locally.
 fn rpc_handle_stream(
     stream: TcpStream,
-    queue: Arc<Mutex<Vec<RPC>>>,
+    socket_addr: Option<SocketAddr>,
+    queue: Arc<Mutex<Vec<(RPC, Option<SocketAddr>)>>>,
 ) {
     loop {
         let rpc = match bincode::deserialize_from(&stream) {
@@ -57,7 +62,7 @@ fn rpc_handle_stream(
                 return;
             }
         };
-        queue.lock().unwrap().push(rpc);
+        queue.lock().unwrap().push((rpc, socket_addr));
     }
 }
 
@@ -84,7 +89,7 @@ pub fn n_rpc_start_server(ctx: RuntimeContext<'_>) -> Result<Value, RuntimeError
     };
 
     // Initialize the thread local with our list of client handles.
-    let handles = Arc::new(Mutex::new(Vec::new()));
+    let handles = Arc::new(Mutex::new(HashMap::new()));
     CLIENT_HANDLES.with(|global_handles| {
         global_handles.borrow_mut().insert(Arc::clone(&handles));
     });
@@ -140,7 +145,7 @@ pub fn n_rpc_connect(ctx: RuntimeContext<'_>) -> Result<Value, RuntimeError> {
 
     // Handle incoming RPCs by putting them on the queue.
     let rpc_queue = RPC_QUEUE.with(|queue| Arc::clone(queue));
-    thread::spawn(|| rpc_handle_stream(stream, rpc_queue));
+    thread::spawn(|| rpc_handle_stream(stream, None, rpc_queue));
 
     Ok(Value::Bool(true))
 }
@@ -174,9 +179,9 @@ pub fn n_rpc_is_client(_: RuntimeContext<'_>) -> Result<Value, RuntimeError> {
 }
 
 /// Parse args given to an external function as rpc arguments, i.e. one callable followed by 0..n arguments.
-fn get_rpc_args(ctx: RuntimeContext<'_>, func_name: &str) -> Result<Vec<FlatValuePack>, RuntimeError> {
+fn get_rpc_args(ctx: RuntimeContext<'_>, arg_offset: usize, func_name: &str) -> Result<Vec<FlatValuePack>, RuntimeError> {
     let values = ctx.machine.stack_from_base(ctx.stack_base);
-    let flat_values: Vec<FlatValuePack> = values.iter().map(|v| FlatValue::pack(v)).collect();
+    let flat_values: Vec<FlatValuePack> = values[arg_offset..].iter().map(|v| FlatValue::pack(v)).collect();
 
     if flat_values.len() != 0 {
         Ok(flat_values)
@@ -196,7 +201,7 @@ pub fn n_rpc_clients(ctx: RuntimeContext<'_>) -> Result<Value, RuntimeError> {
     }
 
     // Serialize the RPC.
-    let serialized = match bincode::serialize(&get_rpc_args(ctx, "n_rpc_clients")?) {
+    let serialized = match bincode::serialize(&get_rpc_args(ctx, 0, "n_rpc_clients")?) {
         Ok(serialized) => serialized,
         Err(e) => {
             eprintln!("Error serializing values: {:?}", e);
@@ -208,19 +213,63 @@ pub fn n_rpc_clients(ctx: RuntimeContext<'_>) -> Result<Value, RuntimeError> {
     CLIENT_HANDLES.with(|client_handles| {
         if let Some(streams) = client_handles.borrow().as_ref() {
             let mut streams = streams.lock().unwrap();
-            for (stream, keep) in streams.iter_mut() {
+            for (_, (stream, keep)) in streams.iter_mut() {
                 if let Err(e) = stream.write(&serialized) {
                     eprintln!("Error sending data to a client: {:?}", e);
                     *keep = false;
                 }
             }
-            streams.retain(|(_, keep)| *keep);
+            streams.retain(|_, (_, keep)| *keep);
         } else {
-            eprintln!("Not connected to a server");
+            eprintln!("A server hasn't been started");
         }
     });
 
     Ok(Value::Nil)
+}
+
+
+#[sylt_macro::sylt_doc(n_rpc_client_ip, "Performs an RPC on a specific connected clients.", [One(Value(callable)), One(List(args))] Type::Bool)]
+#[sylt_macro::sylt_link(n_rpc_client_ip, "sylt_std::network")]
+pub fn n_rpc_client_ip(ctx: RuntimeContext<'_>) -> Result<Value, RuntimeError> {
+    if ctx.typecheck {
+        return Ok(Value::Bool(true));
+    }
+
+    let ip = match ctx.machine.stack_from_base(ctx.stack_base).get(0) {
+        Some(Value::String(s)) => SocketAddr::from_str(s.as_ref()).unwrap(),
+        _ => {
+            return Ok(Value::Bool(false)); //TODO(gu): Type error here, probably.
+        }
+    };
+
+    // Serialize the RPC.
+    let serialized = match bincode::serialize(&get_rpc_args(ctx, 1, "n_rpc_client_ip")?) {
+        Ok(serialized) => serialized,
+        Err(e) => {
+            eprintln!("Error serializing values: {:?}", e);
+            return Ok(Value::Bool(false));
+        }
+    };
+
+    CLIENT_HANDLES.with(|client_handles| {
+        if let Some(streams) = client_handles.borrow().as_ref() {
+            let mut streams = streams.lock().unwrap();
+            if let Entry::Occupied(mut o) = streams.entry(ip) {
+                let (stream, _) = o.get_mut();
+                if let Err(e) = stream.write(&serialized) {
+                    eprintln!("Error sending data to a specific client {:?}: {:?}", ip, e);
+                    o.remove();
+                }
+                Ok(Value::Bool(true))
+            } else {
+                Ok(Value::Bool(false))
+            }
+        } else {
+            eprintln!("A server hasn't been started");
+            Ok(Value::Bool(false))
+        }
+    })
 }
 
 //TODO(gu): This doc is wrong since this takes variadic arguments.
@@ -232,7 +281,7 @@ pub fn n_rpc_server(ctx: RuntimeContext<'_>) -> Result<Value, RuntimeError> {
     }
 
     // Serialize the RPC.
-    let serialized = match bincode::serialize(&get_rpc_args(ctx, "n_rpc_server")?) {
+    let serialized = match bincode::serialize(&get_rpc_args(ctx, 0, "n_rpc_server")?) {
         Ok(serialized) => serialized,
         Err(e) => {
             eprintln!("Error serializing values: {:?}", e);
@@ -268,6 +317,33 @@ pub fn n_rpc_disconnect(ctx: RuntimeContext<'_>) -> Result<Value, RuntimeError> 
     Ok(Value::Nil)
 }
 
+#[sylt_macro::sylt_doc(n_rpc_current_request_ip, "Get the socket address that sent the currently processed RPC. Empty string if not a server or not processing an RPC.", [] Type::String)]
+#[sylt_macro::sylt_link(n_rpc_current_request_ip, "sylt_std::network")]
+pub fn n_rpc_current_request_ip(_: RuntimeContext<'_>) -> Result<Value, RuntimeError> {
+    CURRENT_REQUEST_SOCKET_ADDR.with(|current|
+        Ok(Value::String(Rc::new(
+            current
+                .borrow()
+                .map(|socket| socket.to_string())
+                .unwrap_or("".to_string())
+        )))
+    )
+}
+
+sylt_macro::extern_function!(
+    "sylt_std::network"
+    split_ip
+    ""
+    [One(String(ip_port))] -> Type::Tuple(vec![Type::String, Type::Int]) => {
+        let addr = SocketAddr::from_str(ip_port.as_str()).unwrap();
+        Ok(Value::Tuple(Rc::new(vec![
+            Value::String(Rc::new(addr.ip().to_string())),
+            Value::Int(addr.port() as i64),
+        ])))
+    },
+);
+
+
 #[sylt_macro::sylt_doc(n_rpc_resolve, "Resolves the queued RPCs that has been received since the last resolve.", [] Type::Void)]
 #[sylt_macro::sylt_link(n_rpc_resolve, "sylt_std::network")]
 pub fn n_rpc_resolve(ctx: RuntimeContext<'_>) -> Result<Value, RuntimeError> {
@@ -286,14 +362,15 @@ pub fn n_rpc_resolve(ctx: RuntimeContext<'_>) -> Result<Value, RuntimeError> {
     // Convert the queue into Values that can be evaluated.
     let queue = queue
         .into_iter()
-        .map(|rpc| rpc.iter().map(FlatValue::unpack).collect::<Vec<_>>());
+        .map(|(rpc, addr)| (rpc.iter().map(FlatValue::unpack).collect::<Vec<_>>(), addr));
 
     // Evaluate each RPC one a time.
-    for values in queue {
+    for (values, addr) in queue {
         if values.is_empty() {
             eprintln!("Tried to resolve empty RPC");
             continue;
         }
+        CURRENT_REQUEST_SOCKET_ADDR.with(|current| *current.borrow_mut() = addr);
         // Create a vec of references to the argument list. This is kinda weird
         // but it's needed since the runtime usually doesn't handle owned
         // values.
@@ -302,6 +379,7 @@ pub fn n_rpc_resolve(ctx: RuntimeContext<'_>) -> Result<Value, RuntimeError> {
             eprintln!("{}", e);
             panic!("Error evaluating received RPC");
         }
+        CURRENT_REQUEST_SOCKET_ADDR.with(|current| current.borrow_mut().take());
     }
     Ok(Value::Nil)
 }
