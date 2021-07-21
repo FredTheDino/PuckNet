@@ -155,7 +155,7 @@ player_new :: fn pos: (float, float), team: int, num: int, owner: int -> Player 
             }
 
             force :: 3.0
-            if self.charge != 0.0 {
+            if self.charge == 0.0 {
                 self.acc += force * magnitude' input.dir
             }
 
