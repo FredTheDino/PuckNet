@@ -1,21 +1,25 @@
 use game
 
-main_loop :: fn {
+new_server_state :: fn -> game.GameState {
     n_rpc_start_server'
 
     n_rpc_connect' "127.0.0.1", 8388
     n_rpc_server' game.browser.add_server, "hello!"
 
-    // loop !game.network_exit {
-    //     n_rpc_resolve'
-
-    //     l_update'
-    //     l_render'
-
-    //     game.process_player_input' l_delta'
-    //     game.update' l_delta'
-    //     game.draw'
-
-    //     n_rpc_clients' game.set_entities, game.entities, game.players, game.arena, game.score
-    // }
+    self : !game.GameState = nil
+    self = game.GameState {
+        game: game.new_game(),
+        name: "PuckNET Server",
+        update: fn delta: float {
+            self.game.update' delta
+            n_rpc_clients' game.set_game, self.game
+        },
+        draw: fn {
+            self.game.draw'
+        },
+        process_input: fn {
+            self.game.process_input'
+        },
+    }
+    ret self
 }
