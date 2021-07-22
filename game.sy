@@ -430,6 +430,11 @@ draw_game :: fn {
     entities -> for_each' fn e: entity.Entity {
         if e is :entity.Puck {
             p: !entity.Puck = e
+
+            // Make things exiting
+            exitement_change :: magnitude_squared(p.vel)
+            mupps.add_exitement' exitement_change * l_delta() * 1.0
+
             // The holder will draw the puck in the right place if there is one
             if p.holder is :void {
                 e.draw'
