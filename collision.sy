@@ -1,4 +1,5 @@
 use entity
+use assets
 
 Manifold :: blob {
     normal: (float, float),
@@ -85,6 +86,12 @@ solve :: fn col: Manifold {
             pos: b.pos,
             vel: (0.0, 0.0),
         }
+    }
+
+    if :entity.Puck is a || :entity.Puck is b {
+        assets.random_plink()
+    } else {
+        assets.random_thudd()
     }
 
     // Should the puck action be handled here?

@@ -59,6 +59,7 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
                 && puck.hold_cooldown == 0.0) {
                 self.puck = puck
                 puck.holder = self
+                assets.random_grab()
             }
         },
         tackle_timer: 0.0,
@@ -131,6 +132,7 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
                     puck.holder = nil
                     self.puck = nil
                     self.charge = 0.0
+                    assets.random_plink()
                 }
 
                 if input.charge {
