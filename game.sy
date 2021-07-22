@@ -7,33 +7,113 @@ use entity
 use menu
 use mupps
 use particles
+use practice
 use server
 use text
 use tick
 use util
 
-GameState :: blob {
+Game :: blob {
+    puck: entity.Puck,
+    players: [entity.Player],
+    entities: [entity.Entity],
+    bodies: [collision.CircleBody],
+    arena: arena_mod.Arena,
+    score: (int, int),
+    player_id: int,
+    update: fn float -> void,
+    draw: fn -> void,
+    process_input: fn -> void,
+}
+
+new_game :: fn -> Game {
+    puck := entity.puck_new' (0.0, 0.0)
+    self : !Game = nil
+    self = Game {
+        puck: puck,
+        players: [],
+        entities: [puck],
+        bodies: [puck],
+        arena: arena_mod.arena_new((0.0, 0.0)),
+        score: (0, 0),
+        player_id: -1,
+        update: fn delta: float {
+            self.players -> for_each' fn p: entity.Player {
+                p.try_grab' puck
+            }
+
+            collision_check' delta, self
+
+            self.entities -> for_each' fn e: entity.Entity {
+                e.update' delta
+            }
+
+            particles.update' delta
+        },
+        draw: fn {
+            self.arena.draw'
+            particles.render'
+
+            self.entities -> for_each' fn e: entity.Entity {
+                if !(e is :entity.Puck) {
+                    e.draw'
+                }
+            }
+
+            self.entities -> for_each' fn e: entity.Entity {
+                if e is :entity.Puck {
+                    p: !entity.Puck = e
+
+                    // Make things exiting
+                    exitement_change :: magnitude_squared(p.vel)
+                    mupps.add_exitement' exitement_change * l_delta() * 1.0
+
+                    // The holder will draw the puck in the right place if there is one
+                    if p.holder is :void {
+                        e.draw'
+                    }
+                }
+            }
+
+            mupps.draw'
+
+            zero :: as_chars("0")[0]
+            text.draw_char' -0.1, 0.9, 1., self.score[0] + zero, (255., 0., 0., 255.) / 255.
+            text.draw_char' 0.1,  0.9, 1., self.score[1] + zero, (30., 194., 58., 255.) / 255.
+        },
+        process_input: fn {
+            delta := l_delta'
+
+            self.players -> for_each' fn p: entity.Player {
+                p.process_input' delta
+                if p.input is :entity.Input {
+                    input: !entity.Input = p.input
+                    p.input = clear_input(input)
+                }
+            }
+        }
+    }
+    ret self
+}
+
+State :: blob {
     name: str,
     update: fn float -> void,
     draw: fn -> void,
     process_input: fn -> void,
 }
 
-current_game_state : GameState = GameState {
-    name: "",
-    update: fn delta: float {},
-    draw: fn {},
-    process_input: fn {},
+GameState :: blob {
+    game: Game,
+    name: str,
+    update: fn float -> void,
+    draw: fn -> void,
+    process_input: fn -> void,
 }
 
-players : [entity.Player] = []
-entities : [entity.Entity] = []
+:GameState is :State
 
-puck : entity.Puck = entity.puck_new' (0.0, 0.0)
-bodies : [collision.CircleBody] = []
-arena : arena_mod.Arena = arena_mod.arena_new' (0.0, 0.0)
-
-score : (int, int) = (0, 0)
+states : [State] = []
 
 main_menu_lines := [
     "Connect",
@@ -45,15 +125,11 @@ main_menu_lines := [
 ]
 main_menu : menu.Menu = menu.menu_new' main_menu_lines
 
-exit := false
-network_exit := false
-
 bind_keys :: fn {
     l_bind_key("w", "up")
     l_bind_key("a", "left")
     l_bind_key("s", "down")
     l_bind_key("d", "right")
-    l_bind_key("q", "swap_player")
     l_bind_key("SPACE", "shoot")
 
     l_bind_key("Up", "up")
@@ -64,7 +140,6 @@ bind_keys :: fn {
 
     l_bind_axis(0, "LEFTX", "right")
     l_bind_axis(0, "LEFTY", "down")
-    l_bind_button(0, "Y", "swap_player")
     l_bind_button(0, "A", "shoot")
 
     l_bind_button(0, "dpup", "up")
@@ -80,57 +155,39 @@ init :: fn {
     mupps.init'
     particles.init'
     assets.load_assets'
-    current_game_state = menu_state
+    states -> push' menu_state
 }
 
-reset_state :: fn {
-    puck.pos = (0.0, 0.0)
-    players = []
-    entities = [puck]
-    bodies = [puck]
-    score = (0, 0)
-    num_players = 0
-    player_id = -1
-}
-
-num_players := 0
 player_join :: fn {
-    ip := n_rpc_current_request_ip'
-    n_rpc_client_ip' ip, assign_player_id, num_players
+    state := last(states)
+    if :GameState is state {
+        state : !GameState = state
+        game := state.game
 
-    team :: rem(num_players, 2)
-    player := entity.player_new' (as_float(team) + l_random_range(-1.0, 0.0), l_random_range(-0.5, 0.5)), team, 0, num_players
-    push' players, player
-    push' entities, player
-    push' bodies, player
-    num_players += 1
-}
+        ip := n_rpc_current_request_ip'
+        n_rpc_client_ip' ip, assign_player_id, len(game.players)
 
-assign_player_id :: fn id:int {
-    if player_id == -1 {
-        player_id = id
+        //TODO(gu): Team balancing?
+        team :: rem(len(game.players), 2)
+        player_pos := (as_float(team) + l_random_range(-1.0, 0.0), l_random_range(-0.5, 0.5))
+        player := entity.player_new' player_pos, team, len(game.players)
+        push' game.players, player
+        push' game.entities, player
+        push' game.bodies, player
     }
 }
 
-servers: {str} = {}
-broadcast_server :: fn ip:str {
-    add' servers, ip
-    n_rpc_clients' set_servers, servers
+assign_player_id :: fn id: int {
+    state := last(states)
+    if :GameState is state {
+        state : !GameState = state
+        game := state.game
+
+        game.player_id = id
+    }
 }
 
-set_servers :: fn incoming_servers:{str} {
-    servers = incoming_servers
-    print servers
-}
-
-current_player := 0
-player_id := -1
 poll_input :: fn -> entity.Input {
-    if l_input_pressed("swap_player") && player_id == -1 {
-        current_player += 1
-        current_player = rem' current_player, 2
-    }
-
     entity.Input {
         dir: normalize((l_input_value("right") - l_input_value("left"),
                         l_input_value("up")    - l_input_value("down"))),
@@ -139,32 +196,36 @@ poll_input :: fn -> entity.Input {
         charge: l_input_down("shoot"),
         shoot: l_input_released("shoot"),
 
-        player: player_id + current_player,
-        select: l_input_pressed("shoot")
+        select: l_input_pressed("shoot"),
+
+        player: nil,
     }
 }
 
 set_input :: fn input: entity.Input {
-    if players[input.player].input is nil {
-        players[input.player].input = input
-    } else {
-        player_input: !entity.Input = players[input.player].input
-        players[input.player].input = merge_inputs(player_input, input)
+    state := last(states)
+    if state is :GameState {
+        state : !GameState = state
+        game := state.game
+
+        player := game.players[input.player]
+        if player.input is nil {
+            player.input = input
+        } else {
+            player_input: !entity.Input = player.input
+            player.input = merge_inputs(player_input, input)
+        }
     }
 }
 
 merge_inputs :: fn current: entity.Input, new: entity.Input -> entity.Input {
-    if current.player != new.player {
-        ret new
-    } else {
-        ret entity.Input {
-            dir: new.dir,
-            charge: current.charge || new.charge,
-            tackle: current.tackle || new.tackle,
-            shoot: current.shoot || new.shoot,
-            player: new.player,
-            select: current.select || new.select,
-        }
+    entity.Input {
+        dir: new.dir,
+        charge: current.charge || new.charge,
+        tackle: current.tackle || new.tackle,
+        shoot: current.shoot || new.shoot,
+        select: current.select || new.select,
+        player: new.player,
     }
 }
 
@@ -174,29 +235,19 @@ clear_input :: fn input: entity.Input -> entity.Input {
         charge: false,
         tackle: false,
         shoot: false,
-        player: input.player,
         select: false,
+        player: input.player,
     }
 }
 
-process_player_input :: fn delta: float {
-    players -> for_each' fn p: entity.Player {
-        p.process_input' delta
-        if p.input is :entity.Input {
-            input: !entity.Input = p.input
-            p.input = clear_input(input)
-        }
-    }
-}
-
-collision_check :: fn delta:float {
+collision_check :: fn delta:float, game: Game {
     // Find next collision
     a_i := 0
     // TODO(ed): Write this with for_each, when the upvalue bug is fixed.
-    loop a_i < len(bodies) {
-        a := bodies[a_i]
+    loop a_i < len(game.bodies) {
+        a := game.bodies[a_i]
         b_i := -1
-        bodies -> for_each' fn b: collision.CircleBody {
+        game.bodies -> for_each' fn b: collision.CircleBody {
             b_i += 1
             // Skip the ones we've seen
             if a_i >= b_i {
@@ -211,14 +262,14 @@ collision_check :: fn delta:float {
             }
             collision.solve' col
         }
-        arena.walls -> for_each' fn w: collision.Wall {
+        game.arena.walls -> for_each' fn w: collision.Wall {
             col :: collision.circle_vs_wall' a, w
             if col.depth <= 0.0 {
                 ret
             }
             collision.solve' col
         }
-        arena.corners -> for_each' fn c: collision.Circle {
+        game.arena.corners -> for_each' fn c: collision.Circle {
             col := collision.circle_vs_in_circle' a, c
             if col.depth <= 0.0 {
                 ret
@@ -231,7 +282,7 @@ collision_check :: fn delta:float {
             collision.solve' col
         }
         // Goal outside collision
-        arena.goals -> for_each' fn g: arena_mod.Goal {
+        game.arena.goals -> for_each' fn g: arena_mod.Goal {
             col := collision.circle_vs_circle' a, g.cage
             if col.depth <= 0.0 {
                 ret
@@ -248,15 +299,15 @@ collision_check :: fn delta:float {
                 if :entity.Puck is a && dot(a.vel, in_col.normal) < 0.0 && col.depth > 0.03 {
                     particles.goal' a.pos
                     n_rpc_clients' particles.goal, a.pos
-                    score += (0 if puck.pos[0] < 0. else 1, 1 if puck.pos[0] < 0. else 0)
-                    puck.vel *= 0.0
-                    puck.pos *= 0.0
-                    if :entity.Player is puck.holder {
-                        holder: !entity.Player = puck.holder
+                    game.score += (0 if game.puck.pos[0] < 0. else 1, 1 if game.puck.pos[0] < 0. else 0)
+                    game.puck.vel *= 0.0
+                    game.puck.pos *= 0.0
+                    if :entity.Player is game.puck.holder {
+                        holder: !entity.Player = game.puck.holder
                         holder.puck = nil
                     }
                     assets.random_cheer()
-                    puck.holder = nil
+                    game.puck.holder = nil
                 }
                 collision.solve' in_col
             } else {
@@ -269,45 +320,27 @@ collision_check :: fn delta:float {
         a_i += 1
     }
 
-    bodies -> for_each' fn c: collision.Body {
+    game.bodies -> for_each' fn c: collision.Body {
         c.pos += c.vel * delta
     }
-    arena.update' delta
+    game.arena.update' delta
 }
 
-menu_state :: GameState {
+menu_state :: State {
     name: "menu",
     update: fn delta: float -> void {
         main_menu.update' delta
         if main_menu.line_selected {
             if main_menu_lines[main_menu.line_index] == "Connect" {
                 // When we break out of the client loop, return here.
-                reset_state'
-                network_exit = false
-                current_game_state = browser_state
+                states -> push' browser_state
             } else if main_menu_lines[main_menu.line_index] == "Start server" {
-                reset_state'
-                network_exit = false
-                current_game_state = hockey_state // ?
-                server.main_loop'
-                //TODO(gu): shutdown server
-                main_menu.line_index = 0
+                states -> push' server.new_server_state'
             } else if main_menu_lines[main_menu.line_index] == "Practice" {
-                reset_state'
-                current_game_state = hockey_state
-                [0, 1] -> for_each' fn id:int {
-                    player := entity.player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5)), id, id, 0
-                    push' players, player
-                    push' entities, player
-                    push' bodies, player
-                }
-                player_id = 0
-            } else if main_menu_lines[main_menu.line_index] == "Quit" {
-                exit = true
+                states -> push' practice.new_practice_state'
             } else {
                 print "Unhandled main menu item:"
                 print main_menu_lines[main_menu.line_index]
-                exit = true
             }
         }
     },
@@ -317,32 +350,9 @@ menu_state :: GameState {
     }
 }
 
-hockey_state :: GameState {
-    name: "hockey",
-    update: fn delta: float -> void {
-        players -> for_each' fn p: entity.Player {
-            p.try_grab' puck
-        }
-
-        // It's too slow to run more collision checks
-        collision_check' delta
-
-        entities -> for_each' fn e: entity.Entity {
-            e.update' delta
-        }
-
-        particles.update' delta
-    },
-    draw: draw_game,
-    process_input: fn {
-        set_input' poll_input'
-        process_player_input' l_delta'
-    }
-}
-
 browser_menu := menu.menu_new' []
 
-browser_state :: GameState {
+browser_state :: State {
     name: "Server browser",
     update: fn delta: float -> void {
         browser_menu.lines = browser.servers -> map' fn server: browser.Server -> str {
@@ -363,52 +373,45 @@ browser_state :: GameState {
             addr := split_ip' browser.servers[browser_menu.line_index].ip
             ip := addr[0]
 
-            client.connect' ip //TODO(gu): Custom ports
+            states -> push' client.new_client_state' ip
             //TODO(gu): show connection error in ui in some way
-
-            // Setup playing
-            current_game_state = hockey_state
-            client.main_loop'
-            // Blocks here until the client disconnects
-
-            n_rpc_disconnect' // Disconnect from the server
-            main_menu.line_index = 0
         }
     }
 }
 
 update :: fn delta: float -> void {
-    current_game_state.update' delta
+    state := last(states)
+    if :State is state {
+        state : !State = state
+        state.update' delta
+    }
 
     // Logic for moving "out" of the program
     if l_input_pressed("quit") {
-        reset_camera'
-        if current_game_state.name == hockey_state.name {
-            l_update'
-            network_exit = true
-            current_game_state = menu_state
-        } else {
-            exit = true
-        }
+        states -> pop'
     }
 }
 
 set_entities :: fn incoming_entities: [entity.Entity], incoming_players: [entity.Player], incomming_arena: arena_mod.Arena, incoming_score: (int, int) {
-    entities = incoming_entities
-    players = incoming_players
-    arena = incomming_arena
-    score = incoming_score
+    state := last(states)
+    if :GameState is state {
+        state : !GameState = state
+        game := state.game
+
+        game.entities = incoming_entities
+        game.players = incoming_players
+        game.arena = incomming_arena
+        game.score = incoming_score
+    }
 }
 
-move_camera :: fn {
-    if player_id != -1 {
-        x :: -players[player_id + current_player].pos[0]
-        curr_x :: l_gfx_camera_at()[0]
-        speed :: min' 1.0, 4.0 * l_delta'
-        x :: x * speed + curr_x * (1.0 - speed)
-        l_gfx_camera_place' x, 0.0
-        l_gfx_camera_set_zoom' 0.7
-    }
+move_camera :: fn game: Game {
+    x :: -game.players[game.player_id].pos[0]
+    curr_x :: l_gfx_camera_at()[0]
+    speed :: min' 1.0, 4.0 * l_delta'
+    x :: x * speed + curr_x * (1.0 - speed)
+    l_gfx_camera_place' x, 0.0
+    l_gfx_camera_set_zoom' 0.7
 }
 
 reset_camera :: fn {
@@ -416,37 +419,20 @@ reset_camera :: fn {
     l_gfx_camera_set_zoom' 1.0
 }
 
-draw_game :: fn {
-    move_camera'
-
-    arena.draw'
-    particles.render'
-
-    entities -> for_each' fn e: entity.Entity {
-        if !(e is :entity.Puck) {
-            e.draw'
-        }
+draw :: fn {
+    state := last(states)
+    if :State is state {
+        state : !State = state
+        state.draw'
     }
-
-    entities -> for_each' fn e: entity.Entity {
-        if e is :entity.Puck {
-            p: !entity.Puck = e
-            // The holder will draw the puck in the right place if there is one
-            if p.holder is :void {
-                e.draw'
-            }
-        }
-    }
-
-    mupps.draw'
-
-    zero :: as_chars("0")[0]
-    text.draw_char' -0.1, 0.9, 1., score[0] + zero, (255., 0., 0., 255.) / 255.
-    text.draw_char' 0.1,  0.9, 1., score[1] + zero, (30., 194., 58., 255.) / 255.
 }
 
-draw :: fn {
-    current_game_state.draw'
+process_input :: fn {
+    state := last(states)
+    if :State is state {
+        state : !State = state
+        state.process_input'
+    }
 }
 
 start :: fn {
@@ -463,16 +449,15 @@ start :: fn {
         l_update'
 
         bind_keys'
-        loop !exit {
+        loop len(states) > 0 {
             n_rpc_resolve'
 
             l_update'
             l_render'
 
-            current_game_state.process_input'
-
             update' l_delta'
             draw'
+            process_input'
         }
     }
 }

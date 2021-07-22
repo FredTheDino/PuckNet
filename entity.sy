@@ -16,8 +16,8 @@ Input :: blob {
     tackle: bool,
     shoot: bool,
     charge: bool,
-    player: int,
     select: bool,
+    player: int?,
 }
 
 Player :: blob {
@@ -32,14 +32,13 @@ Player :: blob {
     try_grab: fn Puck -> void,
     tackle_timer: float,
     input: Input?,
-    player_num: int,
     owner_id: int,
     draw: fn -> void,
     process_input: fn float -> void,
     update: fn float -> void,
 }
 
-player_new :: fn pos: (float, float), team: int, num: int, owner: int -> Player {
+player_new :: fn pos: (float, float), team: int, owner: int -> Player {
     sprites :: assets.player1 if team == 0 else assets.player2
     charge_osc := 4.0
     charge_start_osc_offset := pi * 7./4.
@@ -65,7 +64,6 @@ player_new :: fn pos: (float, float), team: int, num: int, owner: int -> Player 
         },
         tackle_timer: 0.0,
         input: nil,
-        player_num: num,
         owner_id: owner,
         draw: fn -> void {
             segment :: ((1 if self.rot > 1./4. * pi else 0) +
@@ -107,15 +105,14 @@ player_new :: fn pos: (float, float), team: int, num: int, owner: int -> Player 
             }
 
             // Arrow (if current player)
-            if self.player_num == game.current_player && self.owner_id == game.player_id {
-                // Red/green matches player colors.
-                color := (1., 0., 0., 1.) if team == 0 else (0.1176, 0.7608, 0.2275, 1.)
-                // How much the shot charge moves the arrow out (linearly).
-                charge_offset := (1. + charge_sin) * 0.08
-                // The sum arrow offset (relative to the player sprite).
-                arrow_offset := (cos(self.rot), sin(self.rot)) * (0.1 + charge_offset)
-                l_gfx_sprite' assets.arrow, (0, 0), self.pos + offset + arrow_offset, (5., 7.) / height * self.rad * scale, self.rot + pi, color
-            }
+            //TODO(gu): Only if current player
+            // Red/green matches player colors.
+            color := (1., 0., 0., 1.) if team == 0 else (0.1176, 0.7608, 0.2275, 1.)
+            // How much the shot charge moves the arrow out (linearly).
+            charge_offset := (1. + charge_sin) * 0.08
+            // The sum arrow offset (relative to the player sprite).
+            arrow_offset := (cos(self.rot), sin(self.rot)) * (0.1 + charge_offset)
+            l_gfx_sprite' assets.arrow, (0, 0), self.pos + offset + arrow_offset, (5., 7.) / height * self.rad * scale, self.rot + pi, color
         },
         process_input: fn delta: float -> void {
             if self.input is nil {
