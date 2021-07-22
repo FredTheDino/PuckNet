@@ -17,6 +17,8 @@ thudds : [(str, int)] = []
 plinks : [(str, int)] = []
 cheers : [(str, int)] = []
 oofs : [(str, int)] = []
+skates : [(str, int)] = []
+hes : [(str, int)] = []
 
 global_gain := 1.0
 random_thudd :: fn {
@@ -37,6 +39,14 @@ random_cheer :: fn {
 
 random_oof :: fn {
     l_audio_play(random_choice(oofs), false, (global_gain * 0.6, global_gain * 0.1), (0.8, 0.02))
+}
+
+random_skate :: fn {
+    l_audio_play(random_choice(skates), false, (global_gain * 0.6, global_gain * 0.1), (1.2, 0.1))
+}
+
+random_he :: fn {
+    l_audio_play(random_choice(hes), false, (global_gain * 2.0, global_gain * 0.1), (0.98, 0.05))
 }
 
 load_assets :: fn {
@@ -140,5 +150,21 @@ load_assets :: fn {
         l_load_audio("res/oof01.wav"),
         l_load_audio("res/oof02.wav"),
         l_load_audio("res/oof03.wav"),
+    ]
+
+    skates = [
+        l_load_audio("res/skate01.wav"),
+        l_load_audio("res/skate02.wav"),
+        l_load_audio("res/skate03.wav"),
+        l_load_audio("res/skate04.wav"),
+        l_load_audio("res/skate05.wav"),
+        l_load_audio("res/skate06.wav"),
+    ]
+
+    hes = [
+        l_load_audio("res/he01.wav"),
+        l_load_audio("res/he02.wav"),
+        l_load_audio("res/he03.wav"),
+        l_load_audio("res/he04.wav"),
     ]
 }

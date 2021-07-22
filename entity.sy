@@ -149,6 +149,7 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
             if self.tackle_timer == 0.0 && input.tackle && self.puck is nil {
                 self.tackle_timer = 1.0
                 self.vel += util.dir(self.rot) * 2.0
+                assets.random_he()
             }
 
             if self.tackle_timer > 0.5 {
@@ -167,6 +168,12 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
             direction_angle :: angle(input.dir) if input.dir != (0.0, 0.0) else self.rot
             delta_angle :: util.angle_distance' self.rot, direction_angle
             rotation :: util.clamp' delta_angle * rotation_speed, -max_rotation, max_rotation
+
+            if dot(input.dir, util.dir(self.rot)) < 0.8 && input_mag > 0.0 {
+                // TODO(ed): Spray particles here
+                assets.random_skate()
+            }
+
             self.rot += rotation * delta
             self.rot = rem' self.rot, 2. * pi
         },
