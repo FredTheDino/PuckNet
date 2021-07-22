@@ -15,6 +15,7 @@ mupps : [((str, int), (int, int))] = []
 thudds : [(str, int)] = []
 plinks : [(str, int)] = []
 cheers : [(str, int)] = []
+oofs : [(str, int)] = []
 
 global_gain := 1.0
 random_thudd :: fn {
@@ -30,7 +31,11 @@ random_grab :: fn {
 }
 
 random_cheer :: fn {
-    l_audio_play(random_choice(cheers), false, (global_gain * 0.3, global_gain * 0.1), (1.0, 0.02))
+    l_audio_play(random_choice(cheers), false, (global_gain * 0.4, global_gain * 0.1), (0.8, 0.02))
+}
+
+random_oof :: fn {
+    l_audio_play(random_choice(oofs), false, (global_gain * 0.6, global_gain * 0.1), (0.8, 0.02))
 }
 
 load_assets :: fn {
@@ -127,5 +132,11 @@ load_assets :: fn {
         l_load_audio("res/cheer01.wav"),
         l_load_audio("res/cheer02.wav"),
         l_load_audio("res/cheer03.wav"),
+    ]
+
+    oofs = [
+        l_load_audio("res/oof01.wav"),
+        l_load_audio("res/oof02.wav"),
+        l_load_audio("res/oof03.wav"),
     ]
 }
