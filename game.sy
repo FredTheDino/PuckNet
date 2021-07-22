@@ -344,7 +344,7 @@ browser_state :: GameState {
     name: "Server browser",
     update: fn delta: float -> void {
         browser_menu.lines = browser.servers -> map' fn server: browser.Server -> str {
-            server.name
+            as_str(server.online) + ": " + server.name
         }
     },
     draw: fn -> void {
@@ -358,9 +358,7 @@ browser_state :: GameState {
             n_rpc_disconnect'
 
             // Connect to the selected server
-            addr := split_ip' browser.servers[browser_menu.line_index].ip
-            ip := addr[0]
-
+            ip := browser.servers[browser_menu.line_index].join_ip
             client.connect' ip //TODO(gu): Custom ports
             //TODO(gu): show connection error in ui in some way
 

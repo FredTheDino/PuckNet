@@ -2,7 +2,11 @@ use game
 
 Server :: blob {
     name: str,
-    ip: str,
+    // The IP clients join to play
+    join_ip: str,
+    // The IP we're communicating with
+    handle_ip: str,
+    online: int,
 }
 
 servers: [Server] = []
@@ -10,7 +14,20 @@ servers: [Server] = []
 add_server :: fn name: str {
     servers -> push' Server {
         name: name,
-        ip: n_rpc_current_request_ip(),
+        join_ip: split_ip(n_rpc_current_request_ip())[0],
+        handle_ip: n_rpc_current_request_ip(),
+        online: 0,
+    }
+}
+
+update_server :: fn online: int {
+    request_ip := n_rpc_current_request_ip()
+    i := 0
+    loop i < len(servers) {
+        if servers[i].handle_ip == request_ip {
+            servers[i].online = online
+        }
+        i += 1
     }
 }
 
@@ -21,9 +38,13 @@ set_servers :: fn recv_servers: [Server] {
 start :: fn {
     n_rpc_start_server' 8388
     loop {
+        print "resolve"
         n_rpc_resolve'
+        print "send"
         n_rpc_clients' set_servers, servers
+        print servers
 
         thread_sleep' 1.0
+        print "slept"
     }
 }
