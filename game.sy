@@ -255,6 +255,7 @@ collision_check :: fn delta:float {
                         holder: !entity.Player = puck.holder
                         holder.puck = nil
                     }
+                    assets.random_cheer()
                     puck.holder = nil
                 }
                 collision.solve' in_col
