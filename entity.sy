@@ -9,6 +9,7 @@ pi :: 3.14159265358979
 Entity :: blob {
     draw: fn -> void,
     update: fn float -> void,
+    remove: bool,
 }
 
 Input :: blob {
@@ -34,6 +35,8 @@ Player :: blob {
     input: Input?,
     player_num: int,
     owner_id: int,
+    last_seen: float,
+    remove: bool,
     draw: fn -> void,
     process_input: fn float -> void,
     update: fn float -> void,
@@ -66,6 +69,8 @@ player_new :: fn pos: (float, float), team: int, num: int, owner: int -> Player 
         input: nil,
         player_num: num,
         owner_id: owner,
+        last_seen: 0.0,
+        remove: false,
         draw: fn -> void {
             segment :: ((1 if self.rot > 1./4. * pi else 0) +
                         (1 if self.rot > 3./4. * pi else 0) +
@@ -215,6 +220,7 @@ Puck :: blob {
     hold_cooldown: float,
     draw: fn -> void,
     update: fn float -> void,
+    remove: bool,
 }
 
 // we might need to tweek mass numbers
@@ -242,7 +248,8 @@ puck_new :: fn pos: (float, float) -> Puck {
             ice_fric :: 1.0
             speed :: magnitude' self.vel
             self.vel = util.friction' self.vel, ice_fric * delta
-        }
+        },
+        remove: false,
     }
     ret self
 }

@@ -145,6 +145,7 @@ poll_input :: fn -> entity.Input {
 }
 
 set_input :: fn input: entity.Input {
+    players[input.player].last_seen = 0.0
     if players[input.player].input is nil {
         players[input.player].input = input
     } else {
@@ -180,8 +181,18 @@ clear_input :: fn input: entity.Input -> entity.Input {
 }
 
 process_player_input :: fn delta: float {
+    players -> for_each' fn player: entity.Player {
+        entity.player.remove = entity.player.last_seen >= 3.0
+    }
+    players = players -> filter' fn player: entity.Player -> bool {
+        !player.remove
+    }
+    entities = entities -> filter' fn entity: entity.Entity -> bool {
+        !entity.remove
+    }
     players -> for_each' fn p: entity.Player {
         p.process_input' delta
+        p.last_seen += delta
         if p.input is :entity.Input {
             input: !entity.Input = p.input
             p.input = clear_input(input)
