@@ -19,12 +19,7 @@ GameState :: blob {
     process_input: fn -> void,
 }
 
-current_game_state : GameState = GameState {
-    name: "",
-    update: fn delta: float {},
-    draw: fn {},
-    process_input: fn {},
-}
+states : [GameState] = []
 
 players : [entity.Player] = []
 entities : [entity.Entity] = []
@@ -44,9 +39,6 @@ main_menu_lines := [
     "Quit",
 ]
 main_menu : menu.Menu = menu.menu_new' main_menu_lines
-
-exit := false
-network_exit := false
 
 bind_keys :: fn {
     l_bind_key("w", "up")
@@ -80,7 +72,7 @@ init :: fn {
     mupps.init'
     particles.init'
     assets.load_assets'
-    current_game_state = menu_state
+    states -> push' menu_state
 }
 
 reset_state :: fn {
@@ -282,18 +274,16 @@ menu_state :: GameState {
             if main_menu_lines[main_menu.line_index] == "Connect" {
                 // When we break out of the client loop, return here.
                 reset_state'
-                network_exit = false
-                current_game_state = browser_state
+                states -> push' browser_state
             } else if main_menu_lines[main_menu.line_index] == "Start server" {
                 reset_state'
-                network_exit = false
-                current_game_state = hockey_state // ?
+                states -> push' hockey_state // ?
                 server.main_loop'
                 //TODO(gu): shutdown server
                 main_menu.line_index = 0
             } else if main_menu_lines[main_menu.line_index] == "Practice" {
                 reset_state'
-                current_game_state = hockey_state
+                states -> push' hockey_state
                 [0, 1] -> for_each' fn id:int {
                     player := entity.player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5)), id, id, 0
                     push' players, player
@@ -301,12 +291,9 @@ menu_state :: GameState {
                     push' bodies, player
                 }
                 player_id = 0
-            } else if main_menu_lines[main_menu.line_index] == "Quit" {
-                exit = true
             } else {
                 print "Unhandled main menu item:"
                 print main_menu_lines[main_menu.line_index]
-                exit = true
             }
         }
     },
@@ -365,7 +352,7 @@ browser_state :: GameState {
             //TODO(gu): show connection error in ui in some way
 
             // Setup playing
-            current_game_state = hockey_state
+            states -> push' hockey_state
             client.main_loop'
             // Blocks here until the client disconnects
 
@@ -376,18 +363,15 @@ browser_state :: GameState {
 }
 
 update :: fn delta: float -> void {
-    current_game_state.update' delta
+    state := last(states)
+    if state is :GameState {
+        state : !GameState = state
+        state.update' delta
+    }
 
     // Logic for moving "out" of the program
     if l_input_pressed("quit") {
-        reset_camera'
-        if current_game_state.name == hockey_state.name {
-            l_update'
-            network_exit = true
-            current_game_state = menu_state
-        } else {
-            exit = true
-        }
+        states -> pop'
     }
 }
 
@@ -444,7 +428,11 @@ draw_game :: fn {
 }
 
 draw :: fn {
-    current_game_state.draw'
+    state := last(states)
+    if state is :GameState {
+        state : !GameState = state
+        state.draw'
+    }
 }
 
 start :: fn {
@@ -461,13 +449,17 @@ start :: fn {
         l_update'
 
         bind_keys'
-        loop !exit {
+        loop len(states) > 0 {
             n_rpc_resolve'
 
             l_update'
             l_render'
 
-            current_game_state.process_input'
+            state := last(states)
+            if state is :GameState {
+                state : !GameState = state
+                state.process_input'
+            }
 
             update' l_delta'
             draw'

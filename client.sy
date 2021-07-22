@@ -19,24 +19,24 @@ connect :: fn ip: str -> bool {
 main_loop :: fn {
     update_ticker := game.tick.ticker_new' 60.0
     input: game.entity.Input? = nil
-    loop !game.network_exit {
-        n_rpc_resolve'
+    // loop !game.network_exit {
+    //     n_rpc_resolve'
 
-        l_update'
-        l_render'
-        new_input := game.poll_input'
-        if input is nil {
-            input = new_input
-        } else {
-            input_: !game.entity.Input = input
-            input = game.merge_inputs(input_, new_input)
-        }
-        if update_ticker.next(l_delta()) {
-            n_rpc_server' game.set_input, input
-            input = nil
-        }
+    //     l_update'
+    //     l_render'
+    //     new_input := game.poll_input'
+    //     if input is nil {
+    //         input = new_input
+    //     } else {
+    //         input_: !game.entity.Input = input
+    //         input = game.merge_inputs(input_, new_input)
+    //     }
+    //     if update_ticker.next(l_delta()) {
+    //         n_rpc_server' game.set_input, input
+    //         input = nil
+    //     }
 
-        game.update' l_delta'
-        game.draw'
-    }
+    //     game.update' l_delta'
+    //     game.draw'
+    // }
 }
