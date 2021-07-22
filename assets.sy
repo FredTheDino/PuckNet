@@ -12,6 +12,27 @@ player1 : [[(str, int)]] = []
 player2 : [[(str, int)]] = []
 mupps : [((str, int), (int, int))] = []
 
+thudds : [(str, int)] = []
+plinks : [(str, int)] = []
+cheers : [(str, int)] = []
+
+global_gain := 1.0
+random_thudd :: fn {
+    l_audio_play(random_choice(thudds), false, (global_gain * 0.2, global_gain * 0.1), (1.0, 0.05))
+}
+
+random_plink :: fn {
+    l_audio_play(random_choice(plinks), false, (global_gain, global_gain * 0.1), (0.7, 0.2))
+}
+
+random_grab :: fn {
+    l_audio_play(random_choice(plinks), false, (global_gain * 0.3, global_gain * 0.1), (0.4, 0.2))
+}
+
+random_cheer :: fn {
+    l_audio_play(random_choice(cheers), false, (global_gain * 0.3, global_gain * 0.1), (1.0, 0.02))
+}
+
 load_assets :: fn {
     ads = l_load_image' "res/ads.png", (401, 20)
     arena = l_load_image' "res/rink.png", (200, 100)
@@ -87,5 +108,24 @@ load_assets :: fn {
         (l_load_image("res/crowd2.png", (8, 13)), (8, 13)),
         (l_load_image("res/crowd3.png", (10, 19)), (10, 19))
         (l_load_image("res/crowd3.png", (8, 13)), (8, 13)),
+    ]
+
+    thudds = [
+        l_load_audio("res/thudd01.wav"),
+        l_load_audio("res/thudd02.wav"),
+    ]
+
+    plinks = [
+        l_load_audio("res/plink01.wav"),
+        l_load_audio("res/plink02.wav"),
+        l_load_audio("res/plink03.wav"),
+        l_load_audio("res/plink04.wav"),
+        l_load_audio("res/plink05.wav"),
+    ]
+
+    cheers = [
+        l_load_audio("res/cheer01.wav"),
+        l_load_audio("res/cheer02.wav"),
+        l_load_audio("res/cheer03.wav"),
     ]
 }
