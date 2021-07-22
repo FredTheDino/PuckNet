@@ -41,7 +41,7 @@ new_game :: fn -> Game {
                 p.try_grab' puck
             }
 
-            collision_check' delta
+            collision_check' delta, self
 
             self.entities -> for_each' fn e: entity.Entity {
                 e.update' delta
@@ -50,8 +50,6 @@ new_game :: fn -> Game {
             particles.update' delta
         },
         draw: fn {
-            move_camera'
-
             self.arena.draw'
             particles.render'
 
@@ -391,7 +389,7 @@ browser_state :: State {
 
 update :: fn delta: float -> void {
     state := last(states)
-    if state is :State {
+    if state is :State || state is :GameState {
         state : !State = state
         state.update' delta
     }
@@ -431,7 +429,7 @@ reset_camera :: fn {
 
 draw :: fn {
     state := last(states)
-    if state is :State {
+    if state is :State || state is :GameState { //TODO(gu): is :State should be enough
         state : !State = state
         state.draw'
     }
@@ -439,7 +437,7 @@ draw :: fn {
 
 process_input :: fn {
     state := last(states)
-    if state is :State {
+    if state is :State || state is :GameState {
         state : !State = state
         state.process_input'
     }
