@@ -420,6 +420,7 @@ reset_camera :: fn {
 }
 
 draw :: fn {
+    reset_camera'
     state := last(states)
     if :State is state {
         state : !State = state
