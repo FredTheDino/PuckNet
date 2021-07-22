@@ -157,7 +157,13 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
 
             force :: 3.0
             if !ignore_movement {
-                self.acc += force * magnitude' input.dir
+                acc := 0.0
+                if :Puck is self.puck {
+                    acc = 0.8
+                } else {
+                    acc = 1.0
+                }
+                self.acc += acc * force * magnitude' input.dir
             }
 
             // Rotation
