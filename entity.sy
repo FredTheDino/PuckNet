@@ -17,6 +17,7 @@ Input :: blob {
     shoot: bool,
     charge: bool,
     select: bool,
+    player: int?,
 }
 
 Player :: blob {
@@ -32,13 +33,12 @@ Player :: blob {
     tackle_timer: float,
     input: Input?,
     owner_id: int,
-    owner_ip: str,
     draw: fn -> void,
     process_input: fn float -> void,
     update: fn float -> void,
 }
 
-player_new :: fn pos: (float, float), team: int, owner: int, ip: str -> Player {
+player_new :: fn pos: (float, float), team: int, owner: int -> Player {
     sprites :: assets.player1 if team == 0 else assets.player2
     charge_osc := 4.0
     charge_start_osc_offset := pi * 7./4.
@@ -64,7 +64,6 @@ player_new :: fn pos: (float, float), team: int, owner: int, ip: str -> Player {
         tackle_timer: 0.0,
         input: nil,
         owner_id: owner,
-        owner_ip: ip,
         draw: fn -> void {
             segment :: ((1 if self.rot > 1./4. * pi else 0) +
                         (1 if self.rot > 3./4. * pi else 0) +

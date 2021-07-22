@@ -76,7 +76,6 @@ new_game :: fn -> Game {
             text.draw_char' 0.1,  0.9, 1., self.score[1] + zero, (30., 194., 58., 255.) / 255.
         },
         process_input: fn {
-            set_input' poll_input'
             delta := l_delta'
 
             self.players -> for_each' fn p: entity.Player {
@@ -154,27 +153,27 @@ init :: fn {
 }
 
 player_join :: fn {
-    // state := last(states)
-    // if state is :GameState {
-    //     state : !GameState = state
-    //     game := state.game
+    state := last(states)
+    if :GameState is state {
+        state : !GameState = state
+        game := state.game
 
-    //     ip := n_rpc_current_request_ip'
-    //     n_rpc_client_ip' ip, assign_player_id, len(game.players)
+        ip := n_rpc_current_request_ip'
+        n_rpc_client_ip' ip, assign_player_id, len(game.players)
 
-    //     //TODO(gu): Team balancing?
-    //     team :: rem(len(game.players), 2)
-    //     player_pos := as_float(team) + l_random_range(-1.0, 0.0), l_random_range(-0.5, 0.5)
-    //     player := entity.player_new' player_pos, team, len(game.players), n_rpc_current_request_ip()
-    //     push' game.players, player
-    //     push' game.entities, player
-    //     push' game.bodies, player
-    // }
+        //TODO(gu): Team balancing?
+        team :: rem(len(game.players), 2)
+        player_pos := (as_float(team) + l_random_range(-1.0, 0.0), l_random_range(-0.5, 0.5))
+        player := entity.player_new' player_pos, team, len(game.players)
+        push' game.players, player
+        push' game.entities, player
+        push' game.bodies, player
+    }
 }
 
-assign_player_id :: fn id:int {
+assign_player_id :: fn id: int {
     state := last(states)
-    if state is :GameState {
+    if :GameState is state {
         state : !GameState = state
         game := state.game
 
@@ -191,7 +190,9 @@ poll_input :: fn -> entity.Input {
         charge: l_input_down("shoot"),
         shoot: l_input_released("shoot"),
 
-        select: l_input_pressed("shoot")
+        select: l_input_pressed("shoot"),
+
+        player: nil,
     }
 }
 
@@ -201,15 +202,12 @@ set_input :: fn input: entity.Input {
         state : !GameState = state
         game := state.game
 
-        game.players -> for_each' fn player: entity.Player {
-            if player.owner_ip == n_rpc_current_request_ip() {
-                if player.input is nil {
-                    player.input = input
-                } else {
-                    player_input: !entity.Input = player.input
-                    player.input = merge_inputs(player_input, input)
-                }
-            }
+        player := game.players[input.player]
+        if player.input is nil {
+            player.input = input
+        } else {
+            player_input: !entity.Input = player.input
+            player.input = merge_inputs(player_input, input)
         }
     }
 }
@@ -221,6 +219,7 @@ merge_inputs :: fn current: entity.Input, new: entity.Input -> entity.Input {
         tackle: current.tackle || new.tackle,
         shoot: current.shoot || new.shoot,
         select: current.select || new.select,
+        player: new.player,
     }
 }
 
@@ -231,6 +230,7 @@ clear_input :: fn input: entity.Input -> entity.Input {
         tackle: false,
         shoot: false,
         select: false,
+        player: input.player,
     }
 }
 
@@ -373,23 +373,15 @@ browser_state :: State {
             addr := split_ip' browser.servers[browser_menu.line_index].ip
             ip := addr[0]
 
-            client.connect' ip //TODO(gu): Custom ports
+            states -> push' client.new_client_state' ip
             //TODO(gu): show connection error in ui in some way
-
-            // Setup playing
-            // states -> push' hockey_state
-            client.main_loop'
-            // Blocks here until the client disconnects
-
-            n_rpc_disconnect' // Disconnect from the server
-            main_menu.line_index = 0
         }
     }
 }
 
 update :: fn delta: float -> void {
     state := last(states)
-    if state is :State || state is :GameState {
+    if :State is state {
         state : !State = state
         state.update' delta
     }
@@ -402,7 +394,7 @@ update :: fn delta: float -> void {
 
 set_entities :: fn incoming_entities: [entity.Entity], incoming_players: [entity.Player], incomming_arena: arena_mod.Arena, incoming_score: (int, int) {
     state := last(states)
-    if state is :GameState {
+    if :GameState is state {
         state : !GameState = state
         game := state.game
 
@@ -429,7 +421,7 @@ reset_camera :: fn {
 
 draw :: fn {
     state := last(states)
-    if state is :State || state is :GameState { //TODO(gu): is :State should be enough
+    if :State is state {
         state : !State = state
         state.draw'
     }
@@ -437,17 +429,9 @@ draw :: fn {
 
 process_input :: fn {
     state := last(states)
-    if state is :State || state is :GameState {
+    if :State is state {
         state : !State = state
         state.process_input'
-    }
-}
-
-set_game :: fn game: Game {
-    state := last(states)
-    if state is :GameState {
-        state : !GameState = state
-        state.game = game
     }
 }
 

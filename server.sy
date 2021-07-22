@@ -12,7 +12,7 @@ new_server_state :: fn -> game.GameState {
         name: "PuckNET Server",
         update: fn delta: float {
             self.game.update' delta
-            n_rpc_clients' game.set_game, self.game
+            n_rpc_clients' game.set_entities, self.game.entities, self.game.players, self.game.arena, self.game.score
         },
         draw: fn {
             self.game.draw'

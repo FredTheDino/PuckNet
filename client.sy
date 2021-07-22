@@ -1,42 +1,51 @@
 use game
 
-connect :: fn ip: str -> bool {
-    // //TODO(gu): return false if connection failed
-    // n_rpc_connect' ip
+new_client_state :: fn ip: str -> game.GameState {
+    n_rpc_connect' ip
+    n_rpc_server' game.player_join
 
-    // n_rpc_server' game.player_join
-
-    // loop (len(game.players) <= 2 * game.player_id || game.player_id == -1) && !l_input_down("quit") {
-    //     n_rpc_resolve'
-
-    //     l_update'
-    //     l_render'
-    // }
-
-    true
-}
-
-main_loop :: fn {
     update_ticker := game.tick.ticker_new' 60.0
-    input: game.entity.Input? = nil
-    // loop !game.network_exit {
-    //     n_rpc_resolve'
+    self : !game.GameState = nil
+    input : game.entity.Input? = nil
+    game_ := game.new_game()
 
-    //     l_update'
-    //     l_render'
-    //     new_input := game.poll_input'
-    //     if input is nil {
-    //         input = new_input
-    //     } else {
-    //         input_: !game.entity.Input = input
-    //         input = game.merge_inputs(input_, new_input)
-    //     }
-    //     if update_ticker.next(l_delta()) {
-    //         n_rpc_server' game.set_input, input
-    //         input = nil
-    //     }
+    recv_done :: fn -> bool {
+        len(game_.players) > game_.player_id && game_.player_id != -1
+    }
 
-    //     game.update' l_delta'
-    //     game.draw'
-    // }
+    self = game.GameState {
+        game: game_,
+        name: "PuckNET Client",
+        update: fn delta: float {
+            if recv_done() {
+                self.game.update' delta
+            }
+        },
+        draw: fn {
+            if recv_done() {
+                self.game.draw'
+            }
+        },
+        process_input: fn {
+            if recv_done() {
+                new_input := game.poll_input'
+                new_input.player = self.game.player_id
+                if input is nil {
+                    input = new_input
+                } else {
+                    input_: !game.entity.Input = input
+                    input = game.merge_inputs(input_, new_input)
+                }
+
+                //TODO(gu): delta parameter?
+                if update_ticker.next(l_delta()) {
+                    n_rpc_server' game.set_input, input
+                    input = nil
+                }
+
+                self.game.process_input'
+            }
+        }
+    }
+    ret self
 }
