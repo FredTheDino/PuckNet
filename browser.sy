@@ -38,13 +38,9 @@ set_servers :: fn recv_servers: [Server] {
 start :: fn {
     n_rpc_start_server' 8388
     loop {
-        print "resolve"
         n_rpc_resolve'
-        print "send"
         n_rpc_clients' set_servers, servers
-        print servers
 
         thread_sleep' 1.0
-        print "slept"
     }
 }
