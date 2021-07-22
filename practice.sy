@@ -1,0 +1,32 @@
+use entity
+use game
+
+new_practice_state :: fn -> game.GameState {
+    new_game := game.new_game'
+    player_pos := (l_random_range(-1.0, 0.0), l_random_range(-0.5, 0.5))
+    player := entity.player_new' player_pos, 0, 0
+    push' new_game.players, player
+    push' new_game.entities, player
+    push' new_game.bodies, player
+    new_game.player_id = 0
+
+    self : !game.GameState = nil
+    self = game.GameState {
+        game: new_game,
+        name: "PuckNET Server",
+        update: fn delta: float {
+            self.game.update' delta
+        },
+        draw: fn {
+            self.game.draw'
+            self.game -> game.move_camera'
+        },
+        process_input: fn {
+            input := game.poll_input'
+            input.player = 0
+            game.set_input' input
+            self.game.process_input'
+        },
+    }
+    ret self
+}
