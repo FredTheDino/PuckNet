@@ -7,6 +7,7 @@ use entity
 use menu
 use mupps
 use particles
+use practice
 use server
 use text
 use tick
@@ -330,14 +331,7 @@ menu_state :: State {
             } else if main_menu_lines[main_menu.line_index] == "Start server" {
                 states -> push' server.new_server_state'
             } else if main_menu_lines[main_menu.line_index] == "Practice" {
-                // states -> push' hockey_state
-                // [0, 1] -> for_each' fn id:int {
-                //     player := entity.player_new' (l_random_range(-0.5, 0.5), l_random_range(-0.5, 0.5)), id, id, 0
-                //     push' players, player
-                //     push' entities, player
-                //     push' bodies, player
-                // }
-                // player_id = 0
+                states -> push' practice.new_practice_state'
             } else {
                 print "Unhandled main menu item:"
                 print main_menu_lines[main_menu.line_index]
@@ -420,7 +414,6 @@ reset_camera :: fn {
 }
 
 draw :: fn {
-    reset_camera'
     state := last(states)
     if :State is state {
         state : !State = state

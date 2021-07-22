@@ -24,7 +24,7 @@ new_client_state :: fn ip: str -> game.GameState {
         draw: fn {
             if recv_done() {
                 self.game.draw'
-                game.move_camera' self.game
+                self.game -> game.move_camera'
             }
         },
         process_input: fn {

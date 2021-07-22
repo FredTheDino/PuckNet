@@ -1,3 +1,4 @@
+use game
 use entity
 use text
 
@@ -81,6 +82,7 @@ menu_new :: fn lines: [str] -> Menu {
             }
         },
         draw: fn {
+            game.reset_camera'
             y := 0.5
             i := 0
             loop i < len(self.lines) {
