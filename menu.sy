@@ -8,6 +8,8 @@ MOVE_REPEAT_DELAY := 0.4 // seconds
 MenuInput :: blob {
     up: bool,
     down: bool,
+    left: bool,
+    right: bool,
     select: bool,
 }
 
@@ -16,6 +18,8 @@ from_input :: fn input: entity.Input -> MenuInput {
     MenuInput {
         up: input.dir[1] > ANALOG_CUTOFF,
         down: input.dir[1] < -ANALOG_CUTOFF,
+        left: input.dir[0] > ANALOG_CUTOFF,
+        right: input.dir[0] < -ANALOG_CUTOFF,
         select: input.select,
     }
 }
@@ -28,7 +32,7 @@ Menu :: blob {
     cur_move_cooldown: float,
     move_repeating: bool,
 
-    process_input: fn MenuInput -> void,
+    process_input: fn MenuInput -> bool,
     update: fn float -> void,
     draw: fn -> void,
 }
@@ -43,9 +47,9 @@ menu_new :: fn lines: [str] -> Menu {
         cur_move_cooldown: 0.,
         move_repeating: false,
 
-        process_input: fn input: MenuInput {
+        process_input: fn input: MenuInput -> bool {
             should_process := false
-            if input.up || input.down {
+            if input.up || input.down || input.left || input.right {
                 if self.cur_move_cooldown == 0. {
                     should_process = true
                     if self.move_repeating {
@@ -74,6 +78,7 @@ menu_new :: fn lines: [str] -> Menu {
             }
 
             self.line_selected = input.select
+            ret should_process
         },
         update: fn delta: float {
             self.cur_move_cooldown -= delta

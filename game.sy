@@ -339,6 +339,8 @@ menu_state :: State {
                 states -> push' server.new_server_state'
             } else if main_menu_lines[main_menu.line_index] == "Practice" {
                 states -> push' practice.new_practice_state'
+            } else if main_menu_lines[main_menu.line_index] == "Settings" {
+                states -> push' config.new_settings_state'
             } else {
                 print "Unhandled main menu item:"
                 print main_menu_lines[main_menu.line_index]
