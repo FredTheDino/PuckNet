@@ -32,7 +32,7 @@ new_game :: fn -> Game {
     self : !Game = nil
     self = Game {
         puck: puck,
-        players: [],
+        players: {:},
         entities: [puck],
         bodies: [puck],
         arena: arena_mod.arena_new((0.0, 0.0)),
@@ -40,7 +40,7 @@ new_game :: fn -> Game {
         player_id: -1,
         next_id: 0,
         update: fn delta: float {
-            self.players -> for_each' fn p: entity.Player {
+            self.players -> for_each' fn _id: int, p: entity.Player {
                 p.try_grab' puck
             }
 
@@ -86,7 +86,7 @@ new_game :: fn -> Game {
         process_input: fn {
             delta := l_delta'
 
-            self.players -> for_each' fn player: entity.Player {
+            self.players -> for_each' fn _id: int, player: entity.Player {
                 player.remove = entity.player.last_seen >= 3.0
             }
             self.players = self.players -> filter' fn _id: int, player: entity.Player -> bool {
@@ -96,7 +96,7 @@ new_game :: fn -> Game {
                 !entity.remove
             }
 
-            self.players -> for_each' fn p: entity.Player {
+            self.players -> for_each' fn _id: int, p: entity.Player {
                 p.process_input' delta
                 if p.input is :entity.Input {
                     input: !entity.Input = p.input
@@ -223,9 +223,15 @@ set_input :: fn input: entity.Input {
         state : !GameState = state
         game := state.game
 
-        player_ := game.players[input.player]
-        if :entity.Player is player_ {
-            player: !entity.Player = player_
+        // Without the ID we don't know which player to set the input to.
+        if input.player is nil {
+            ret
+        }
+        id: !int = input.player
+
+        player := game.players[id]
+        if :entity.Player is player {
+            player: !entity.Player = player
             player.last_seen = 0.0
             if player.input is nil {
                 player.input = input
