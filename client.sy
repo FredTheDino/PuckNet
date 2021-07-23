@@ -2,6 +2,7 @@ use config
 use game
 
 new_client_state :: fn ip: str -> game.GameState {
+    print ip
     n_rpc_connect' ip, config.SERVER_PORT
     n_rpc_server' game.player_join
 
@@ -11,7 +12,7 @@ new_client_state :: fn ip: str -> game.GameState {
     game_ := game.new_game()
 
     recv_done :: fn -> bool {
-        len(game_.players) > game_.player_id && game_.player_id != -1
+        game_.player_id in game_.players
     }
 
     self = game.GameState {
