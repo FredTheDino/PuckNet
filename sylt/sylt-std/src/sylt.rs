@@ -609,4 +609,13 @@ sylt_macro::extern_function!(
     },
 );
 
+sylt_macro::extern_function!(
+    "sylt_std::sylt"
+    abort
+    "Abort the game immediately"
+    [] -> Type::Void => {
+        std::process::exit(0)
+    },
+);
+
 sylt_macro::sylt_link_gen!("sylt_std::sylt");
