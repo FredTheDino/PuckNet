@@ -141,9 +141,9 @@ load_assets :: fn {
     ]
 
     cheers = [
-        l_load_audio("res/cheer01.wav"),
-        l_load_audio("res/cheer02.wav"),
-        l_load_audio("res/cheer03.wav"),
+        l_load_audio("res/cheer01.ogg"),
+        l_load_audio("res/cheer02.ogg"),
+        l_load_audio("res/cheer03.ogg"),
     ]
 
     oofs = [
