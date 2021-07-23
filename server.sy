@@ -5,7 +5,7 @@ new_server_state :: fn -> game.GameState {
     n_rpc_start_server'
 
     server_name_done := false
-    server_name = "Puck.NET"
+    server_name := "Puck.NET"
 
     l_set_text_input_enabled' true
 
@@ -31,7 +31,8 @@ new_server_state :: fn -> game.GameState {
         draw: fn {
             if !server_name_done {
                 //TODO(gu): draw text centered
-                text.draw_text' 0.0, 0.2, 1.0, server_name + "|", (255., 255., 255., 255.) / 255.
+                flashing := "_" if rem(floor(l_time() * 2.0), 2) == 0 else " "
+                text.draw_text' 0.0, 0.2, 1.0, server_name + flashing, (255., 255., 255., 255.) / 255.
             } else {
                 self.game.draw'
             }
