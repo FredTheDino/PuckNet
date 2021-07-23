@@ -7,6 +7,7 @@ border := empty_asset
 font := empty_asset
 goal := empty_asset
 puck := empty_asset
+menu := empty_asset
 
 player1 : [[(str, int)]] = []
 player2 : [[(str, int)]] = []
@@ -47,6 +48,7 @@ load_assets :: fn {
     font = l_load_image' "res/font.png", (14, 18)
     goal = l_load_image' "res/goal.png", (8, 13)
     puck = l_load_image' "res/puck.png", (7, 6)
+    menu = l_load_image' "res/menu.png", (400, 400)
 
     player1_back  :: l_load_image' "res/player1_back.png", (13, 15)
     player1_front :: l_load_image' "res/player1_front.png", (13, 15)
