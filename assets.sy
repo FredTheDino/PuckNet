@@ -37,7 +37,7 @@ random_cheer :: fn {
 }
 
 random_bloop :: fn {
-    l_audio_play(bloop, false, (global_gain * 0.2, global_gain * 0.1), (1.0, 0.1))
+    l_audio_play(bloop, false, (config.VOLUME_FLOAT * 0.2, config.VOLUME_FLOAT * 0.1), (1.0, 0.1))
 }
 
 
