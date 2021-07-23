@@ -1,6 +1,4 @@
-use game
-
-BROWSER_SERVER_IP := "fuffens.xyz"
+use config
 
 Server :: blob {
     name: str,
@@ -21,7 +19,7 @@ set_servers :: fn recv_servers: [Server] {
 }
 
 start :: fn {
-    n_rpc_start_server' 8388
+    n_rpc_start_server' config.BROWSER_SERVER_PORT
     loop {
         n_rpc_resolve'
         n_rpc_clients' set_servers, servers
