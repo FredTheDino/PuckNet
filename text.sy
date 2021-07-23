@@ -11,8 +11,10 @@ y_scale_global :: 0.1
 
 draw_text :: fn x: float, y: float, scale: float, s: str, color: (float, float, float, float) {
     x := x
-    as_chars(s) -> for_each' fn c: int -> {
-        draw_char' x, y, scale, c, color
+    chars :: as_chars(s)
+    offset :: (as_float(len(chars)) - 1.) * x_scale_global * scale * 0.85 / 2.
+    chars -> for_each' fn c: int -> {
+        draw_char' x - offset, y, scale, c, color
         x += x_scale_global * scale * 0.85
     }
 }
