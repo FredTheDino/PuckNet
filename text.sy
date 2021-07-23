@@ -2,7 +2,15 @@ use assets
 
 glyph_tile :: fn c: int -> (int, int) {
     //TODO(gu): The y is inverted in the engine somewhere.
-    (rem(c, 18), 5 - (c / 18))
+    if c + 32 == as_char("å") {
+        ret (5, 0)
+    } else if c + 32 == as_char("ä") {
+        ret (6, 0)
+    } else if c + 32 == as_char("ö") {
+        ret (7, 0)
+    } else {
+        ret (rem(c, 18), 5 - (c / 18))
+    }
 }
 
 x_inc :: 0.42
@@ -21,7 +29,8 @@ draw_text :: fn x: float, y: float, scale: float, s: str, color: (float, float, 
 
 draw_char :: fn x: float, y: float, scale: float, c: int, color: (float, float, float, float) {
     c >= 32 <=> true  // unprintable
-    c <= 126 <=> true // upper bound
+    // c <= 126 <=> true // upper bound
+    // ;)
     scale := (x_scale_global, y_scale_global) * scale
     l_gfx_sprite' assets.font, glyph_tile(c - 32), (x, y), scale, color
 }
