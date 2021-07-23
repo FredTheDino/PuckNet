@@ -223,13 +223,16 @@ set_input :: fn input: entity.Input {
         state : !GameState = state
         game := state.game
 
-        player := game.players[input.player]
-        player.last_seen = 0.0
-        if player.input is nil {
-            player.input = input
-        } else {
-            player_input: !entity.Input = player.input
-            player.input = merge_inputs(player_input, input)
+        player_ := game.players[input.player]
+        if :entity.Player is player_ {
+            player: !entity.Player = player_
+            player.last_seen = 0.0
+            if player.input is nil {
+                player.input = input
+            } else {
+                player_input: !entity.Input = player.input
+                player.input = merge_inputs(player_input, input)
+            }
         }
     }
 }
