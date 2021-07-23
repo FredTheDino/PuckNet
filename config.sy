@@ -20,6 +20,8 @@ new_settings_state :: fn -> game.State {
     self = game.State {
         name: "PuckNET Settings",
         update: fn delta: float {
+            settings_menu.update' delta
+
             volume_s := "Volume: "
             i := 0
             loop i < VOLUME {
