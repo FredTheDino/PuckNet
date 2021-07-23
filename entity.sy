@@ -54,7 +54,7 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
         charge: 0.0,
         puck: nil,
         try_grab: fn puck: Puck -> void {
-            if (magnitude(self.pos - puck.pos) < 0.05
+            if (magnitude(self.pos - puck.pos) < 0.08
                 && puck.holder is nil
                 && puck.hold_cooldown == 0.0) {
                 self.puck = puck
@@ -147,7 +147,7 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
 
             // Tackling
             if self.tackle_timer == 0.0 && input.tackle && self.puck is nil {
-                self.tackle_timer = 1.0
+                self.tackle_timer = 0.8
                 self.vel += util.dir(self.rot) * 2.0
             }
 
@@ -157,7 +157,13 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
 
             force :: 3.0
             if !ignore_movement {
-                self.acc += force * magnitude' input.dir
+                acc := 0.0
+                if :Puck is self.puck {
+                    acc = 0.8
+                } else {
+                    acc = 1.0
+                }
+                self.acc += acc * force * magnitude' input.dir
             }
 
             // Rotation
