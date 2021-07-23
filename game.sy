@@ -14,14 +14,17 @@ use text
 use tick
 use util
 
+PLAYER_DISCONNECT_TIMEOUT :: 3.0
+
 Game :: blob {
     puck: entity.Puck,
-    players: [entity.Player],
+    players: {int: entity.Player},
     entities: [entity.Entity],
     bodies: [collision.CircleBody],
     arena: arena_mod.Arena,
     score: (int, int),
     player_id: int,
+    next_id: int,
     update: fn float -> void,
     draw: fn -> void,
     process_input: fn -> void,
@@ -32,14 +35,15 @@ new_game :: fn -> Game {
     self : !Game = nil
     self = Game {
         puck: puck,
-        players: [],
+        players: {:},
         entities: [puck],
         bodies: [puck],
         arena: arena_mod.arena_new((0.0, 0.0)),
         score: (0, 0),
         player_id: -1,
+        next_id: 0,
         update: fn delta: float {
-            self.players -> for_each' fn p: entity.Player {
+            self.players -> for_each' fn _id: int, p: entity.Player {
                 p.try_grab' puck
             }
 
@@ -85,7 +89,17 @@ new_game :: fn -> Game {
         process_input: fn {
             delta := l_delta'
 
-            self.players -> for_each' fn p: entity.Player {
+            self.players -> for_each' fn _id: int, player: entity.Player {
+                player.remove = entity.player.last_seen >= PLAYER_DISCONNECT_TIMEOUT
+            }
+            self.players = self.players -> filter' fn _id: int, player: entity.Player -> bool {
+                !player.remove
+            }
+            self.entities = self.entities -> filter' fn entity: entity.Entity -> bool {
+                !entity.remove
+            }
+
+            self.players -> for_each' fn _id: int, p: entity.Player {
                 p.process_input' delta
                 if p.input is :entity.Input {
                     input: !entity.Input = p.input
@@ -165,14 +179,17 @@ player_join :: fn {
         state : !GameState = state
         game := state.game
 
+        id := game.next_id
+        game.next_id += 1
+
         ip := n_rpc_current_request_ip'
-        n_rpc_client_ip' ip, assign_player_id, len(game.players)
+        n_rpc_client_ip' ip, assign_player_id, id
 
         //TODO(gu): Team balancing?
-        team :: rem(len(game.players), 2)
+        team :: rem(id, 2)
         player_pos := (as_float(team) + l_random_range(-1.0, 0.0), l_random_range(-0.5, 0.5))
-        player := entity.player_new' player_pos, team, len(game.players)
-        push' game.players, player
+        player := entity.player_new' player_pos, team, id
+        game.players[id] = player
         push' game.entities, player
         push' game.bodies, player
     }
@@ -209,12 +226,22 @@ set_input :: fn input: entity.Input {
         state : !GameState = state
         game := state.game
 
-        player := game.players[input.player]
-        if player.input is nil {
-            player.input = input
-        } else {
-            player_input: !entity.Input = player.input
-            player.input = merge_inputs(player_input, input)
+        // Without the ID we don't know which player to set the input to.
+        if input.player is nil {
+            ret
+        }
+        id: !int = input.player
+
+        player := game.players[id]
+        if :entity.Player is player {
+            player: !entity.Player = player
+            player.last_seen = 0.0
+            if player.input is nil {
+                player.input = input
+            } else {
+                player_input: !entity.Input = player.input
+                player.input = merge_inputs(player_input, input)
+            }
         }
     }
 }
@@ -359,7 +386,7 @@ browser_state :: State {
     name: "Server browser",
     update: fn delta: float -> void {
         browser_menu.lines = browser.servers -> map' fn server: browser.Server -> str {
-            server.name
+            as_str(server.online) + ": " + server.name
         }
     },
     draw: fn -> void {
@@ -373,9 +400,7 @@ browser_state :: State {
             n_rpc_disconnect'
 
             // Connect to the selected server
-            addr := split_ip' browser.servers[browser_menu.line_index].ip
-            ip := addr[0]
-
+            ip := browser.servers[browser_menu.line_index].join_ip
             states -> push' client.new_client_state' ip
             //TODO(gu): show connection error in ui in some way
         }
@@ -395,7 +420,7 @@ update :: fn delta: float -> void {
     }
 }
 
-set_entities :: fn incoming_entities: [entity.Entity], incoming_players: [entity.Player], incomming_arena: arena_mod.Arena, incoming_score: (int, int) {
+set_entities :: fn incoming_entities: [entity.Entity], incoming_players: {int: entity.Player}, incomming_arena: arena_mod.Arena, incoming_score: (int, int) {
     state := last(states)
     if :GameState is state {
         state : !GameState = state

@@ -1,22 +1,44 @@
+use browser
 use config
 use game
+use text
 
 new_server_state :: fn -> game.GameState {
     n_rpc_start_server' config.SERVER_PORT
 
-    n_rpc_connect' config.BROWSER_SERVER_IP, config.BROWSER_SERVER_PORT
-    n_rpc_server' game.browser.add_server, "hello!"
+    server_name_done := false
+    server_name := "Puck.NET"
+
+    l_set_text_input_enabled' true
 
     self : !game.GameState = nil
     self = game.GameState {
         game: game.new_game(),
         name: "PuckNET Server",
         update: fn delta: float {
-            self.game.update' delta
-            n_rpc_clients' game.set_entities, self.game.entities, self.game.players, self.game.arena, self.game.score
+            if !server_name_done {
+                text_input_response := l_text_input_update' server_name
+                server_name = text_input_response[0]
+                if text_input_response[1] {
+                    server_name_done = true
+                    n_rpc_connect' config.BROWSER_SERVER_IP, config.BROWSER_SERVER_PORT
+                    n_rpc_server' game.browser.add_server, server_name
+                    l_set_text_input_enabled' false
+                }
+            } else {
+                self.game.update' delta
+                n_rpc_clients' game.set_entities, self.game.entities, self.game.players, self.game.arena, self.game.score
+                n_rpc_server' browser.update_server, len(self.game.players)
+            }
         },
         draw: fn {
-            self.game.draw'
+            if !server_name_done {
+                //TODO(gu): draw text centered
+                flashing := "_" if rem(floor(l_time() * 2.0), 2) == 0 else " "
+                text.draw_text' 0.0, 0.2, 1.0, server_name + flashing, (255., 255., 255., 255.) / 255.
+            } else {
+                self.game.draw'
+            }
         },
         process_input: fn {
             self.game.process_input'

@@ -50,6 +50,14 @@ pub fn for_each(ctx: RuntimeContext<'_>) -> Result<Value, RuntimeError> {
             }
             return Ok(Value::Nil);
         }
+        [Value::Dict(dict), callable] => {
+            let dict = Rc::clone(dict);
+            let callable = callable.clone();
+            for (key, value) in dict.borrow().iter() {
+                ctx.machine.eval_call(callable.clone(), &[key, value]).unwrap();
+            }
+            return Ok(Value::Nil);
+        }
         _ => {}
     }
 
@@ -72,6 +80,42 @@ pub fn map(ctx: RuntimeContext<'_>) -> Result<Value, RuntimeError> {
                 .map(|element| ctx.machine.eval_call(callable.clone(), &[element]).unwrap())
                 .collect();
             return Ok(Value::List(Rc::new(RefCell::new(mapped))));
+        }
+        _ => {}
+    }
+
+    return Err(RuntimeError::ExternTypeMismatch(
+        "map".to_string(),
+        values.iter().map(Type::from).collect(),
+    ));
+}
+
+#[sylt_macro::sylt_link(filter, "sylt_std::sylt")]
+pub fn filter(ctx: RuntimeContext<'_>) -> Result<Value, RuntimeError> {
+    let values = ctx.machine.stack_from_base(ctx.stack_base);
+    match values.as_ref() {
+        [Value::List(list), callable] => {
+            let list = Rc::clone(list);
+            let callable = callable.clone();
+            let filtered = list
+                .borrow()
+                .iter()
+                .filter(|element| ctx.machine.eval_call(callable.clone(), &[element]).unwrap() == Value::Bool(true))
+                .map(Value::clone)
+                .collect();
+            return Ok(Value::List(Rc::new(RefCell::new(filtered))));
+        }
+        [Value::Dict(dict), callable] => {
+            let dict = Rc::clone(dict);
+            let callable = callable.clone();
+            let filtered = dict
+                .borrow()
+                .iter()
+                .filter(|(key, value)| ctx.machine.eval_call(callable.clone(), &[key, value]).unwrap() == Value::Bool(true))
+                // We can't .cloned() since we need the inner values cloned, not the outer tuple
+                .map(|(key, value)| (key.clone(), value.clone()))
+                .collect();
+            return Ok(Value::Dict(Rc::new(RefCell::new(filtered))));
         }
         _ => {}
     }
@@ -271,6 +315,15 @@ sylt_macro::extern_function!(
 
 sylt_macro::extern_function!(
     "sylt_std::sylt"
+    floor
+    "Rounds a float down (towards -inf)"
+    [One(Float(t))] -> Type::Int => {
+        Ok(Int(t.floor() as i64))
+    },
+);
+
+sylt_macro::extern_function!(
+    "sylt_std::sylt"
     as_chars
     "Converts an ASCII string into a list of chars. Non-ASCII is converted to '?'."
     [One(String(s))] -> Type::List(Box::new(Type::Int)) => {
@@ -281,6 +334,15 @@ sylt_macro::extern_function!(
             .collect();
 
         Ok(Value::List(Rc::new(RefCell::new(chars))))
+    },
+);
+
+sylt_macro::extern_function!(
+    "sylt_std::sylt"
+    as_str
+    "Converts to a string representation"
+    [One(Int(i))] -> Type::String => {
+        Ok(Value::String(Rc::new(i.to_string())))
     },
 );
 
