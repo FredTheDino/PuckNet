@@ -1,3 +1,5 @@
+use config
+
 empty_asset :: ("", 0)
 
 ads := empty_asset
@@ -18,21 +20,20 @@ plinks : [(str, int)] = []
 cheers : [(str, int)] = []
 bloop := empty_asset
 
-global_gain := 1.0
 random_thudd :: fn {
-    l_audio_play(random_choice(thudds), false, (global_gain * 0.2, global_gain * 0.1), (1.0, 0.05))
+    l_audio_play(random_choice(thudds), false, (config.VOLUME_FLOAT * 0.2, config.VOLUME_FLOAT * 0.1), (1.0, 0.05))
 }
 
 random_plink :: fn {
-    l_audio_play(random_choice(plinks), false, (global_gain, global_gain * 0.1), (0.7, 0.2))
+    l_audio_play(random_choice(plinks), false, (config.VOLUME_FLOAT, config.VOLUME_FLOAT * 0.1), (0.7, 0.2))
 }
 
 random_grab :: fn {
-    l_audio_play(random_choice(plinks), false, (global_gain * 0.3, global_gain * 0.1), (0.4, 0.2))
+    l_audio_play(random_choice(plinks), false, (config.VOLUME_FLOAT * 0.3, config.VOLUME_FLOAT * 0.1), (0.4, 0.2))
 }
 
 random_cheer :: fn {
-    l_audio_play(random_choice(cheers), false, (global_gain * 0.3, global_gain * 0.1), (1.0, 0.02))
+    l_audio_play(random_choice(cheers), false, (config.VOLUME_FLOAT * 0.3, config.VOLUME_FLOAT * 0.1), (1.0, 0.02))
 }
 
 random_bloop :: fn {
