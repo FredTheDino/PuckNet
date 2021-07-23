@@ -103,12 +103,14 @@ solve :: fn col: Manifold {
             puck: !entity.Puck = b.puck
             puck.holder = b
             a.puck = nil
+            assets.random_oof()
         }
         if :entity.Puck is b.puck && magnitude_squared(a.vel) > magnitude_squared(b.vel) {
             a.puck = b.puck
             puck: !entity.Puck = a.puck
             puck.holder = a
             b.puck = nil
+            assets.random_oof()
         }
     }
 

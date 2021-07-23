@@ -154,6 +154,8 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
             if self.tackle_timer == 0.0 && input.tackle && self.puck is nil {
                 self.tackle_timer = 0.8
                 self.vel += util.dir(self.rot) * 2.0
+                assets.random_he()
+                particles.dash' self
             }
 
             if self.tackle_timer > 0.5 {
@@ -161,6 +163,7 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
             }
 
             force :: 3.0
+            input_mag :: magnitude(input.dir)
             if !ignore_movement {
                 acc := 0.0
                 if :Puck is self.puck {
@@ -172,12 +175,19 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
             }
 
             // Rotation
-            max_rotation :: 4.0 + 6.0 / (2.0 * magnitude(input.dir) + 0.1) // rad/sec
+            max_rotation :: 4.0 + 6.0 / (2.0 * input_mag + 0.1) // rad/sec
             rotation_speed :: 2.0 * 3.14
 
             direction_angle :: angle(input.dir) if input.dir != (0.0, 0.0) else self.rot
             delta_angle :: util.angle_distance' self.rot, direction_angle
             rotation :: util.clamp' delta_angle * rotation_speed, -max_rotation, max_rotation
+
+            if dot(input.dir, util.dir(self.rot)) < 0.8 && input_mag > 0.0 {
+                // TODO(ed): Spray particles here
+                assets.random_skate()
+                particles.turn' self, rotation
+            }
+
             self.rot += rotation * delta
             self.rot = rem' self.rot, 2. * pi
         },
@@ -253,6 +263,9 @@ puck_new :: fn pos: (float, float) -> Puck {
             ice_fric :: 1.0
             speed :: magnitude' self.vel
             self.vel = util.friction' self.vel, ice_fric * delta
+
+            // Particles
+            particles.skate' self
         },
         remove: false,
     }

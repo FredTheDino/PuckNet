@@ -9,6 +9,7 @@ border := empty_asset
 font := empty_asset
 goal := empty_asset
 puck := empty_asset
+crowd := empty_asset
 menu := empty_asset
 
 player1 : [[(str, int)]] = []
@@ -18,6 +19,9 @@ mupps : [((str, int), (int, int))] = []
 thudds : [(str, int)] = []
 plinks : [(str, int)] = []
 cheers : [(str, int)] = []
+oofs : [(str, int)] = []
+skates : [(str, int)] = []
+hes : [(str, int)] = []
 bloop := empty_asset
 
 random_thudd :: fn {
@@ -25,7 +29,19 @@ random_thudd :: fn {
 }
 
 random_plink :: fn {
-    l_audio_play(random_choice(plinks), false, (config.VOLUME_FLOAT * 2.0, config.VOLUME_FLOAT * 0.1), (0.7, 0.2))
+    l_audio_play(random_choice(plinks), false, (config.VOLUME_FLOAT * 2.0, config.VOLUME_FLOAT * 0.1), (0.4, 0.2))
+}
+
+random_oof :: fn {
+    l_audio_play(random_choice(oofs), false, (config.VOLUME_FLOAT * 0.9, config.VOLUME_FLOAT * 0.1), (0.8, 0.02))
+}
+
+random_skate :: fn {
+    l_audio_play(random_choice(skates), false, (config.VOLUME_FLOAT * 0.6, config.VOLUME_FLOAT * 0.1), (1.2, 0.1))
+}
+
+random_he :: fn {
+    l_audio_play(random_choice(hes), false, (config.VOLUME_FLOAT * 2.0, config.VOLUME_FLOAT * 0.1), (0.98, 0.05))
 }
 
 random_grab :: fn {
@@ -49,6 +65,7 @@ load_assets :: fn {
     font = l_load_image' "res/font.png", (14, 18)
     goal = l_load_image' "res/goal.png", (8, 13)
     puck = l_load_image' "res/puck.png", (7, 6)
+    crowd = l_load_audio("res/crowd.ogg")
     menu = l_load_image' "res/menu.png", (400, 400)
 
     player1_back  :: l_load_image' "res/player1_back.png", (13, 15)
@@ -133,9 +150,31 @@ load_assets :: fn {
     ]
 
     cheers = [
-        l_load_audio("res/cheer01.wav"),
-        l_load_audio("res/cheer02.wav"),
-        l_load_audio("res/cheer03.wav"),
+        l_load_audio("res/cheer01.ogg"),
+        l_load_audio("res/cheer02.ogg"),
+        l_load_audio("res/cheer03.ogg"),
+    ]
+
+    oofs = [
+        l_load_audio("res/oof01.wav"),
+        l_load_audio("res/oof02.wav"),
+        l_load_audio("res/oof03.wav"),
+    ]
+
+    skates = [
+        l_load_audio("res/skate01.wav"),
+        l_load_audio("res/skate02.wav"),
+        l_load_audio("res/skate03.wav"),
+        l_load_audio("res/skate04.wav"),
+        l_load_audio("res/skate05.wav"),
+        l_load_audio("res/skate06.wav"),
+    ]
+
+    hes = [
+        l_load_audio("res/he01.wav"),
+        l_load_audio("res/he02.wav"),
+        l_load_audio("res/he03.wav"),
+        l_load_audio("res/he04.wav"),
     ]
 
     bloop = l_load_audio("res/bloop.wav")
