@@ -9,6 +9,7 @@ pi :: 3.14159265358979
 Entity :: blob {
     draw: fn -> void,
     update: fn float -> void,
+    remove: bool,
 }
 
 Input :: blob {
@@ -33,6 +34,8 @@ Player :: blob {
     tackle_timer: float,
     input: Input?,
     owner_id: int,
+    last_seen: float,
+    remove: bool,
     draw: fn -> void,
     process_input: fn float -> void,
     update: fn float -> void,
@@ -54,7 +57,7 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
         charge: 0.0,
         puck: nil,
         try_grab: fn puck: Puck -> void {
-            if (magnitude(self.pos - puck.pos) < 0.05
+            if (magnitude(self.pos - puck.pos) < 0.08
                 && puck.holder is nil
                 && puck.hold_cooldown == 0.0) {
                 self.puck = puck
@@ -65,6 +68,8 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
         tackle_timer: 0.0,
         input: nil,
         owner_id: owner,
+        last_seen: 0.0,
+        remove: false,
         draw: fn -> void {
             segment :: ((1 if self.rot > 1./4. * pi else 0) +
                         (1 if self.rot > 3./4. * pi else 0) +
@@ -147,7 +152,7 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
 
             // Tackling
             if self.tackle_timer == 0.0 && input.tackle && self.puck is nil {
-                self.tackle_timer = 1.0
+                self.tackle_timer = 0.8
                 self.vel += util.dir(self.rot) * 2.0
                 assets.random_he()
                 particles.dash' self
@@ -160,7 +165,13 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
             force :: 3.0
             input_mag :: magnitude(input.dir)
             if !ignore_movement {
-                self.acc += force * input_mag
+                acc := 0.0
+                if :Puck is self.puck {
+                    acc = 0.8
+                } else {
+                    acc = 1.0
+                }
+                self.acc += acc * force * magnitude' input.dir
             }
 
             // Rotation
@@ -224,6 +235,7 @@ Puck :: blob {
     hold_cooldown: float,
     draw: fn -> void,
     update: fn float -> void,
+    remove: bool,
 }
 
 // we might need to tweek mass numbers
@@ -254,7 +266,8 @@ puck_new :: fn pos: (float, float) -> Puck {
 
             // Particles
             particles.skate' self
-        }
+        },
+        remove: false,
     }
     ret self
 }

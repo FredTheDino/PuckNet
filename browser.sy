@@ -1,16 +1,44 @@
 use game
 
+//TODO(gu): Servers aren't dropped on the browser instance, they're just not sent to the clients.
+
 Server :: blob {
     name: str,
-    ip: str,
+    // The IP clients join to play
+    join_ip: str,
+    // The IP we're communicating with
+    handle_ip: str,
+    online: int,
+    updated: bool,
 }
 
 servers: [Server] = []
 
 add_server :: fn name: str {
+    request_ip := n_rpc_current_request_ip'
+
+    // Remove any servers that are currently using this exact same socket to communicate with us.
+    // A conflict /probably/ means that a server restarted.
+    servers = servers -> filter' fn server: Server {
+        server.handle_ip != request_ip
+    }
+
     servers -> push' Server {
         name: name,
-        ip: n_rpc_current_request_ip(),
+        join_ip: split_ip(request_ip)[0],
+        handle_ip: request_ip,
+        online: 0,
+        updated: true,
+    }
+}
+
+update_server :: fn online: int {
+    request_ip := n_rpc_current_request_ip()
+    servers -> for_each' fn server: Server {
+        if server.handle_ip == request_ip {
+            server.online = online
+            server.updated = true
+        }
     }
 }
 
@@ -22,7 +50,16 @@ start :: fn {
     n_rpc_start_server' 8388
     loop {
         n_rpc_resolve'
-        n_rpc_clients' set_servers, servers
+
+        updated_servers := servers -> filter' fn server: Server -> bool {
+            server.updated
+        }
+
+        n_rpc_clients' set_servers, updated_servers
+
+        servers -> for_each' fn server: Server {
+            server.updated = false
+        }
 
         thread_sleep' 1.0
     }

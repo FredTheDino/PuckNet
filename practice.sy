@@ -5,7 +5,7 @@ new_practice_state :: fn -> game.GameState {
     new_game := game.new_game'
     player_pos := (l_random_range(-1.0, 0.0), l_random_range(-0.5, 0.5))
     player := entity.player_new' player_pos, 0, 0
-    push' new_game.players, player
+    new_game.players[0] = player
     push' new_game.entities, player
     push' new_game.bodies, player
     new_game.player_id = 0

@@ -10,6 +10,7 @@ Goal :: blob {
     cage: collision.CircleBody,
     draw: fn -> void,
     update: fn float -> void,
+    remove: bool
 }
 
 :Goal is :entity.Entity
@@ -43,7 +44,8 @@ goal_new :: fn pos: (float, float), dir: float, arena_scale: float -> Goal {
                 self.vel = (self.vel[0], -sign(self.pos[1]) * abs(self.vel[1]))
                 self.cage.vel = self.vel
             }
-        }
+        },
+        remove: false,
     }
 
     ret self
@@ -55,6 +57,7 @@ Arena :: blob {
     walls: [collision.Wall],
     corners: [collision.Circle],
     goals: [Goal],
+    remove: bool,
 }
 
 Mupp :: blob {
@@ -118,6 +121,7 @@ arena_new :: fn pos: (float, float) -> Arena {
             goal_new(pos, 1., scale),
             goal_new(pos, -1., scale),
         ],
+        remove: false,
     }
 
     ret self
