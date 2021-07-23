@@ -163,7 +163,6 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
                 self.acc += force * input_mag
             }
 
-
             // Rotation
             max_rotation :: 4.0 + 6.0 / (2.0 * input_mag + 0.1) // rad/sec
             rotation_speed :: 2.0 * 3.14
