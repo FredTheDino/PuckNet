@@ -1,5 +1,7 @@
 use game
 
+BROWSER_SERVER_IP := "fuffens.xyz"
+
 Server :: blob {
     name: str,
     ip: str,

@@ -3,7 +3,7 @@ use game
 new_server_state :: fn -> game.GameState {
     n_rpc_start_server'
 
-    n_rpc_connect' "fuffens.xyz", 8388
+    n_rpc_connect' browser.BROWSER_SERVER_IP, 8388
     n_rpc_server' game.browser.add_server, "hello!"
 
     self : !game.GameState = nil
