@@ -13,6 +13,8 @@ use text
 use tick
 use util
 
+PLAYER_DISCONNECT_TIMEOUT :: 3.0
+
 Game :: blob {
     puck: entity.Puck,
     players: {int: entity.Player},
@@ -87,7 +89,7 @@ new_game :: fn -> Game {
             delta := l_delta'
 
             self.players -> for_each' fn _id: int, player: entity.Player {
-                player.remove = entity.player.last_seen >= 3.0
+                player.remove = entity.player.last_seen >= PLAYER_DISCONNECT_TIMEOUT
             }
             self.players = self.players -> filter' fn _id: int, player: entity.Player -> bool {
                 !player.remove
