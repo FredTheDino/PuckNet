@@ -1,5 +1,6 @@
 use entity
 use game
+use mupps
 
 goal_parts := ("", 0)
 
@@ -9,6 +10,8 @@ goal :: fn pos: (float, float) {
     l_gfx_particle_y(goal_parts, (pos[1], pos[1]))
     l_gfx_particle_spawn(goal_parts, 400)
     l_gfx_particle_vel_magnitude' goal_parts, (0.2, 0.3)
+
+    mupps.add_exitement' 5.0
 }
 
 goal_small :: fn pos: (float, float) {

@@ -1,4 +1,5 @@
 use assets
+use util
 
 Mupp :: blob {
     pos: (float, float),
@@ -31,20 +32,24 @@ init :: fn {
     place_mupps(-26.0,  26.0, -20.0, -13.0)
 }
 
+exitement := 0.0
+
+add_exitement :: fn delta: float {
+    exitement += delta
+}
+
+t := 0.0
 draw :: fn {
-    t :: l_time()
-
-    // This should be broken out and modified by
-    // the distance to the goals.
-    exitement :: sin(t)
-
     if !debug_assertions() {
-        vibrations :: (t + 100.0) * exitement * exitement
+
+        exitement = exitement * pow(0.2, l_delta())
+        t += l_delta() * (1.0 + exitement * 7.0) * 5.0
+
         muppets -> for_each(fn m: Mupp {
             mupp :: assets.mupps[m.sprite]
             scale :: as_float(mupp[1][1]) / as_float(mupp[1][0])
             uni_scale :: 0.1
-            pos :: 0.08 * m.pos + (0.0, 0.1 * m.bobbiness * sin(vibrations * m.bobbiness))
+            pos :: 0.08 * m.pos + (0.0, 0.1 * m.bobbiness * sin(m.bobbiness * 100.0 + t * m.bobbiness))
             l_gfx_sprite(mupp[0], (0, 0), pos, (uni_scale) * (1.0, scale), m.rgb)
         })
     }
