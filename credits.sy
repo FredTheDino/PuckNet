@@ -43,7 +43,6 @@ new_credits_state :: fn -> game.State {
             }
         },
         process_input: fn {
-            settings_menu.process_input' menu.from_input' game.poll_input'
         },
     }
     ret self
