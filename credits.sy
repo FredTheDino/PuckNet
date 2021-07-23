@@ -1,0 +1,50 @@
+use game
+use menu
+use text
+
+new_credits_state :: fn -> game.State {
+    self : !game.State = nil
+
+    settings_menu := menu.menu_new' [], false
+
+    names :: [
+        "Erik Mattfolk",
+        "Charlie S.",
+        "Gustav Sörnäs",
+        "Edvard Thörnros",
+        "Annie Wång",
+    ]
+
+    colors :: [
+        (0.0, 0.6, 0.8, 1.),
+        (0.9, 0.65, 0.3, 1.),
+        (1.0, 0.5, 0.8, 1.),
+        (l_random(), l_random(), l_random(), 1.),
+        (0.5, 0.0, 0.5, 1.),
+    ]
+
+    self = game.State {
+        name: "PuckNET Credits",
+        update: fn delta: float {
+            settings_menu.update' delta
+            settings_menu.line_index = -1
+        },
+        draw: fn {
+            settings_menu.draw'
+            y := 0.5
+            i := 0
+            loop i < len(names) {
+                color := colors[i]
+                shadow :: 0.005
+                text.draw_text' 0.0 + shadow, y - shadow, 1.0, names[i], (.0, .0, .0, 1.)
+                text.draw_text' 0.0, y, 1.0, names[i], color
+                y -= 0.2
+                i += 1
+            }
+        },
+        process_input: fn {
+            settings_menu.process_input' menu.from_input' game.poll_input'
+        },
+    }
+    ret self
+}
