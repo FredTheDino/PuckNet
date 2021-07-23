@@ -15,12 +15,13 @@ use util
 
 Game :: blob {
     puck: entity.Puck,
-    players: [entity.Player],
+    players: {int: entity.Player},
     entities: [entity.Entity],
     bodies: [collision.CircleBody],
     arena: arena_mod.Arena,
     score: (int, int),
     player_id: int,
+    next_id: int,
     update: fn float -> void,
     draw: fn -> void,
     process_input: fn -> void,
@@ -37,6 +38,7 @@ new_game :: fn -> Game {
         arena: arena_mod.arena_new((0.0, 0.0)),
         score: (0, 0),
         player_id: -1,
+        next_id: 0,
         update: fn delta: float {
             self.players -> for_each' fn p: entity.Player {
                 p.try_grab' puck
@@ -87,7 +89,7 @@ new_game :: fn -> Game {
             self.players -> for_each' fn player: entity.Player {
                 player.remove = entity.player.last_seen >= 3.0
             }
-            self.players = self.players -> filter' fn player: entity.Player -> bool {
+            self.players = self.players -> filter' fn _id: int, player: entity.Player -> bool {
                 !player.remove
             }
             self.entities = self.entities -> filter' fn entity: entity.Entity -> bool {
@@ -174,14 +176,17 @@ player_join :: fn {
         state : !GameState = state
         game := state.game
 
+        id := game.next_id
+        game.next_id += 1
+
         ip := n_rpc_current_request_ip'
-        n_rpc_client_ip' ip, assign_player_id, len(game.players)
+        n_rpc_client_ip' ip, assign_player_id, id
 
         //TODO(gu): Team balancing?
-        team :: rem(len(game.players), 2)
+        team :: rem(id, 2)
         player_pos := (as_float(team) + l_random_range(-1.0, 0.0), l_random_range(-0.5, 0.5))
-        player := entity.player_new' player_pos, team, len(game.players)
-        push' game.players, player
+        player := entity.player_new' player_pos, team, id
+        game.players[id] = player
         push' game.entities, player
         push' game.bodies, player
     }
@@ -401,7 +406,7 @@ update :: fn delta: float -> void {
     }
 }
 
-set_entities :: fn incoming_entities: [entity.Entity], incoming_players: [entity.Player], incomming_arena: arena_mod.Arena, incoming_score: (int, int) {
+set_entities :: fn incoming_entities: [entity.Entity], incoming_players: {int: entity.Player}, incomming_arena: arena_mod.Arena, incoming_score: (int, int) {
     state := last(states)
     if :GameState is state {
         state : !GameState = state
