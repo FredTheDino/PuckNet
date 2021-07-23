@@ -1,4 +1,4 @@
-use game
+use config
 
 //TODO(gu): Servers aren't dropped on the browser instance, they're just not sent to the clients.
 
@@ -47,7 +47,7 @@ set_servers :: fn recv_servers: [Server] {
 }
 
 start :: fn {
-    n_rpc_start_server' 8388
+    n_rpc_start_server' config.BROWSER_SERVER_PORT
     loop {
         n_rpc_resolve'
 

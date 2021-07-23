@@ -3,6 +3,7 @@ use assets
 use browser
 use client
 use collision
+use config
 use entity
 use menu
 use mupps
@@ -365,6 +366,8 @@ menu_state :: State {
                 states -> push' server.new_server_state'
             } else if main_menu_lines[main_menu.line_index] == "Practice" {
                 states -> push' practice.new_practice_state'
+            } else if main_menu_lines[main_menu.line_index] == "Settings" {
+                states -> push' config.new_settings_state'
             } else {
                 print "Unhandled main menu item:"
                 print main_menu_lines[main_menu.line_index]
@@ -468,7 +471,7 @@ start :: fn {
         l_set_window_size' (800, 800)
         init'
 
-        n_rpc_connect' "fuffens.xyz", 8388
+        n_rpc_connect' config.BROWSER_SERVER_IP, config.BROWSER_SERVER_PORT
 
         // Added for safety - to avoid delta=0
         l_update'
