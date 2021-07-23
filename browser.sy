@@ -1,5 +1,7 @@
 use game
 
+//TODO(gu): Servers aren't dropped on the browser instance, they're just not sent to the clients.
+
 Server :: blob {
     name: str,
     // The IP clients join to play
@@ -7,6 +9,7 @@ Server :: blob {
     // The IP we're communicating with
     handle_ip: str,
     online: int,
+    updated: false,
 }
 
 servers: [Server] = []
@@ -17,17 +20,17 @@ add_server :: fn name: str {
         join_ip: split_ip(n_rpc_current_request_ip())[0],
         handle_ip: n_rpc_current_request_ip(),
         online: 0,
+        updated: true,
     }
 }
 
 update_server :: fn online: int {
     request_ip := n_rpc_current_request_ip()
-    i := 0
-    loop i < len(servers) {
-        if servers[i].handle_ip == request_ip {
-            servers[i].online = online
+    servers -> for_each' fn server: Server {
+        if server.handle_ip == request_ip {
+            server.online = online
+            server.updated = true
         }
-        i += 1
     }
 }
 
@@ -39,7 +42,16 @@ start :: fn {
     n_rpc_start_server' 8388
     loop {
         n_rpc_resolve'
-        n_rpc_clients' set_servers, servers
+
+        updated_servers := servers -> filter' fn server: Server -> bool {
+            server.updated
+        }
+
+        n_rpc_clients' set_servers, updated_servers
+
+        servers -> for_each' fn server: Server {
+            server.updated = false
+        }
 
         thread_sleep' 1.0
     }
