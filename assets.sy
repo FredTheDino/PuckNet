@@ -33,7 +33,7 @@ random_plink :: fn {
 }
 
 random_oof :: fn {
-    l_audio_play(random_choice(oofs), false, (config.VOLUME_FLOAT * 0.6, config.VOLUME_FLOAT * 0.1), (0.8, 0.02))
+    l_audio_play(random_choice(oofs), false, (config.VOLUME_FLOAT * 0.9, config.VOLUME_FLOAT * 0.1), (0.8, 0.02))
 }
 
 random_skate :: fn {
