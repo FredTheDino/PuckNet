@@ -9,7 +9,7 @@ new_credits_state :: fn -> game.State {
 
     names :: [
         "Erik Mattfolk",
-        "Charlie S.",
+        "Charlie Simonsson",
         "Gustav Sörnäs",
         "Edvard Thörnros",
         "Annie Wång",
