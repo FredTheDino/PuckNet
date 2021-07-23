@@ -4,6 +4,7 @@ use browser
 use client
 use collision
 use config
+use credits
 use entity
 use menu
 use mupps
@@ -133,7 +134,7 @@ states : [State] = []
 main_menu_lines := [
     "Connect",
     "Practice",
-    "Start server",
+    "Start Server",
     "Settings",
     "Credits",
     "Quit",
@@ -362,12 +363,14 @@ menu_state :: State {
             if main_menu_lines[main_menu.line_index] == "Connect" {
                 // When we break out of the client loop, return here.
                 states -> push' browser_state
-            } else if main_menu_lines[main_menu.line_index] == "Start server" {
-                states -> push' server.new_server_state'
             } else if main_menu_lines[main_menu.line_index] == "Practice" {
                 states -> push' practice.new_practice_state'
+            } else if main_menu_lines[main_menu.line_index] == "Start Server" {
+                states -> push' server.new_server_state'
             } else if main_menu_lines[main_menu.line_index] == "Settings" {
                 states -> push' config.new_settings_state'
+            } else if main_menu_lines[main_menu.line_index] == "Credits" {
+                states -> push' credits.new_credits_state'
             } else if main_menu_lines[main_menu.line_index] == "Quit" {
                 states -> pop'
             } else {
