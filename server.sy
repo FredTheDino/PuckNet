@@ -1,3 +1,4 @@
+use browser
 use game
 use text
 
@@ -26,6 +27,7 @@ new_server_state :: fn -> game.GameState {
             } else {
                 self.game.update' delta
                 n_rpc_clients' game.set_entities, self.game.entities, self.game.players, self.game.arena, self.game.score
+                n_rpc_server' browser.update_server, len(self.game.players)
             }
         },
         draw: fn {
