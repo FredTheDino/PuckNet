@@ -28,6 +28,10 @@ random_thudd :: fn {
     l_audio_play(random_choice(thudds), false, (config.VOLUME_FLOAT * 0.4, config.VOLUME_FLOAT * 0.1), (1.0, 0.05))
 }
 
+random_plink :: fn {
+    l_audio_play(random_choice(plinks), false, (config.VOLUME_FLOAT * 2.0, config.VOLUME_FLOAT * 0.1), (0.4, 0.2))
+}
+
 random_oof :: fn {
     l_audio_play(random_choice(oofs), false, (config.VOLUME_FLOAT * 0.6, config.VOLUME_FLOAT * 0.1), (0.8, 0.02))
 }
