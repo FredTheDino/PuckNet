@@ -1,9 +1,10 @@
 use browser
+use config
 use game
 use text
 
 new_server_state :: fn -> game.GameState {
-    n_rpc_start_server'
+    n_rpc_start_server' config.SERVER_PORT
 
     server_name_done := false
     server_name := "Puck.NET"
@@ -20,7 +21,7 @@ new_server_state :: fn -> game.GameState {
                 server_name = text_input_response[0]
                 if text_input_response[1] {
                     server_name_done = true
-                    n_rpc_connect' "fuffens.xyz", 8388
+                    n_rpc_connect' config.BROWSER_SERVER_IP, config.BROWSER_SERVER_PORT
                     n_rpc_server' game.browser.add_server, server_name
                     l_set_text_input_enabled' false
                 }

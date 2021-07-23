@@ -1,7 +1,8 @@
+use config
 use game
 
 new_client_state :: fn ip: str -> game.GameState {
-    n_rpc_connect' ip
+    n_rpc_connect' ip, config.SERVER_PORT
     n_rpc_server' game.player_join
 
     update_ticker := game.tick.ticker_new' 60.0

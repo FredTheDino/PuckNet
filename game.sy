@@ -3,6 +3,7 @@ use assets
 use browser
 use client
 use collision
+use config
 use entity
 use menu
 use mupps
@@ -137,7 +138,7 @@ main_menu_lines := [
     "Credits",
     "Quit",
 ]
-main_menu : menu.Menu = menu.menu_new' main_menu_lines
+main_menu : menu.Menu = menu.menu_new' main_menu_lines, true
 
 bind_keys :: fn {
     l_bind_key("w", "up")
@@ -365,6 +366,10 @@ menu_state :: State {
                 states -> push' server.new_server_state'
             } else if main_menu_lines[main_menu.line_index] == "Practice" {
                 states -> push' practice.new_practice_state'
+            } else if main_menu_lines[main_menu.line_index] == "Settings" {
+                states -> push' config.new_settings_state'
+            } else if main_menu_lines[main_menu.line_index] == "Quit" {
+                states -> pop'
             } else {
                 print "Unhandled main menu item:"
                 print main_menu_lines[main_menu.line_index]
@@ -377,7 +382,7 @@ menu_state :: State {
     }
 }
 
-browser_menu := menu.menu_new' []
+browser_menu := menu.menu_new' [], false
 
 browser_state :: State {
     name: "Server browser",
@@ -469,7 +474,7 @@ start :: fn {
         init'
         l_audio_play' assets.crowd, true, 0.1, 1.0
 
-        n_rpc_connect' "fuffens.xyz", 8388
+        n_rpc_connect' config.BROWSER_SERVER_IP, config.BROWSER_SERVER_PORT
 
         // Added for safety - to avoid delta=0
         l_update'

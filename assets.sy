@@ -1,3 +1,5 @@
+use config
+
 empty_asset :: ("", 0)
 
 ads := empty_asset
@@ -8,6 +10,7 @@ font := empty_asset
 goal := empty_asset
 puck := empty_asset
 crowd := empty_asset
+menu := empty_asset
 
 player1 : [[(str, int)]] = []
 player2 : [[(str, int)]] = []
@@ -19,35 +22,36 @@ cheers : [(str, int)] = []
 oofs : [(str, int)] = []
 skates : [(str, int)] = []
 hes : [(str, int)] = []
+bloop := empty_asset
 
-global_gain := 1.0
 random_thudd :: fn {
-    l_audio_play(random_choice(thudds), false, (global_gain * 0.2, global_gain * 0.1), (1.0, 0.05))
-}
-
-random_plink :: fn {
-    l_audio_play(random_choice(plinks), false, (global_gain * 0.3, global_gain * 0.1), (0.6, 0.09))
-}
-
-random_grab :: fn {
-    l_audio_play(random_choice(plinks), false, (global_gain * 0.1, global_gain * 0.1), (0.5, 0.1))
-}
-
-random_cheer :: fn {
-    l_audio_play(random_choice(cheers), false, (global_gain * 0.4, global_gain * 0.1), (1.0, 0.01))
+    l_audio_play(random_choice(thudds), false, (config.VOLUME_FLOAT * 0.4, config.VOLUME_FLOAT * 0.1), (1.0, 0.05))
 }
 
 random_oof :: fn {
-    l_audio_play(random_choice(oofs), false, (global_gain * 0.6, global_gain * 0.1), (0.8, 0.02))
+    l_audio_play(random_choice(oofs), false, (config.VOLUME_FLOAT * 0.6, config.VOLUME_FLOAT * 0.1), (0.8, 0.02))
 }
 
 random_skate :: fn {
-    l_audio_play(random_choice(skates), false, (global_gain * 0.6, global_gain * 0.1), (1.2, 0.1))
+    l_audio_play(random_choice(skates), false, (config.VOLUME_FLOAT * 0.6, config.VOLUME_FLOAT * 0.1), (1.2, 0.1))
 }
 
 random_he :: fn {
-    l_audio_play(random_choice(hes), false, (global_gain * 2.0, global_gain * 0.1), (0.98, 0.05))
+    l_audio_play(random_choice(hes), false, (config.VOLUME_FLOAT * 2.0, config.VOLUME_FLOAT * 0.1), (0.98, 0.05))
 }
+
+random_grab :: fn {
+    l_audio_play(random_choice(plinks), false, (config.VOLUME_FLOAT * 0.6, config.VOLUME_FLOAT * 0.1), (0.4, 0.2))
+}
+
+random_cheer :: fn {
+    l_audio_play(random_choice(cheers), false, (config.VOLUME_FLOAT * 0.6, config.VOLUME_FLOAT * 0.1), (1.0, 0.02))
+}
+
+random_bloop :: fn {
+    l_audio_play(bloop, false, (config.VOLUME_FLOAT * 0.4, config.VOLUME_FLOAT * 0.1), (1.0, 0.1))
+}
+
 
 load_assets :: fn {
     ads = l_load_image' "res/ads.png", (401, 20)
@@ -58,6 +62,7 @@ load_assets :: fn {
     goal = l_load_image' "res/goal.png", (8, 13)
     puck = l_load_image' "res/puck.png", (7, 6)
     crowd = l_load_audio("res/crowd.ogg")
+    menu = l_load_image' "res/menu.png", (400, 400)
 
     player1_back  :: l_load_image' "res/player1_back.png", (13, 15)
     player1_front :: l_load_image' "res/player1_front.png", (13, 15)
@@ -167,4 +172,6 @@ load_assets :: fn {
         l_load_audio("res/he03.wav"),
         l_load_audio("res/he04.wav"),
     ]
+
+    bloop = l_load_audio("res/bloop.wav")
 }
