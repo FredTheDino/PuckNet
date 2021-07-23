@@ -15,6 +15,7 @@ mupps : [((str, int), (int, int))] = []
 thudds : [(str, int)] = []
 plinks : [(str, int)] = []
 cheers : [(str, int)] = []
+bloop := empty_asset
 
 global_gain := 1.0
 random_thudd :: fn {
@@ -32,6 +33,11 @@ random_grab :: fn {
 random_cheer :: fn {
     l_audio_play(random_choice(cheers), false, (global_gain * 0.3, global_gain * 0.1), (1.0, 0.02))
 }
+
+random_bloop :: fn {
+    l_audio_play(bloop, false, (global_gain * 0.2, global_gain * 0.1), (1.0, 0.1))
+}
+
 
 load_assets :: fn {
     ads = l_load_image' "res/ads.png", (401, 20)
@@ -128,4 +134,6 @@ load_assets :: fn {
         l_load_audio("res/cheer02.wav"),
         l_load_audio("res/cheer03.wav"),
     ]
+
+    bloop = l_load_audio("res/bloop.wav")
 }
