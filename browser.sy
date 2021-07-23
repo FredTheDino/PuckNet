@@ -15,10 +15,18 @@ Server :: blob {
 servers: [Server] = []
 
 add_server :: fn name: str {
+    request_ip := n_rpc_current_request_ip'
+
+    // Remove any servers that are currently using this exact same socket to communicate with us.
+    // A conflict /probably/ means that a server restarted.
+    servers = servers -> filter' fn server: Server {
+        server.handle_ip != request_ip
+    }
+
     servers -> push' Server {
         name: name,
-        join_ip: split_ip(n_rpc_current_request_ip())[0],
-        handle_ip: n_rpc_current_request_ip(),
+        join_ip: split_ip(request_ip)[0],
+        handle_ip: request_ip,
         online: 0,
         updated: true,
     }
