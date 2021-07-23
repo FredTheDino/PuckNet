@@ -34,7 +34,7 @@ Menu :: blob {
     draw: fn -> void,
 }
 
-menu_new :: fn lines: [str] -> Menu {
+menu_new :: fn lines: [str], title: bool -> Menu {
     self: !Menu = nil
     self = Menu {
         lines: lines,
@@ -87,12 +87,20 @@ menu_new :: fn lines: [str] -> Menu {
             game.reset_camera'
             l_gfx_sprite' assets.menu, (0, 0), (0., 0.), (2., 2.)
             y := 0.5
+
+            if title {
+                shadow :: 0.01
+                text.draw_text' 0.0 + shadow, .65 - shadow, 2.0, "PuckNet", (0., .0, .0, 1.)
+                text.draw_text' 0.0, 0.65, 2.0, "PuckNet", (.8, 0., 0., 1.)
+                y = 0.35
+            }
+
             i := 0
             loop i < len(self.lines) {
                 color := (0.8, 0., 0., 1.) if i == self.line_index else (0., 0., 0., 1.)
                 if i == self.line_index {
-                    shadow :: 0.008
-                    text.draw_text' 0.0 + shadow, y - shadow, 1.0, self.lines[i], (.0, .0, .0, .23)
+                    shadow :: 0.005
+                    text.draw_text' 0.0 + shadow, y - shadow, 1.0, self.lines[i], (.0, .0, .0, 1.)
                 }
                 text.draw_text' 0.0, y, 1.0, self.lines[i], color
                 y -= 0.2
