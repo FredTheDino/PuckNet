@@ -51,7 +51,9 @@ new_server_state :: fn -> game.GameState {
         process_input: fn {
             self.game.process_input'
         },
-        cleanup: fn {},
+        cleanup: fn {
+            n_rpc_stop_server'
+        },
     }
     ret self
 }
