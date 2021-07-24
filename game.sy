@@ -477,6 +477,16 @@ process_input :: fn {
     }
 }
 
+player_id :: fn -> int {
+    state := last(states)
+    if :GameState is state {
+        state : !GameState = state
+        ret state.game.player_id
+    } else {
+        ret -1
+    }
+}
+
 start :: fn {
     if "browser" in args() {
         browser.start'
