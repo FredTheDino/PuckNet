@@ -77,6 +77,8 @@ load_assets :: fn {
     player1_back_charge2  :: l_load_image' "res/player1_back_charge2.png", (13, 15)
     player1_front_charge2 :: l_load_image' "res/player1_front_charge2.png", (13, 15)
     player1_side_charge2  :: l_load_image' "res/player1_side_charge2.png", (12, 15)
+    player1_fish1 :: l_load_image' "res/player1_fish1.png", (12, 15)
+    player1_fish2 :: l_load_image' "res/player1_fish2.png", (12, 15)
     player2_back  :: l_load_image' "res/player2_back.png", (13, 15)
     player2_front :: l_load_image' "res/player2_front.png", (13, 15)
     player2_side  :: l_load_image' "res/player2_side.png", (12, 15)
@@ -86,6 +88,8 @@ load_assets :: fn {
     player2_back_charge2  :: l_load_image' "res/player2_back_charge2.png", (13, 15)
     player2_front_charge2 :: l_load_image' "res/player2_front_charge2.png", (13, 15)
     player2_side_charge2  :: l_load_image' "res/player2_side_charge2.png", (12, 15)
+    player2_fish1 :: l_load_image' "res/player2_fish1.png", (12, 15)
+    player2_fish2 :: l_load_image' "res/player2_fish2.png", (12, 15)
 
     player1 = [
         [
@@ -105,6 +109,10 @@ load_assets :: fn {
             player1_back_charge2,
             player1_side_charge2,
             player1_front_charge2,
+        ],
+        [
+            player1_fish1,
+            player1_fish2,
         ],
     ]
 
@@ -126,6 +134,10 @@ load_assets :: fn {
             player2_back_charge2,
             player2_side_charge2,
             player2_front_charge2,
+        ],
+        [
+            player2_fish1,
+            player2_fish2,
         ],
     ]
 
