@@ -76,7 +76,7 @@ menu_new :: fn lines: [str], title: str -> Menu {
                 } else if input.down {
                     self.line_index += 1
                 }
-                self.line_index = rem(self.line_index, len(self.lines))
+                self.line_index = rem(self.line_index, len(self.lines) if > 0 else 1)
             }
 
             self.line_selected = input.select

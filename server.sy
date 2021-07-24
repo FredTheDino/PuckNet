@@ -38,7 +38,6 @@ new_server_state :: fn -> game.GameState {
         },
         draw: fn {
             if !server_name_done {
-                //TODO(gu): draw text centered
                 flashing := "_" if rem(floor(l_time() * 2.0), 2) == 0 else " "
                 text.draw_text' 0.0, 0.2, 1.0, server_name + flashing, (255., 255., 255., 255.) / 255.
             } else {

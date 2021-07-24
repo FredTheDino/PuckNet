@@ -4,6 +4,7 @@ use browser
 use client
 use collision
 use config
+use connect
 use credits
 use entity
 use menu
@@ -378,7 +379,7 @@ menu_state :: State {
         if main_menu.line_selected {
             if main_menu_lines[main_menu.line_index] == "Connect" {
                 // When we break out of the client loop, return here.
-                states -> push' browser_state
+                states -> push' connect.new_browser_state'
             } else if main_menu_lines[main_menu.line_index] == "Practice" {
                 states -> push' practice.new_practice_state'
             } else if main_menu_lines[main_menu.line_index] == "Start Server" {
@@ -398,31 +399,6 @@ menu_state :: State {
     draw: main_menu.draw,
     process_input: fn {
         main_menu.process_input' menu.from_input' poll_input'
-    },
-    cleanup: fn {},
-}
-
-browser_menu := menu.menu_new' [], "Join a Game"
-
-browser_state :: State {
-    name: "Server browser",
-    update: fn delta: float -> void {
-        browser_menu.lines = browser.servers -> map' fn server: browser.Server -> str {
-            as_str(server.online) + ": " + server.name
-        }
-    },
-    draw: fn -> void {
-        browser_menu.draw'
-    },
-    process_input: fn {
-        browser_menu.process_input' menu.from_input' poll_input'
-
-        if browser_menu.line_selected && len(browser_menu.lines) > 0 {
-            // Connect to the selected server
-            ip := browser.servers[browser_menu.line_index].join_ip
-            states -> push' client.new_client_state' ip
-            //TODO(gu): show connection error in ui in some way
-        }
     },
     cleanup: fn {},
 }
