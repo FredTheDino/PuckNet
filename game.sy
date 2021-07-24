@@ -105,6 +105,13 @@ new_game :: fn -> Game {
             self.entities = self.entities -> filter' fn entity: entity.Entity -> bool {
                 !entity.remove
             }
+            self.bodies = self.bodies -> filter' fn body: collision.CircleBody -> bool {
+                if :entity.Entity is body {
+                    entity: !entity.Entity = body
+                    ret !entity.remove
+                }
+                true
+            }
 
             self.players -> for_each' fn _id: int, p: entity.Player {
                 p.process_input' delta
