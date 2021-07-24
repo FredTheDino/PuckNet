@@ -36,6 +36,7 @@ Player :: blob {
     owner_id: int,
     last_seen: float,
     remove: bool,
+    team: int,
     draw: fn -> void,
     process_input: fn float -> void,
     update: fn float -> void,
@@ -70,6 +71,7 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
         owner_id: owner,
         last_seen: 0.0,
         remove: false,
+        team: team,
         draw: fn -> void {
             segment :: ((1 if self.rot > 1./4. * pi else 0) +
                         (1 if self.rot > 3./4. * pi else 0) +
