@@ -27,6 +27,7 @@ new_practice_state :: fn -> game.GameState {
             game.set_input' input
             self.game.process_input'
         },
+        cleanup: fn {},
     }
     ret self
 }

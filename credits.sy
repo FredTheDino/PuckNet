@@ -42,8 +42,8 @@ new_credits_state :: fn -> game.State {
                 i += 1
             }
         },
-        process_input: fn {
-        },
+        process_input: fn {},
+        cleanup: fn {},
     }
     ret self
 }

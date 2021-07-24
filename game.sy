@@ -117,6 +117,7 @@ State :: blob {
     update: fn float -> void,
     draw: fn -> void,
     process_input: fn -> void,
+    cleanup: fn -> void,
 }
 
 GameState :: blob {
@@ -125,6 +126,7 @@ GameState :: blob {
     update: fn float -> void,
     draw: fn -> void,
     process_input: fn -> void,
+    cleanup: fn -> void,
 }
 
 :GameState is :State
@@ -383,7 +385,8 @@ menu_state :: State {
     draw: main_menu.draw,
     process_input: fn {
         main_menu.process_input' menu.from_input' poll_input'
-    }
+    },
+    cleanup: fn {},
 }
 
 browser_menu := menu.menu_new' [], "Join a Game"
@@ -410,7 +413,8 @@ browser_state :: State {
             states -> push' client.new_client_state' ip
             //TODO(gu): show connection error in ui in some way
         }
-    }
+    },
+    cleanup: fn {},
 }
 
 update :: fn delta: float -> void {

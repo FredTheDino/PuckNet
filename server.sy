@@ -51,6 +51,7 @@ new_server_state :: fn -> game.GameState {
         process_input: fn {
             self.game.process_input'
         },
+        cleanup: fn {},
     }
     ret self
 }

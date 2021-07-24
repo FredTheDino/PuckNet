@@ -48,7 +48,8 @@ new_client_state :: fn ip: str -> game.GameState {
 
                 self.game.process_input'
             }
-        }
+        },
+        cleanup: fn {},
     }
     ret self
 }
