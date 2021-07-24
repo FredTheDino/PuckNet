@@ -199,7 +199,7 @@ init :: fn {
     states -> push' menu_state
 }
 
-player_join :: fn {
+player_join :: fn name: str {
     state := last(states)
     if :GameState is state {
         state : !GameState = state
@@ -215,6 +215,7 @@ player_join :: fn {
         state.game.team_members += (1 - team, team)
         player_pos := (as_float(team) + l_random_range(-1.0, 0.0), l_random_range(-0.5, 0.5))
         player := entity.player_new' player_pos, team, id
+        player.name = name
         game.players[id] = player
         push' game.entities, player
         push' game.bodies, player
@@ -391,7 +392,11 @@ menu_state :: State {
         if main_menu.line_selected {
             if main_menu_lines[main_menu.line_index] == "Connect" {
                 // When we break out of the client loop, return here.
-                states -> push' connect.new_browser_state'
+                if client.NAME == "" {
+                    states -> push' client.new_name_input_state'
+                } else {
+                    states -> push' connect.new_browser_state'
+                }
             } else if main_menu_lines[main_menu.line_index] == "Practice" {
                 states -> push' practice.new_practice_state'
             } else if main_menu_lines[main_menu.line_index] == "Start Server" {

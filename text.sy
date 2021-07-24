@@ -9,7 +9,7 @@ glyph_tile :: fn c: int -> (int, int) {
 }
 
 x_inc :: 0.42
-x_scale_global :: 0.08
+x_scale_global :: (14./18.) / 10.
 y_scale_global :: 0.1
 
 draw_text :: fn x: float, y: float, scale: float, s: str, color: (float, float, float, float) {
