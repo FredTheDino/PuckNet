@@ -192,6 +192,8 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
             self.rot = rem' self.rot, 2. * pi
         },
         update: fn delta: float -> void {
+            self.last_seen += delta
+
             self.tackle_timer = max' 0.0, self.tackle_timer - delta
 
             // Linear motion
