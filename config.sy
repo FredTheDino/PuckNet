@@ -53,6 +53,7 @@ new_settings_state :: fn -> game.State {
                 }
             }
         },
+        cleanup: fn {},
     }
     ret self
 }
