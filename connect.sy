@@ -24,14 +24,11 @@ new_browser_state :: fn -> game.State {
             browser_menu.process_input' menu.from_input' game.poll_input'
 
             if browser_menu.line_selected && len(browser_menu.lines) > 0 {
-                // Disconnect from the server browser
-                n_rpc_disconnect'
-
                 // Connect to the selected server
                 if browser_menu.line_index == 0 {
                     game.states -> push' new_ip_input_state'
                 } else {
-                    ip :: browser.servers[browser_menu.line_index].join_ip
+                    ip :: browser.servers[browser_menu.line_index - 1].join_ip
                     game.states -> push' client.new_client_state' ip
                 }
 

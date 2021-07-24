@@ -92,13 +92,26 @@ new_game :: fn -> Game {
             delta := l_delta'
 
             self.players -> for_each' fn _id: int, player: entity.Player {
-                player.remove = entity.player.last_seen >= PLAYER_DISCONNECT_TIMEOUT
+                remove := entity.player.last_seen >= PLAYER_DISCONNECT_TIMEOUT
+                player.remove = remove
+                if remove && :entity.Puck is player.puck {
+                    puck: !entity.Puck = player.puck
+                    puck.pos = (0., 0.)
+                    puck.holder = nil
+                }
             }
             self.players = self.players -> filter' fn _id: int, player: entity.Player -> bool {
                 !player.remove
             }
             self.entities = self.entities -> filter' fn entity: entity.Entity -> bool {
                 !entity.remove
+            }
+            self.bodies = self.bodies -> filter' fn body: collision.CircleBody -> bool {
+                if :entity.Entity is body {
+                    entity: !entity.Entity = body
+                    ret !entity.remove
+                }
+                true
             }
 
             self.players -> for_each' fn _id: int, p: entity.Player {
@@ -447,6 +460,16 @@ process_input :: fn {
     if :State is state {
         state : !State = state
         state.process_input'
+    }
+}
+
+player_id :: fn -> int {
+    state := last(states)
+    if :GameState is state {
+        state : !GameState = state
+        ret state.game.player_id
+    } else {
+        ret -1
     }
 }
 
