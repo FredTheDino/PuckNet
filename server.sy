@@ -42,7 +42,10 @@ new_server_state :: fn -> game.GameState {
                 flashing := "_" if rem(floor(l_time() * 2.0), 2) == 0 else " "
                 text.draw_text' 0.0, 0.2, 1.0, server_name + flashing, (255., 255., 255., 255.) / 255.
             } else {
-                self.game.draw'
+                white :: (255., 255., 255., 255.) / 255.
+                text.draw_text' 0.0, 0.2, 1.0,        "Server"        , white
+                text.draw_text' 0.0, 0.0, 1.0, "'" + server_name + "'", white
+                text.draw_text' 0.0,-0.2, 1.0,       "is online"      , white
             }
         },
         process_input: fn {
