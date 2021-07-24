@@ -426,7 +426,11 @@ update :: fn delta: float -> void {
 
     // Logic for moving "out" of the program
     if l_input_pressed("quit") {
-        states -> pop'
+        last := states -> pop'
+        if :State is last {
+            last: !State = last
+            last.cleanup'
+        }
     }
 }
 
