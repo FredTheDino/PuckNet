@@ -401,7 +401,7 @@ browser_state :: State {
     process_input: fn {
         browser_menu.process_input' menu.from_input' poll_input'
 
-        if browser_menu.line_selected {
+        if browser_menu.line_selected && len(browser_menu.lines) > 0 {
             // Disconnect from the server browser
             n_rpc_disconnect'
 
