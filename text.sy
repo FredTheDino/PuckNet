@@ -1,8 +1,11 @@
 use assets
 
+FONTMAP_WIDTH :: 16
+FONTMAP_HEIGHT :: 16
+
 glyph_tile :: fn c: int -> (int, int) {
     //TODO(gu): The y is inverted in the engine somewhere.
-    (rem(c, 18), 5 - (c / 18))
+    ret (rem(c, FONTMAP_WIDTH), (FONTMAP_HEIGHT - 1) - (c / FONTMAP_HEIGHT))
 }
 
 x_inc :: 0.42
@@ -20,8 +23,8 @@ draw_text :: fn x: float, y: float, scale: float, s: str, color: (float, float, 
 }
 
 draw_char :: fn x: float, y: float, scale: float, c: int, color: (float, float, float, float) {
-    c >= 32 <=> true  // unprintable
-    c <= 126 <=> true // upper bound
+    c >= 0   <=> true
+    c <= 256 <=> true // upper bound
     scale := (x_scale_global, y_scale_global) * scale
-    l_gfx_sprite' assets.font, glyph_tile(c - 32), (x, y), scale, color
+    l_gfx_sprite' assets.font, glyph_tile(c), (x, y), scale, color
 }
