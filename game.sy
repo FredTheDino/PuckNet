@@ -405,9 +405,6 @@ browser_state :: State {
         browser_menu.process_input' menu.from_input' poll_input'
 
         if browser_menu.line_selected && len(browser_menu.lines) > 0 {
-            // Disconnect from the server browser
-            n_rpc_disconnect'
-
             // Connect to the selected server
             ip := browser.servers[browser_menu.line_index].join_ip
             states -> push' client.new_client_state' ip
