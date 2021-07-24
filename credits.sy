@@ -5,7 +5,7 @@ use text
 new_credits_state :: fn -> game.State {
     self : !game.State = nil
 
-    settings_menu := menu.menu_new' [], false
+    settings_menu := menu.menu_new' [], ""
 
     names :: [
         "Erik Mattfolk",

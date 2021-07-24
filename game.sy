@@ -139,7 +139,7 @@ main_menu_lines := [
     "Credits",
     "Quit",
 ]
-main_menu : menu.Menu = menu.menu_new' main_menu_lines, true
+main_menu : menu.Menu = menu.menu_new' main_menu_lines, "PuckNet"
 
 bind_keys :: fn {
     l_bind_key("w", "up")
@@ -386,7 +386,7 @@ menu_state :: State {
     }
 }
 
-browser_menu := menu.menu_new' [], false
+browser_menu := menu.menu_new' [], "Join a Game"
 
 browser_state :: State {
     name: "Server browser",
@@ -401,7 +401,7 @@ browser_state :: State {
     process_input: fn {
         browser_menu.process_input' menu.from_input' poll_input'
 
-        if browser_menu.line_selected {
+        if browser_menu.line_selected && len(browser_menu.lines) > 0 {
             // Disconnect from the server browser
             n_rpc_disconnect'
 

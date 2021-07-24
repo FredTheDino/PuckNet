@@ -15,7 +15,7 @@ new_settings_state :: fn -> game.State {
 
     settings_menu := menu.menu_new' [
         "", // Volume
-    ], false
+    ], "Settings"
 
     self = game.State {
         name: "PuckNET Settings",
