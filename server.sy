@@ -37,14 +37,15 @@ new_server_state :: fn -> game.GameState {
             }
         },
         draw: fn {
+            white :: (255., 255., 255., 255.) / 255.
             if !server_name_done {
+                text.draw_text' 0.0, 0.2, 1.0, "Name Your Server", white
                 flashing := "_" if rem(floor(l_time() * 2.0), 2) == 0 else " "
-                text.draw_text' 0.0, 0.2, 1.0, server_name + flashing, (255., 255., 255., 255.) / 255.
+                text.draw_text' 0.0, 0.0, 1.0, server_name + flashing, white
             } else {
-                white :: (255., 255., 255., 255.) / 255.
-                text.draw_text' 0.0, 0.2, 1.0,        "Server"        , white
+                text.draw_text' 0.0, 0.2, 1.0, "Your server", white
                 text.draw_text' 0.0, 0.0, 1.0, "'" + server_name + "'", white
-                text.draw_text' 0.0,-0.2, 1.0,       "is online"      , white
+                text.draw_text' 0.0,-0.2, 1.0, "is online on port " + as_str(config.SERVER_PORT), white
             }
         },
         process_input: fn {
