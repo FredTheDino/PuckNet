@@ -384,7 +384,6 @@ menu_state :: State {
                 } else {
                     states -> push' connect.new_browser_state'
                 }
-                states -> push' connect.new_browser_state'
             } else if main_menu_lines[main_menu.line_index] == "Practice" {
                 states -> push' practice.new_practice_state'
             } else if main_menu_lines[main_menu.line_index] == "Start Server" {
