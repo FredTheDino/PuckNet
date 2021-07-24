@@ -70,7 +70,7 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
         tackle_timer: 0.0,
         input: nil,
         owner_id: owner,
-        name: "gustav",
+        name: "",
         last_seen: 0.0,
         remove: false,
         draw: fn -> void {
