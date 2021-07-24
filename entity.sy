@@ -2,6 +2,7 @@ use assets
 use collision
 use game
 use particles
+use text
 use util
 
 pi :: 3.14159265358979
@@ -35,6 +36,7 @@ Player :: blob {
     input: Input?,
     owner_id: int,
     last_seen: float,
+    name: str,
     remove: bool,
     draw: fn -> void,
     process_input: fn float -> void,
@@ -68,6 +70,7 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
         tackle_timer: 0.0,
         input: nil,
         owner_id: owner,
+        name: "gustav",
         last_seen: 0.0,
         remove: false,
         draw: fn -> void {
@@ -98,8 +101,19 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
                 p.pos -= puck_offsets[segment] * self.rad
             }
 
+            color :: (1., 0., 0., 1.) if team == 0 else (0.1176, 0.7608, 0.2275, 1.)
+
             // Player
             l_gfx_sprite' sprite, (0, 0), self.pos + offset, (width, height) / height * self.rad * scale
+
+            // Name
+            text_offset :: (0.0, 4.0) * self.rad
+            text_pos :: self.pos + text_offset
+            text_scale :: 0.9
+            text_shadow_offset :: (0.09, -0.09) * self.rad
+            text_shadow_pos :: text_pos + text_shadow_offset
+            text.draw_text' text_shadow_pos[0], text_shadow_pos[1], text_scale, self.name, (0., 0., 0., 1.)
+            text.draw_text' text_pos[0], text_pos[1], text_scale, self.name, color
 
             // Puck (if held)
             if (!puck_before && self.puck is :Puck) {
@@ -112,7 +126,6 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
             // Arrow (if current player)
             if self.owner_id == game.player_id() {
                 // Red/green matches player colors.
-                color := (1., 0., 0., 1.) if team == 0 else (0.1176, 0.7608, 0.2275, 1.)
                 // How much the shot charge moves the arrow out (linearly).
                 charge_offset := (1. + charge_sin) * 0.08
                 // The sum arrow offset (relative to the player sprite).
