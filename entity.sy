@@ -19,6 +19,7 @@ Input :: blob {
     charge: bool,
     select: bool,
     player: int?,
+    fish: bool,
 }
 
 Player :: blob {
@@ -37,6 +38,7 @@ Player :: blob {
     last_seen: float,
     remove: bool,
     team: int,
+    fishing: bool,
     draw: fn -> void,
     process_input: fn float -> void,
     update: fn float -> void,
@@ -72,13 +74,22 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
         last_seen: 0.0,
         remove: false,
         team: team,
+        fishing: false,
         draw: fn -> void {
-            segment :: ((1 if self.rot > 1./4. * pi else 0) +
+            segment := ((1 if self.rot > 1./4. * pi else 0) +
                         (1 if self.rot > 3./4. * pi else 0) +
                         (1 if self.rot > 5./4. * pi else 0) -
                         (3 if self.rot > 7./4. * pi else 0))
             charge_sin :: sin(charge_osc * self.charge + charge_start_osc_offset)
-            sprite :: sprites[as_int(1.499 * (charge_sin + 1.)) if self.charge < 0.5 else 2][segment]
+            sprite := sprites[as_int(1.499 * (charge_sin + 1.)) if self.charge < 0.5 else 2][segment]
+
+            // Select fishing sprite (if fishing)
+            if self.fishing {
+                segment = ((2 if self.rot > 1./2. * pi else 0) -
+                           (2 if self.rot > 3./2. * pi else 0))
+                sprite = sprites[3][as_int(rem(l_time(), 2.))]
+            }
+
             widths :: [-12.0, 13.0, 12.0, 13.0]
             width :: widths[segment]
             height :: 15.
@@ -111,8 +122,8 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
                 p.pos -= puck_offsets[segment] * self.rad
             }
 
-            // Arrow (if current player)
-            if self.owner_id == game.player_id() {
+            // Arrow (if current player and not fishing)
+            if self.owner_id == game.player_id() && !self.fishing {
                 // Red/green matches player colors.
                 color := (1., 0., 0., 1.) if team == 0 else (0.1176, 0.7608, 0.2275, 1.)
                 // How much the shot charge moves the arrow out (linearly).
@@ -127,6 +138,16 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
                 ret
             }
             input: !Input = self.input
+
+            // Handle fishing inputs
+            if input.fish {
+                self.fishing = !self.fishing
+            }
+
+            if self.fishing {
+                ret
+            }
+
             charge_sin :: sin(charge_osc * self.charge + charge_start_osc_offset)
 
             // Shooting

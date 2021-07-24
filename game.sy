@@ -86,9 +86,8 @@ new_game :: fn -> Game {
 
             mupps.draw'
 
-            zero :: as_chars("0")[0]
-            text.draw_char' -0.1, 0.9, 1., self.score[0] + zero, (255., 0., 0., 255.) / 255.
-            text.draw_char' 0.1,  0.9, 1., self.score[1] + zero, (30., 194., 58., 255.) / 255.
+            text.draw_text' -0.1, 0.9, 1., as_str(self.score[0]), (255., 0., 0., 255.) / 255.
+            text.draw_text' 0.1,  0.9, 1., as_str(self.score[1]), (30., 194., 58., 255.) / 255.
         },
         process_input: fn {
             delta := l_delta'
@@ -170,6 +169,7 @@ bind_keys :: fn {
     l_bind_key("s", "down")
     l_bind_key("d", "right")
     l_bind_key("SPACE", "shoot")
+    l_bind_key("f", "fish")
 
     l_bind_key("Up", "up")
     l_bind_key("Left", "left")
@@ -180,6 +180,7 @@ bind_keys :: fn {
     l_bind_axis(0, "LEFTX", "right")
     l_bind_axis(0, "LEFTY", "down")
     l_bind_button(0, "A", "shoot")
+    l_bind_button(0, "Y", "fish")
 
     l_bind_button(0, "dpup", "up")
     l_bind_button(0, "dpdown", "down")
@@ -242,6 +243,8 @@ poll_input :: fn -> entity.Input {
         select: l_input_pressed("shoot"),
 
         player: nil,
+
+        fish: l_input_pressed("fish"),
     }
 }
 
@@ -279,6 +282,7 @@ merge_inputs :: fn current: entity.Input, new: entity.Input -> entity.Input {
         shoot: current.shoot || new.shoot,
         select: current.select || new.select,
         player: new.player,
+        fish: current.fish || new.fish,
     }
 }
 
@@ -290,6 +294,7 @@ clear_input :: fn input: entity.Input -> entity.Input {
         shoot: false,
         select: false,
         player: input.player,
+        fish: false,
     }
 }
 
