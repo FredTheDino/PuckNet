@@ -8,7 +8,7 @@ NAME := ""
 new_client_state :: fn ip: str -> game.GameState {
     print ip
     n_rpc_connect' ip, config.SERVER_PORT
-    n_rpc_server' game.player_join
+    n_rpc_server' game.player_join, NAME
 
     update_ticker := game.tick.ticker_new' 60.0
     self : !game.GameState = nil

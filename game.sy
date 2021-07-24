@@ -191,7 +191,7 @@ init :: fn {
     states -> push' menu_state
 }
 
-player_join :: fn {
+player_join :: fn name: str {
     state := last(states)
     if :GameState is state {
         state : !GameState = state
@@ -207,6 +207,7 @@ player_join :: fn {
         team :: rem(id, 2)
         player_pos := (as_float(team) + l_random_range(-1.0, 0.0), l_random_range(-0.5, 0.5))
         player := entity.player_new' player_pos, team, id
+        player.name = name
         game.players[id] = player
         push' game.entities, player
         push' game.bodies, player
