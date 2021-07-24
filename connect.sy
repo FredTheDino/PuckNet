@@ -1,0 +1,79 @@
+use browser
+use client
+use game
+use menu
+use text
+
+new_browser_state :: fn -> game.State {
+    browser_menu := menu.menu_new' ["Connect via IP"], "Join a Game"
+    browser_state :: game.State {
+        name: "Server browser",
+        update: fn delta: float -> void {
+            browser_menu.lines = ["Connect via IP"]
+            i := 0
+            loop i < len(browser.servers) {
+                server := browser.servers[i]
+                browser_menu.lines -> push' as_str(server.online) + ": " + server.name
+                i += 1
+            }
+        },
+        draw: fn -> void {
+            browser_menu.draw'
+        },
+        process_input: fn {
+            browser_menu.process_input' menu.from_input' game.poll_input'
+
+            if browser_menu.line_selected && len(browser_menu.lines) > 0 {
+                // Disconnect from the server browser
+                n_rpc_disconnect'
+
+                // Connect to the selected server
+                if browser_menu.line_index == 0 {
+                    game.states -> push' new_ip_input_state'
+                } else {
+                    ip :: browser.servers[browser_menu.line_index].join_ip
+                    game.states -> push' client.new_client_state' ip
+                }
+
+                // TODO(gu): show connection error in ui in some way
+            }
+        },
+        cleanup: fn {},
+    }
+    ret browser_state
+}
+
+new_ip_input_state :: fn -> game.GameState {
+    ip := "localhost"
+
+    l_set_text_input_enabled' true
+
+    self : !game.GameState = nil
+    self = game.GameState {
+        game: game.new_game(),
+        name: "PuckNET IP input",
+        update: fn delta: float {
+            text_input_response := l_text_input_update' ip
+            ip = text_input_response[0]
+            if text_input_response[1] {
+                l_set_text_input_enabled' false
+                if ip == "" {
+                    game.states -> pop'
+                    ret
+                }
+                // We don't want to return to the IP input screen.
+                game.states -> pop'
+                game.states -> push' client.new_client_state' ip
+            }
+        },
+        draw: fn {
+            flashing := "_" if rem(floor(l_time() * 2.0), 2) == 0 else " "
+            text.draw_text' 0.0, 0.2, 1.0, ip + flashing, (255., 255., 255., 255.) / 255.
+        },
+        process_input: fn {
+            self.game.process_input'
+        },
+        cleanup: fn {},
+    }
+    ret self
+}
