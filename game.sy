@@ -27,6 +27,7 @@ Game :: blob {
     score: (int, int),
     player_id: int,
     next_id: int,
+    team_members: (int, int),
     update: fn float -> void,
     draw: fn -> void,
     process_input: fn -> void,
@@ -44,6 +45,7 @@ new_game :: fn -> Game {
         score: (0, 0),
         player_id: -1,
         next_id: 0,
+        team_members: (0, 0),
         update: fn delta: float {
             self.players -> for_each' fn _id: int, p: entity.Player {
                 p.try_grab' puck
@@ -91,15 +93,20 @@ new_game :: fn -> Game {
         process_input: fn {
             delta := l_delta'
 
+            member_change := [0, 0]
             self.players -> for_each' fn _id: int, player: entity.Player {
                 remove := entity.player.last_seen >= PLAYER_DISCONNECT_TIMEOUT
                 player.remove = remove
-                if remove && :entity.Puck is player.puck {
-                    puck: !entity.Puck = player.puck
-                    puck.pos = (0., 0.)
-                    puck.holder = nil
+                if remove {
+                    member_change[player.team] -= 1
+                    if :entity.Puck is player.puck {
+                        puck: !entity.Puck = player.puck
+                        puck.pos = (0., 0.)
+                        puck.holder = nil
+                    }
                 }
             }
+            self.team_members += (member_change[0], member_change[1])
             self.players = self.players -> filter' fn _id: int, player: entity.Player -> bool {
                 !player.remove
             }
@@ -203,8 +210,8 @@ player_join :: fn {
         ip := n_rpc_current_request_ip'
         n_rpc_client_ip' ip, assign_player_id, id
 
-        //TODO(gu): Team balancing?
-        team :: rem(id, 2)
+        team :: 0 if state.game.team_members[0] <= state.game.team_members[1] else 1
+        state.game.team_members += (1 - team, team)
         player_pos := (as_float(team) + l_random_range(-1.0, 0.0), l_random_range(-0.5, 0.5))
         player := entity.player_new' player_pos, team, id
         game.players[id] = player
