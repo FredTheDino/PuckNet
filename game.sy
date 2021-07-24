@@ -100,7 +100,8 @@ new_game :: fn -> Game {
                 !entity.remove
             }
             self.bodies = self.bodies -> filter' fn body: collision.CircleBody -> bool {
-                if :Entity is body {
+                if :entity.Entity is body {
+                    entity: !entity.Entity = body
                     ret !entity.remove
                 }
                 true
