@@ -167,6 +167,7 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
             ignore_movement := false
             if self.puck is :Puck && (((input.charge || input.shoot) && self.charge != 0.0) || (input.tackle && self.charge == 0.0)) {
                 if input.shoot {
+                    game.add_camera_shake(charge_sin * .01, self.owner_id)
                     shoot_speed :: max(charge_sin * 1.2, -1.0) + 1.8
                     puck: !Puck = self.puck
                     puck.vel = util.dir(self.rot) * shoot_speed
@@ -190,6 +191,7 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
 
             // Tackling
             if self.tackle_timer == 0.0 && input.tackle && self.puck is nil {
+                game.add_camera_shake(.007, self.owner_id)
                 self.tackle_timer = 0.8
                 self.vel += util.dir(self.rot) * 2.0
                 assets.random_he()

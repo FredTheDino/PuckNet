@@ -34,6 +34,7 @@ Game :: blob {
     player_id: int,
     next_id: int,
     team_members: (int, int),
+    camera_shake: float,
     scored_name: str,
     scored_name_timeout: float,
     scored_name_color: (float, float, float, float),
@@ -55,6 +56,7 @@ new_game :: fn -> Game {
         player_id: -1,
         next_id: 0,
         team_members: (0, 0),
+        camera_shake: 0.0,
         scored_name: "",
         scored_name_timeout: 0.0,
         scored_name_color: (0., 0., 0., 1.),
@@ -517,12 +519,15 @@ set_entities :: fn incoming_entities: [entity.Entity], incoming_players: {int: e
 }
 
 move_camera :: fn game: Game {
+    camera_shake_decay :: .1
     x :: -game.players[game.player_id].pos[0]
     curr_x :: l_gfx_camera_at()[0]
     speed :: min' 1.0, 4.0 * l_delta'
     x :: x * speed + curr_x * (1.0 - speed)
-    l_gfx_camera_place' x, 0.0
+    shake_angle :: l_random() * 2. * entity.pi
+    l_gfx_camera_place' x + game.camera_shake * cos(shake_angle), 0.0 + game.camera_shake * sin(shake_angle)
     l_gfx_camera_set_zoom' 0.7
+    game.camera_shake = max(game.camera_shake - l_delta() * camera_shake_decay, 0.)
 }
 
 reset_camera :: fn {
@@ -553,6 +558,14 @@ player_id :: fn -> int {
         ret state.game.player_id
     } else {
         ret -1
+    }
+}
+
+add_camera_shake :: fn shake: float, player: int -> void {
+    state := last(states)
+    if :GameState is state && player == player_id() {
+        state : !GameState = state
+        state.game.camera_shake += shake
     }
 }
 
