@@ -1,3 +1,4 @@
+use config
 use entity
 use game
 
@@ -9,6 +10,11 @@ new_practice_state :: fn -> game.GameState {
     push' new_game.entities, player
     push' new_game.bodies, player
     new_game.player_id = 0
+
+    if !config.SHOWED_TUTORIAL {
+        config.set_SHOW_TUTORIAL' true
+        config.set_SHOWED_TUTORIAL' true
+    }
 
     self : !game.GameState = nil
     self = game.GameState {
@@ -27,7 +33,9 @@ new_practice_state :: fn -> game.GameState {
             game.set_input' input
             self.game.process_input'
         },
-        cleanup: fn {},
+        cleanup: fn {
+            config.set_SHOW_TUTORIAL' false
+        },
     }
     ret self
 }

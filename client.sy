@@ -13,7 +13,7 @@ new_client_state :: fn ip: str -> game.GameState {
     update_ticker := game.tick.ticker_new' 60.0
     self : !game.GameState = nil
     input : game.entity.Input? = nil
-    game_ := game.new_game()
+    game_ := game.new_game'
 
     recv_done :: fn -> bool {
         game_.player_id in game_.players
