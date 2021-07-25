@@ -41,7 +41,7 @@ random_skate :: fn {
 }
 
 random_he :: fn {
-    l_audio_play(random_choice(hes), false, (config.VOLUME_FLOAT * 2.0, config.VOLUME_FLOAT * 0.1), (0.98, 0.05))
+    l_audio_play(random_choice(hes), false, (config.VOLUME_FLOAT * 4.0, config.VOLUME_FLOAT * 0.1), (0.98, 0.05))
 }
 
 random_grab :: fn {
