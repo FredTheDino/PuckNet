@@ -391,9 +391,16 @@ collision_check :: fn delta:float, game: Game {
                     assets.random_cheer()
                     game.puck.holder = nil
 
-                    game.scored_name = "Player"
+                    if !(game.puck.last_holder is nil) {
+                        last_holder: !entity.Player = game.puck.last_holder
+                        game.scored_name = last_holder.name
+                    } else {
+                        game.scored_name = ""
+                    }
                     game.scored_name_timeout = SCORE_NAME_TIMEOUT
                     game.scored_name_color = RED if team == 0 else GREEN
+
+                    game.puck.last_holder = nil
                 }
                 collision.solve' in_col
             } else {
