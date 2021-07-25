@@ -1,5 +1,6 @@
-use entity
 use assets
+use entity
+use game
 
 Manifold :: blob {
     normal: (float, float),
@@ -92,6 +93,16 @@ solve :: fn col: Manifold {
         assets.random_plink()
     } else {
         assets.random_thudd()
+    }
+    // Shake it up
+    if :entity.Player is a {
+        p: !entity.Player = a
+        n_rpc_clients' game.add_camera_shake, col.depth * .5, p.owner_id
+    }
+    // Shake it up
+    if :entity.Player is b {
+        p: !entity.Player = b
+        n_rpc_clients' game.add_camera_shake, col.depth * .5, p.owner_id
     }
 
     // Should the puck action be handled here?
