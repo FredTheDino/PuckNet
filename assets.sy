@@ -42,7 +42,7 @@ random_skate :: fn {
 }
 
 random_he :: fn {
-    l_audio_play(random_choice(hes), false, (2.0, 0.1), (0.98, 0.05))
+    l_audio_play(random_choice(hes), false, (4.0, 0.1), (0.98, 0.05))
 }
 
 random_grab :: fn {
