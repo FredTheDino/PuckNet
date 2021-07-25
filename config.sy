@@ -50,6 +50,7 @@ new_settings_state :: fn -> game.State {
                     }
                     VOLUME = clamp' VOLUME, 0, MAX_VOLUME
                     VOLUME_FLOAT = as_float(VOLUME) / as_float(MAX_VOLUME)
+                    l_audio_master_gain' VOLUME_FLOAT
                 }
             }
         },
