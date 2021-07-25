@@ -173,6 +173,7 @@ player_new :: fn pos: (float, float), team: int, owner: int -> Player {
                     puck.vel = util.dir(self.rot) * shoot_speed
                     puck.hold_cooldown = 0.1
                     puck.holder = nil
+                    puck.last_holder = self
                     self.puck = nil
                     self.charge = 0.0
                     assets.random_plink()
@@ -273,6 +274,7 @@ Puck :: blob {
     pos: (float, float),
     vel: (float, float),
     holder: Player?,
+    last_holder: Player?,
     hold_cooldown: float,
     draw: fn -> void,
     update: fn float -> void,
@@ -289,6 +291,7 @@ puck_new :: fn pos: (float, float) -> Puck {
         pos: pos,
         vel: (0.0, 0.0),
         holder: nil,
+        last_holder: nil,
         hold_cooldown: 0.0,
         draw: fn -> void {
             rad :: (circle_rad, circle_rad) * 2.0

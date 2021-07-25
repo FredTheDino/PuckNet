@@ -18,6 +18,12 @@ use util
 
 PLAYER_DISCONNECT_TIMEOUT :: 3.0
 
+RED :: (255., 0., 0., 255.) / 255.
+GREEN :: (30., 194., 58., 255.) / 255.
+BLACK :: (0., 0., 0., 255.) / 255.
+
+SCORE_NAME_TIMEOUT :: 4.0
+
 Game :: blob {
     puck: entity.Puck,
     players: {int: entity.Player},
@@ -29,6 +35,9 @@ Game :: blob {
     next_id: int,
     team_members: (int, int),
     camera_shake: float,
+    scored_name: str,
+    scored_name_timeout: float,
+    scored_name_color: (float, float, float, float),
     update: fn float -> void,
     draw: fn -> void,
     process_input: fn -> void,
@@ -48,6 +57,9 @@ new_game :: fn -> Game {
         next_id: 0,
         team_members: (0, 0),
         camera_shake: 0.0,
+        scored_name: "",
+        scored_name_timeout: 0.0,
+        scored_name_color: (0., 0., 0., 1.),
         update: fn delta: float {
             self.players -> for_each' fn _id: int, p: entity.Player {
                 p.try_grab' puck
@@ -59,11 +71,49 @@ new_game :: fn -> Game {
                 e.update' delta
             }
 
+            if self.scored_name_timeout > 0.0 {
+                self.scored_name_timeout -= delta
+                if self.scored_name_timeout < 0.0 {
+                    self.scored_name_timeout = 0.0
+                }
+            }
+
             particles.update' delta
         },
         draw: fn {
             self.arena.draw'
             particles.render'
+
+            if self.scored_name_timeout > 0.0 && self.scored_name != "" {
+                text.draw_text' 0.005, 0.795, 1.0, self.scored_name + " scored!", BLACK
+                text.draw_text' 0.0, 0.8, 1.0, self.scored_name + " scored!", self.scored_name_color
+
+            if config.SHOW_TUTORIAL {
+                black :: (0., 0., 0., 1.)
+
+                controller_pos :: (0.0, 0.5)
+                fish_text_offset :: (0.36, 0.18)
+                fish_text_pos :: controller_pos + fish_text_offset
+                action_text_offset :: (0.42, -0.12)
+                action_text_pos :: controller_pos + action_text_offset
+                move_text_offset :: (-0.345, -0.12)
+                move_text_pos :: controller_pos + move_text_offset
+                exit_text_offset :: (-0.25, 0.2)
+                exit_text_pos :: controller_pos + exit_text_offset
+
+                l_gfx_rect((0.0, 0.53), (1., .45), (1., 1., 1., 0.8))
+                l_gfx_sprite' assets.controller, (0, 0), controller_pos, (29., 18.) / 18. * 0.3
+                text.draw_text' fish_text_pos[0], fish_text_pos[1], 0.8, "Fish", black
+                text.draw_text' action_text_pos[0], action_text_pos[1], 0.8, "Action", black
+                text.draw_text' move_text_pos[0], move_text_pos[1], 0.8, "Move", black
+                text.draw_text' exit_text_pos[0], exit_text_pos[1], 0.8, "Go back", black
+
+                l_gfx_rect((0.0, -0.55), (1., .45), (1., 1., 1., 0.8))
+                text.draw_text' 0.0, -0.4, 0.8, "WASD/Arrows to move", black
+                text.draw_text' 0.0, -0.5, 0.8, "Space to shoot/tackle", black
+                text.draw_text' 0.0, -0.6, 0.8, "F to fish", black
+                text.draw_text' 0.0, -0.7, 0.8, "ESC to go back", black
+            }
 
             self.entities -> for_each' fn e: entity.Entity {
                 if !(e is :entity.Puck) {
@@ -88,8 +138,8 @@ new_game :: fn -> Game {
 
             mupps.draw'
 
-            text.draw_text' -0.1, 0.9, 1., as_str(self.score[0]), (255., 0., 0., 255.) / 255.
-            text.draw_text' 0.1,  0.9, 1., as_str(self.score[1]), (30., 194., 58., 255.) / 255.
+            text.draw_text' -0.1, 0.9, 1., as_str(self.score[0]), RED
+            text.draw_text' 0.1,  0.9, 1., as_str(self.score[1]), GREEN
         },
         process_input: fn {
             delta := l_delta'
@@ -360,7 +410,8 @@ collision_check :: fn delta:float, game: Game {
                 if :entity.Puck is a && dot(a.vel, in_col.normal) < 0.0 && col.depth > 0.03 {
                     particles.goal' a.pos
                     n_rpc_clients' particles.goal, a.pos
-                    game.score += (0 if game.puck.pos[0] < 0. else 1, 1 if game.puck.pos[0] < 0. else 0)
+                    team := 0 if game.puck.pos[0] > 0. else 1
+                    game.score += (1 - team, team)
                     game.puck.vel *= 0.0
                     game.puck.pos *= 0.0
                     if :entity.Player is game.puck.holder {
@@ -369,6 +420,17 @@ collision_check :: fn delta:float, game: Game {
                     }
                     assets.random_cheer()
                     game.puck.holder = nil
+
+                    if !(game.puck.last_holder is nil) {
+                        last_holder: !entity.Player = game.puck.last_holder
+                        game.scored_name = last_holder.name
+                    } else {
+                        game.scored_name = ""
+                    }
+                    game.scored_name_timeout = SCORE_NAME_TIMEOUT
+                    game.scored_name_color = RED if team == 0 else GREEN
+
+                    game.puck.last_holder = nil
                 }
                 collision.solve' in_col
             } else {
@@ -439,7 +501,7 @@ update :: fn delta: float -> void {
     }
 }
 
-set_entities :: fn incoming_entities: [entity.Entity], incoming_players: {int: entity.Player}, incomming_arena: arena_mod.Arena, incoming_score: (int, int) {
+set_entities :: fn incoming_entities: [entity.Entity], incoming_players: {int: entity.Player}, incomming_arena: arena_mod.Arena, incoming_score: (int, int), scored_name: str, scored_name_timeout: float, scored_name_color: (float, float, float, float) {
     state := last(states)
     if :GameState is state {
         state : !GameState = state
@@ -449,6 +511,10 @@ set_entities :: fn incoming_entities: [entity.Entity], incoming_players: {int: e
         game.players = incoming_players
         game.arena = incomming_arena
         game.score = incoming_score
+
+        game.scored_name = scored_name
+        game.scored_name_timeout = scored_name_timeout
+        game.scored_name_color = scored_name_color
     }
 }
 
@@ -510,7 +576,11 @@ start :: fn {
         // We set window size before ANY call to the engine so we have the correct size from the beginning
         l_set_window_size' (800, 800)
         init'
+
+        l_audio_master_gain' config.VOLUME_FLOAT
+
         l_audio_play' assets.crowd, true, 0.1, 1.0
+        l_audio_play' assets.music, true, 0.3, 1.0
 
         n_rpc_connect' config.BROWSER_SERVER_IP, config.BROWSER_SERVER_PORT
 

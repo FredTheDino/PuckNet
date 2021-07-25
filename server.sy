@@ -32,7 +32,7 @@ new_server_state :: fn -> game.GameState {
                 }
             } else {
                 self.game.update' delta
-                n_rpc_clients' game.set_entities, self.game.entities, self.game.players, self.game.arena, self.game.score
+                n_rpc_clients' game.set_entities, self.game.entities, self.game.players, self.game.arena, self.game.score, self.game.scored_name, self.game.scored_name_timeout, self.game.scored_name_color
                 n_rpc_server' browser.update_server, len(self.game.players)
             }
         },
