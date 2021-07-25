@@ -87,6 +87,7 @@ new_game :: fn -> Game {
             if self.scored_name_timeout > 0.0 && self.scored_name != "" {
                 text.draw_text' 0.005, 0.795, 1.0, self.scored_name + " scored!", BLACK
                 text.draw_text' 0.0, 0.8, 1.0, self.scored_name + " scored!", self.scored_name_color
+            }
 
             if config.SHOW_TUTORIAL {
                 black :: (0., 0., 0., 1.)
