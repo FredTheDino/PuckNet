@@ -10,6 +10,17 @@ VOLUME := 5
 MAX_VOLUME :: 10
 VOLUME_FLOAT := as_float(VOLUME) / as_float(MAX_VOLUME)
 
+SHOWED_TUTORIAL := false
+SHOW_TUTORIAL := false
+
+set_SHOWED_TUTORIAL :: fn showed: bool {
+    SHOWED_TUTORIAL = showed
+}
+
+set_SHOW_TUTORIAL :: fn show: bool {
+    SHOW_TUTORIAL = show
+}
+
 new_settings_state :: fn -> game.State {
     self : !game.State = nil
 

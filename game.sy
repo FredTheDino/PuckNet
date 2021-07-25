@@ -63,6 +63,31 @@ new_game :: fn -> Game {
             self.arena.draw'
             particles.render'
 
+            if config.SHOW_TUTORIAL {
+                black :: (0., 0., 0., 1.)
+
+                controller_pos :: (0.0, 0.5)
+                fish_text_offset :: (0.36, 0.18)
+                fish_text_pos :: controller_pos + fish_text_offset
+                action_text_offset :: (0.42, -0.12)
+                action_text_pos :: controller_pos + action_text_offset
+                move_text_offset :: (-0.345, -0.12)
+                move_text_pos :: controller_pos + move_text_offset
+                exit_text_offset :: (-0.25, 0.2)
+                exit_text_pos :: controller_pos + exit_text_offset
+
+                l_gfx_sprite' assets.controller, (0, 0), controller_pos, (29., 18.) / 18. * 0.3
+                text.draw_text' fish_text_pos[0], fish_text_pos[1], 0.8, "Fish", black
+                text.draw_text' action_text_pos[0], action_text_pos[1], 0.8, "Action", black
+                text.draw_text' move_text_pos[0], move_text_pos[1], 0.8, "Move", black
+                text.draw_text' exit_text_pos[0], exit_text_pos[1], 0.8, "Go back", black
+
+                text.draw_text' -1.15, 0.15, 0.8, "WASD/Arrows to move", black
+                text.draw_text' -1.15, 0.05, 0.8, "Space to shoot/tackle", black
+                text.draw_text' -1.15, -0.05, 0.8, "F to fish", black
+                text.draw_text' -1.15, -0.15, 0.8, "ESC to go back", black
+            }
+
             self.entities -> for_each' fn e: entity.Entity {
                 if !(e is :entity.Puck) {
                     e.draw'

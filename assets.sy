@@ -6,6 +6,7 @@ ads := empty_asset
 arena := empty_asset
 arrow := empty_asset
 border := empty_asset
+controller := empty_asset
 font := empty_asset
 goal := empty_asset
 puck := empty_asset
@@ -62,6 +63,7 @@ load_assets :: fn {
     arena = l_load_image' "res/rink.png", (200, 100)
     arrow = l_load_image' "res/arrow.png", (5, 7)
     border = l_load_image' "res/border.png", (200, 40)
+    controller = l_load_image' "res/controller.png", (29, 18)
     font = l_load_image' "res/font.png", (14, 18)
     goal = l_load_image' "res/goal.png", (8, 13)
     puck = l_load_image' "res/puck.png", (7, 6)
