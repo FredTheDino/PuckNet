@@ -190,4 +190,6 @@ load_assets :: fn {
     ]
 
     bloop = l_load_audio("res/bloop.wav")
+
+    l_set_window_icon' "res/logo.png"
 }
