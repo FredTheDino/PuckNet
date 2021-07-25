@@ -497,6 +497,9 @@ start :: fn {
         // We set window size before ANY call to the engine so we have the correct size from the beginning
         l_set_window_size' (800, 800)
         init'
+
+        l_audio_master_gain' config.VOLUME_FLOAT
+
         l_audio_play' assets.crowd, true, 0.1, 1.0
         l_audio_play' assets.music, true, 0.3, 1.0
 
