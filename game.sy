@@ -76,12 +76,14 @@ new_game :: fn -> Game {
                 exit_text_offset :: (-0.25, 0.2)
                 exit_text_pos :: controller_pos + exit_text_offset
 
+                l_gfx_rect((0.0, 0.53), (1., .45), (1., 1., 1., 0.8))
                 l_gfx_sprite' assets.controller, (0, 0), controller_pos, (29., 18.) / 18. * 0.3
                 text.draw_text' fish_text_pos[0], fish_text_pos[1], 0.8, "Fish", black
                 text.draw_text' action_text_pos[0], action_text_pos[1], 0.8, "Action", black
                 text.draw_text' move_text_pos[0], move_text_pos[1], 0.8, "Move", black
                 text.draw_text' exit_text_pos[0], exit_text_pos[1], 0.8, "Go back", black
 
+                l_gfx_rect((0.0, -0.55), (1., .45), (1., 1., 1., 0.8))
                 text.draw_text' 0.0, -0.4, 0.8, "WASD/Arrows to move", black
                 text.draw_text' 0.0, -0.5, 0.8, "Space to shoot/tackle", black
                 text.draw_text' 0.0, -0.6, 0.8, "F to fish", black
