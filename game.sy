@@ -82,10 +82,10 @@ new_game :: fn -> Game {
                 text.draw_text' move_text_pos[0], move_text_pos[1], 0.8, "Move", black
                 text.draw_text' exit_text_pos[0], exit_text_pos[1], 0.8, "Go back", black
 
-                text.draw_text' -1.15, 0.15, 0.8, "WASD/Arrows to move", black
-                text.draw_text' -1.15, 0.05, 0.8, "Space to shoot/tackle", black
-                text.draw_text' -1.15, -0.05, 0.8, "F to fish", black
-                text.draw_text' -1.15, -0.15, 0.8, "ESC to go back", black
+                text.draw_text' 0.0, -0.4, 0.8, "WASD/Arrows to move", black
+                text.draw_text' 0.0, -0.5, 0.8, "Space to shoot/tackle", black
+                text.draw_text' 0.0, -0.6, 0.8, "F to fish", black
+                text.draw_text' 0.0, -0.7, 0.8, "ESC to go back", black
             }
 
             self.entities -> for_each' fn e: entity.Entity {
