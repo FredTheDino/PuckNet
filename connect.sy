@@ -64,7 +64,8 @@ new_ip_input_state :: fn -> game.State {
         },
         draw: fn {
             flashing := "_" if rem(floor(l_time() * 2.0), 2) == 0 else " "
-            text.draw_text' 0.0, 0.2, 1.0, ip + flashing, (255., 255., 255., 255.) / 255.
+            text.draw_text' 0.0, 0.2, 1.0, "Enter IP", (255., 255., 255., 255.) / 255.
+            text.draw_text' 0.0, 0.0, 1.0, ip + flashing, (255., 255., 255., 255.) / 255.
         },
         process_input: fn {},
         cleanup: fn {},
