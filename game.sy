@@ -18,6 +18,12 @@ use util
 
 PLAYER_DISCONNECT_TIMEOUT :: 3.0
 
+RED :: (255., 0., 0., 255.) / 255.
+GREEN :: (30., 194., 58., 255.) / 255.
+BLACK :: (0., 0., 0., 255.) / 255.
+
+SCORE_NAME_TIMEOUT :: 4.0
+
 Game :: blob {
     puck: entity.Puck,
     players: {int: entity.Player},
@@ -28,6 +34,9 @@ Game :: blob {
     player_id: int,
     next_id: int,
     team_members: (int, int),
+    scored_name: str,
+    scored_name_timeout: float,
+    scored_name_color: (float, float, float, float),
     update: fn float -> void,
     draw: fn -> void,
     process_input: fn -> void,
@@ -46,6 +55,9 @@ new_game :: fn -> Game {
         player_id: -1,
         next_id: 0,
         team_members: (0, 0),
+        scored_name: "",
+        scored_name_timeout: 0.0,
+        scored_name_color: (0., 0., 0., 1.),
         update: fn delta: float {
             self.players -> for_each' fn _id: int, p: entity.Player {
                 p.try_grab' puck
@@ -57,11 +69,22 @@ new_game :: fn -> Game {
                 e.update' delta
             }
 
+            if self.scored_name_timeout > 0.0 {
+                self.scored_name_timeout -= delta
+                if self.scored_name_timeout < 0.0 {
+                    self.scored_name_timeout = 0.0
+                }
+            }
+
             particles.update' delta
         },
         draw: fn {
             self.arena.draw'
             particles.render'
+
+            if self.scored_name_timeout > 0.0 && self.scored_name != "" {
+                text.draw_text' 0.005, 0.795, 1.0, self.scored_name + " scored!", BLACK
+                text.draw_text' 0.0, 0.8, 1.0, self.scored_name + " scored!", self.scored_name_color
 
             if config.SHOW_TUTORIAL {
                 black :: (0., 0., 0., 1.)
@@ -113,8 +136,8 @@ new_game :: fn -> Game {
 
             mupps.draw'
 
-            text.draw_text' -0.1, 0.9, 1., as_str(self.score[0]), (255., 0., 0., 255.) / 255.
-            text.draw_text' 0.1,  0.9, 1., as_str(self.score[1]), (30., 194., 58., 255.) / 255.
+            text.draw_text' -0.1, 0.9, 1., as_str(self.score[0]), RED
+            text.draw_text' 0.1,  0.9, 1., as_str(self.score[1]), GREEN
         },
         process_input: fn {
             delta := l_delta'
@@ -385,7 +408,8 @@ collision_check :: fn delta:float, game: Game {
                 if :entity.Puck is a && dot(a.vel, in_col.normal) < 0.0 && col.depth > 0.03 {
                     particles.goal' a.pos
                     n_rpc_clients' particles.goal, a.pos
-                    game.score += (0 if game.puck.pos[0] < 0. else 1, 1 if game.puck.pos[0] < 0. else 0)
+                    team := 0 if game.puck.pos[0] > 0. else 1
+                    game.score += (1 - team, team)
                     game.puck.vel *= 0.0
                     game.puck.pos *= 0.0
                     if :entity.Player is game.puck.holder {
@@ -394,6 +418,17 @@ collision_check :: fn delta:float, game: Game {
                     }
                     assets.random_cheer()
                     game.puck.holder = nil
+
+                    if !(game.puck.last_holder is nil) {
+                        last_holder: !entity.Player = game.puck.last_holder
+                        game.scored_name = last_holder.name
+                    } else {
+                        game.scored_name = ""
+                    }
+                    game.scored_name_timeout = SCORE_NAME_TIMEOUT
+                    game.scored_name_color = RED if team == 0 else GREEN
+
+                    game.puck.last_holder = nil
                 }
                 collision.solve' in_col
             } else {
@@ -464,7 +499,7 @@ update :: fn delta: float -> void {
     }
 }
 
-set_entities :: fn incoming_entities: [entity.Entity], incoming_players: {int: entity.Player}, incomming_arena: arena_mod.Arena, incoming_score: (int, int) {
+set_entities :: fn incoming_entities: [entity.Entity], incoming_players: {int: entity.Player}, incomming_arena: arena_mod.Arena, incoming_score: (int, int), scored_name: str, scored_name_timeout: float, scored_name_color: (float, float, float, float) {
     state := last(states)
     if :GameState is state {
         state : !GameState = state
@@ -474,6 +509,10 @@ set_entities :: fn incoming_entities: [entity.Entity], incoming_players: {int: e
         game.players = incoming_players
         game.arena = incomming_arena
         game.score = incoming_score
+
+        game.scored_name = scored_name
+        game.scored_name_timeout = scored_name_timeout
+        game.scored_name_color = scored_name_color
     }
 }
 
