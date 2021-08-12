@@ -8,7 +8,4 @@ edition = "2018"
 [dependencies]
 
 gumdrop = "0.8"
-sylt = { path = "sylt/sylt" }
-
-[patch.'https://github.com/sornas/lingon.git']
-lingon = { path = "lingon" }
+sylt = { git = "http://github.com/FredTheDino/sylt-lang.git", tag = "v0.1.0" }
