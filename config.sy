@@ -10,6 +10,8 @@ VOLUME := 5
 MAX_VOLUME :: 10
 VOLUME_FLOAT := as_float(VOLUME) / as_float(MAX_VOLUME)
 
+NAME := ""
+
 new_settings_state :: fn -> game.State {
     self : !game.State = nil
 

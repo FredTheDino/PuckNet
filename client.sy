@@ -3,8 +3,6 @@ use connect
 use game
 use text
 
-NAME := ""
-
 new_client_state :: fn ip: str -> game.GameState {
     print ip
     n_rpc_connect' ip, config.SERVER_PORT
@@ -67,11 +65,11 @@ new_name_input_state :: fn -> game.State {
     self = game.State {
         name: "PuckNET name input",
         update: fn delta: float {
-            text_input_response := l_text_input_update' NAME
-            NAME = text_input_response[0]
+            text_input_response := l_text_input_update' config.NAME
+            config.NAME = text_input_response[0]
             if text_input_response[1] {
                 l_set_text_input_enabled' false
-                if NAME == "" {
+                if config.NAME == "" {
                     game.states -> pop'
                     ret
                 }
@@ -82,7 +80,7 @@ new_name_input_state :: fn -> game.State {
         },
         draw: fn {
             flashing := "_" if rem(floor(l_time() * 2.0), 2) == 0 else " "
-            text.draw_text' 0.0, 0.2, 1.0, NAME + flashing, (255., 255., 255., 255.) / 255.
+            text.draw_text' 0.0, 0.2, 1.0, config.NAME + flashing, (255., 255., 255., 255.) / 255.
         },
         process_input: fn {},
         cleanup: fn {},

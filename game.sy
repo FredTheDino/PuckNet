@@ -379,7 +379,7 @@ menu_state :: State {
         if main_menu.line_selected {
             if main_menu_lines[main_menu.line_index] == "Connect" {
                 // When we break out of the client loop, return here.
-                if client.NAME == "" {
+                if config.NAME == "" {
                     states -> push' client.new_name_input_state'
                 } else {
                     states -> push' connect.new_browser_state'
