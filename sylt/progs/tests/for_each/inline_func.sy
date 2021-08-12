@@ -1,5 +1,0 @@
-start :: fn {
-    for_each([1,2,3], fn a:int {
-        a > 0 <=> true
-    })
-}
